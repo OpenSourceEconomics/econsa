@@ -1,0 +1,25 @@
+name: econsa
+
+channels:
+  - defaults
+  - conda-forge
+  - opensourceeconomics
+
+dependencies:
+
+  - python=3.7
+  - pandas>=0.25
+  - numpy=1.16
+  - scipy
+  - jupyter
+  - seaborn
+  - pytest
+  - numba
+  - pip=19.3.1
+  - pdbpp
+  - chaospy
+  - pip:
+    - salib==1.3.8
+    - isort
+    - black
+
