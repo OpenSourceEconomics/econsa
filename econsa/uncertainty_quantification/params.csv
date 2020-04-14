@@ -1,0 +1,31 @@
+category,name,value,comment
+delta,delta,0.95,discount factor
+wage_a,constant,9.21,log of rental price
+wage_a,exp_edu,0.038,return to an additional year of schooling
+wage_a,exp_a,0.033,return to same sector experience
+wage_a,exp_a_square,-0.0005,"return to same sector, quadratic experience"
+wage_a,exp_b,0,return to other sector experience
+wage_a,exp_b_square,0,"return to other sector, quadratic experience"
+wage_b,constant,8.48,log of rental price
+wage_b,exp_edu,0.07,return to an additional year of schooling
+wage_b,exp_b,0.067,return to same sector experience
+wage_b,exp_b_square,-0.001,"return to same sector, quadratic experience"
+wage_b,exp_a,0.022,return to other sector experience
+wage_b,exp_a_square,-0.0005,"return to other sector, quadratic experience"
+nonpec_edu,constant,0,constant reward for choosing education
+nonpec_edu,at_least_twelve_exp_edu,0,"reward for going to college (tuition, etc.)"
+nonpec_edu,not_edu_last_period,-4000,reward for going back to school
+nonpec_home,constant,17750,constant reward of non-market alternative
+shocks_chol,chol_a,0.2,"Element 1,1 of standard-deviation/correlation matrix"
+shocks_chol,chol_b_a,0,"Element 2,2 of standard-deviation/correlation matrix"
+shocks_chol,chol_b,0.25,"Element 3,3 of standard-deviation/correlation matrix"
+shocks_chol,chol_edu_a,0,"Element 4,4 of standard-deviation/correlation matrix"
+shocks_chol,chol_edu_b,0,"Element 2,1 of standard-deviation/correlation matrix"
+shocks_chol,chol_edu,1500,"Element 3,1 of standard-deviation/correlation matrix"
+shocks_chol,chol_home_a,0,"Element 3,2 of standard-deviation/correlation matrix"
+shocks_chol,chol_home_b,0,"Element 4,1 of standard-deviation/correlation matrix"
+shocks_chol,chol_home_edu,0,"Element 4,2 of standard-deviation/correlation matrix"
+shocks_chol,chol_home,1500,"Element 4,3 of standard-deviation/correlation matrix"
+lagged_choice_1_edu,probability,1,Probability that the first lagged choice is education (simulation only)
+initial_exp_edu_10,probability,1,Probability that the initial level of education is 10
+maximum_exp,edu,20,"Maximum level of experience for education (optional, reduces computation complexity)"
