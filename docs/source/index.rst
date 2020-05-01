@@ -1,14 +1,27 @@
-.. econsa documentation master file, created by
-   sphinx-quickstart on Wed Apr 22 16:54:14 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to econsa's documentation!
 ==================================
+econsa is a Python toolbox for uncertainty quantification and 
+sensitivity analysis tailored to economic models.
+
+
+econsa paper
+============
+
+The paper based on econsa can be found here: 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   getting_started/index
+   uncertainty_quantification/index
+   tutorials/index
+   utilities/index
+   theory/index
+   faq
+   contributing/index
+   versions
+   acknowledgement
 
 
 
