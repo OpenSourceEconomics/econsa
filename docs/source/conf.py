@@ -16,6 +16,20 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import os
+import sys
+
+
+# Add custom CSS
+def setup(app):
+    app.add_stylesheet("css/custom.css")
+
+
+sys.path.insert(0, os.path.abspath("../.."))
+
+# Set variable so that todos are shown in local build
+on_rtd = os.environ.get("READTHEDOCS") == "True"
+
 
 # -- Project information -----------------------------------------------------
 
@@ -39,6 +53,15 @@ release = '0.01'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.todo",
+    "sphinx.ext.coverage",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.mathjax",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+    "nbsphinx",
     'sphinx.ext.doctest',
 ]
 
