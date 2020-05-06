@@ -4,11 +4,6 @@ econsa is a Python toolbox for uncertainty quantification and
 sensitivity analysis tailored to economic models.
 
 
-econsa paper
-============
-
-The paper based on econsa can be found here: 
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -18,6 +13,7 @@ The paper based on econsa can be found here:
    tutorials/index
    utilities/index
    theory/index
+   research/index
    faq
    contributing/index
    versions
