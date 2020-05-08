@@ -29,7 +29,8 @@ sys.path.insert(0, os.path.abspath("../.."))
 
 # Set variable so that todos are shown in local build
 on_rtd = os.environ.get("READTHEDOCS") == "True"
-
+if not on_rtd:
+    todo_include_todos = True
 
 # -- Project information -----------------------------------------------------
 

@@ -1,6 +1,6 @@
 Welcome to econsa's documentation!
 ==================================
-econsa is a Python toolbox for uncertainty quantification and 
+econsa is a Python toolbox for uncertainty quantification and
 sensitivity analysis tailored to economic models.
 
 
@@ -9,7 +9,7 @@ sensitivity analysis tailored to economic models.
    :caption: Contents:
 
    getting_started/index
-   uncertainty_quantification/index
+   methods/index
    tutorials/index
    utilities/index
    theory/index
@@ -18,7 +18,7 @@ sensitivity analysis tailored to economic models.
    contributing/index
    versions
    acknowledgement
-
+   resources
 
 
 Indices and tables
