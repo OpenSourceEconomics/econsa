@@ -24,3 +24,9 @@ Books
 * https://www.springer.com/gp/book/9783319123844
 
 * ...
+
+---------------
+Popular science
+---------------
+
+* https://www.amazon.de/Radical-Uncertainty-Decision-making-unknowable-English-ebook/dp/B07SZLGZYH/ref=sr_1_1?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2VSDVAW3UZCLG&dchild=1&keywords=radical+uncertainty&qid=1589128882&sprefix=radical+uncer%2Caps%2C180&sr=8-1
