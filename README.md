@@ -8,3 +8,15 @@ Install the package with
 $ conda install -c opensourceeconomics econsa
 
 ```
+
+
+## Supported by
+
+<p align="center">
+
+  <a href="https://github.com/OpenSourceEconomics">
+     <img src="docs/source/images/ose_logo.jpg" width="150"
+     alt="Open Source Economics">
+  </a>
+
+</p>
