@@ -12,10 +12,10 @@ $ conda install -c opensourceeconomics econsa
 
 ## Supported by
 
-<p align="center">
+<p align="left">
 
   <a href="https://github.com/OpenSourceEconomics">
-     <img src="docs/source/images/ose-logo.jpg" width="150"
+     <img src="docs/source/images/ose-logo.jpg" width="250"
      alt="Open Source Economics">
   </a>
 
