@@ -9,10 +9,10 @@ sensitivity analysis tailored to economic models.
    :caption: Contents:
 
    getting_started/index
+   motivation/index
    methods/index
    tutorials/index
    utilities/index
-   theory/index
    research/index
    faq
    contributing/index
