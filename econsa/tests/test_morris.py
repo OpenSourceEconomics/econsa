@@ -7,7 +7,7 @@ from numpy.testing import assert_array_almost_equal as aaae
 # from morris import elementary_effects
 from pandas.testing import assert_series_equal
 
-from morris import (
+from econsa.morris import (
     _shift_cov,
     _shift_sample,
     _uniform_to_standard_normal,
