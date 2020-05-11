@@ -17,7 +17,7 @@ $ conda install -c opensourceeconomics econsa
 <p align="left">
 
   <a href="https://github.com/OpenSourceEconomics">
-     <img src="docs/source/images/ose-logo.jpg" width="250"
+     <img src="docs/_static/images/images/ose-logo.jpg" width="250"
      alt="Open Source Economics">
   </a>
 

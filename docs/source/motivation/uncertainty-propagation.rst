@@ -4,16 +4,18 @@ Uncertainty Propagation
 Prediction
 ----------
 
-We want to have an image such as the one below following one of the policy predictions in KW97 model.
+We want to have an image such as the one below following some simple model. The codes for these graphs are available in _static/codes.
 
-.. image:: ../images/fig-quantity-of-interest.png
-   :width: 250
+.. image:: ../../_static/images/fig-illustration-density.png
+  :width: 250
 
+.. image:: ../../_static/images/fig-illustration-reliability.png
+  :width: 250
 
 Forecasting
 -----------
 
-We want to have an image such as below produced from looking at the predictions regarding future share in labor market occupations from a KW97 model.
+We want to have an image such as below produced from some simple model.
 
-.. image:: ../images/fig-fan-chart.png
-   :width: 250
+.. image:: ../../_static/images/fig-fan-chart.png
+  :width: 250
