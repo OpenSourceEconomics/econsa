@@ -1,5 +1,7 @@
 # econsa
 
+![CI](https://github.com/OpenSourceEconomics/econsa/workflows/CI/badge.svg)
+
 Conda installable package comprising of a python toolbox for uncertainty quantification and sensitivity analysis tailored to economic models.
 
 Install the package with
