@@ -16,4 +16,3 @@ platform - we are eager to hear from you.
    :maxdepth: 2
 
    academic
-   thesis

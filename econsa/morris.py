@@ -9,6 +9,8 @@ normal variables. To not get confused, we use the following naming conventions:
 
 This is vaguely in line with the paper but more explicit.
 
+Contributor: Janos Gaabler
+
 """
 import numba as nb
 import numpy as np
