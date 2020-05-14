@@ -26,4 +26,4 @@ jobs:
       shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
-        cd docs/_static/codes/fig-illustrations.py
+        cd docs/_static/codes; python fig-illustrations.py
