@@ -1,7 +1,7 @@
 ===============
 Getting Started
 ===============
-econsa is a Python toolbox for uncertainty quantification and
+``econsa`` is a Python toolbox for uncertainty quantification and
 sensitivity analysis tailored to economic models.
 
 .. toctree::
