@@ -49,7 +49,9 @@ def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_co
     mean_np = params["value"].to_numpy()
     cov_np = cov.to_numpy()
 
-    dep_samples_ind_x, a_sample_ind_x = _dependent_draws(z_a, z_b, mean_np, cov_np, "ind")
+    dep_samples_ind_x, a_sample_ind_x = _dependent_draws(
+        z_a, z_b, mean_np, cov_np, "ind"
+    )
 
     dep_samples_corr_x, _ = _dependent_draws(z_a, z_b, mean_np, cov_np, "corr")
 
@@ -59,7 +61,6 @@ def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_co
         pd.to_pickle(evals_ind, evals_ind_path)
     else:
         evals_ind = pd.read_pickle(evals_ind_path)
-
 
     evals_base_ind_path = Path("bld/evals/evals_base_ind")
     if not evals_base_ind_path.exists():
@@ -79,12 +80,19 @@ def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_co
 
     deltas = u_b - u_a
 
-    mu_ind, sigma_ind = _calculate_indices(evals_ind, evals_base_ind, deltas, params.index)
-    mu_corr, sigma_corr = _calculate_indices(evals_corr, evals_base_corr, deltas, params.index)
+    mu_ind, sigma_ind = _calculate_indices(
+        evals_ind, evals_base_ind, deltas, params.index
+    )
+    mu_corr, sigma_corr = _calculate_indices(
+        evals_corr, evals_base_corr, deltas, params.index
+    )
 
-
-    mu_ind_cum, sigma_ind_cum = _calculate_cumulative_indices(evals_ind, evals_base_ind, deltas, params.index)
-    mu_corr_cum, sigma_corr_cum = _calculate_cumulative_indices(evals_corr, evals_base_corr, deltas, params.index)
+    mu_ind_cum, sigma_ind_cum = _calculate_cumulative_indices(
+        evals_ind, evals_base_ind, deltas, params.index
+    )
+    mu_corr_cum, sigma_corr_cum = _calculate_cumulative_indices(
+        evals_corr, evals_base_corr, deltas, params.index
+    )
 
     res = {
         "mu_ind": mu_ind,
@@ -94,9 +102,8 @@ def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_co
         "mu_ind_cum": mu_ind_cum,
         "mu_corr_cum": mu_corr_cum,
         "sigma_ind_cum": sigma_ind_cum,
-        "sigma_corr_cum": sigma_corr_cum
+        "sigma_corr_cum": sigma_corr_cum,
     }
-
 
     return res
 
@@ -119,7 +126,9 @@ def _get_uniform_base_draws(n_draws, n_params, sampling_scheme):
 
     """
     if sampling_scheme == "sobol":
-        u = cp.generate_samples(order=n_draws * 2 * n_params, rule="S").reshape(n_draws, -1)
+        u = cp.generate_samples(order=n_draws * 2 * n_params, rule="S").reshape(
+            n_draws, -1
+        )
     elif sampling_scheme == "random":
         u = np.random.uniform(low=1e-5, high=1 - 1e-5, size=(n_draws, 2 * n_params))
     else:
@@ -176,7 +185,7 @@ def _dependent_draws(z_a, z_b, mean, cov, kind):
 
     if kind == "ind":
         shift = np.arange(n_params).astype(int) + 1
-        diag_pos = - 1
+        diag_pos = -1
     elif kind == "corr":
         shift = np.arange(n_params).astype(int)
         diag_pos = 0
@@ -192,7 +201,6 @@ def _dependent_draws(z_a, z_b, mean, cov, kind):
 
     ab_sample_z_shifted = a_sample_z_shifted.copy()
     ab_sample_z_shifted[:, :, diag_pos] = z_b
-
 
     shifted_covs = np.zeros((n_params, n_params, n_params))
     for p, s in enumerate(shift):
@@ -342,4 +350,3 @@ def _calculate_cumulative_indices(evals, evals_a, deltas, params_index):
     cum_sigma = ee_df.rolling(n_draws, min_periods=2).std()
 
     return cum_mu, cum_sigma
-

@@ -16,10 +16,7 @@ setup(
     author_email="linda.maokomatanda@gmail.com",
     packages=p,
     zip_safe=False,
-    package_data={
-        "utilities": [
-            ]
-    },
+    package_data={"utilities": []},
     include_package_data=True,
 )
 
