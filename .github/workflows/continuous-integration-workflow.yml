@@ -14,9 +14,16 @@ jobs:
            activate-environment: econsa
            environment-file: environment.yml
            python-version: 3.7
-
+    - uses: ammaraskar/sphinx-action@master
+      with:
+          docs-folder: "docs/"
     - name: run tests
       shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
         pytest
+    - name: run figures
+      shell: bash -l {0}
+      run: |
+        export PATH="$PATH:/usr/share/miniconda/bin"
+        cd docs/_static/codes/fig-illustrations.py
