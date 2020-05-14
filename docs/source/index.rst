@@ -1,7 +1,15 @@
 Welcome to econsa's documentation!
 ==================================
-econsa is a Python toolbox for uncertainty quantification and
-sensitivity analysis tailored to economic models.
+
+
+	*I prefer true but imperfet knowledge, even if it leaves
+	much indetermined and unpredictable, to a pretence of
+	exact knowledge that is likely to be false.*
+
+	| -- FRIEDRICH VON HAYEK, 
+	| Nobel Price Lecture, 1974
+	
+
 
 
 .. toctree::
