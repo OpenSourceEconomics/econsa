@@ -20,9 +20,9 @@ econsa
 Supported by
 ------------
 
-.. image:: ./docs/_static/images/ose-logo.jpg
+.. image:: docs/_static/images/ose-logo.jpg
    :height: 100px
-   :width: 200 px
-   :scale: 50 %
+   :width: 200px
+   :scale: 50%
    :alt: alternate text
    :align: right
