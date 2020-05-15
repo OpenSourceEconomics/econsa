@@ -29,5 +29,5 @@ econsa
 Supported by
 ------------
 
-.. image:: docs/_static/images/ose-logo-small.jpg
+.. image:: docs/_static/images/ose-logo.jpg
     :target: https://github.com/OpenSourceEconomics
