@@ -56,6 +56,7 @@ def test_shift_cov():
     calculated = _shift_cov(cov, 2)
     aaae(calculated, expected)
 
+
 @pytest.mark.skip(reason="we are investigating")
 def test_ee():
     def model_func(params):
