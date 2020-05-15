@@ -18,4 +18,5 @@ Supported by
 ------------
 
 .. image:: ./docs/_static/images/ose-logo.jpg
-    :width: 1
+  :target: https://econsa.readthedocs.io/en/latest
+  :width: 1
