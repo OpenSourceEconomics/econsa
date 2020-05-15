@@ -14,18 +14,21 @@ jobs:
            activate-environment: econsa
            environment-file: environment.yml
            python-version: 3.7
-    - uses: ammaraskar/sphinx-action@master
-      with:
-          docs-folder: "docs/"
+
     - name: run tests
       shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
-        pytest
+        pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
         flake8-nb; [ $? -eq 0 ] || exit 1
         black-nb .; [ $? -eq 0 ] || exit 1
+
+    - name: upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        file: .coverage
 
     - name: run figures
       shell: bash -l {0}
