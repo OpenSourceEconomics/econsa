@@ -27,4 +27,5 @@ dependencies:
     - black
     - black-nb
     - flake8-nb
+    - sphinx_rtd_theme
     - nbsphinx
