@@ -28,7 +28,7 @@ Supported by
 <p align="center">
 
   <a href="https://github.com/OpenSourceEconomics">
-     <img src="docs/source/_static/images/ose-logo.jpg" width="150"
+     <img src="docs/source/_static/images/ose-logo-small.jpg" width="150"
      alt="Open Source Economics">
   </a>
   &emsp;
