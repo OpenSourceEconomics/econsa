@@ -25,9 +25,13 @@ econsa
 Supported by
 ------------
 
-.. image:: docs/_static/images/ose-logo.jpg
-   :height: 10px
-   :width: 20px
-   :scale: 50%
-   :alt: alternate text
-   :align: right
+<p align="center">
+
+  <a href="https://github.com/OpenSourceEconomics">
+     <img src="docs/source/_static/images/ose-logo.jpg" width="150"
+     alt="Open Source Economics">
+  </a>
+  &emsp;
+
+
+</p>
