@@ -8,7 +8,8 @@ setup(
     name="econsa",
     version="0.1.5",
     description=(
-        "Conda installable package comprising of a python toolbox for uncertainty quantification and sensitivity analysis tailored to economic models."
+        "Conda installable package comprising of a python toolbox for uncertainty "
+        "quantification and sensitivity analysis tailored to economic models."
     ),
     license="MIT",
     url="https://github.com/OpenSourceEconomics/econsa",
@@ -19,4 +20,3 @@ setup(
     package_data={"utilities": []},
     include_package_data=True,
 )
-
