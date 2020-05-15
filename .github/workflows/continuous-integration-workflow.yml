@@ -22,7 +22,7 @@ jobs:
       shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
-        pytest --cov=test_integration
+        pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
         flake8-nb; [ $? -eq 0 ] || exit 1
