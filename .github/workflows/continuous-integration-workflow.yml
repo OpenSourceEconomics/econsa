@@ -9,7 +9,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: codecov/codecov-action@v1
     - uses: goanpeca/setup-miniconda@v1.0.2
       with:
            activate-environment: econsa
@@ -30,9 +29,9 @@ jobs:
         black-nb .; [ $? -eq 0 ] || exit 1
 
     - name: upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          file: .coverage
+      uses: codecov/codecov-action@v1
+      with:
+        file: .coverage
 
     - name: run figures
       shell: bash -l {0}
