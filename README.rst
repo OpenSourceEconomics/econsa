@@ -18,4 +18,4 @@ Supported by
 ------------
 
 .. image:: ./docs/_static/images/ose-logo.jpg
-    :width: 10
+    :width: 1
