@@ -18,5 +18,5 @@ Supported by
 ------------
 
 .. image:: ./docs/_static/images/ose-logo.jpg
-  :target: https://econsa.readthedocs.io/en/latest
-  :width: 1
+  :target: https://github.com/OpenSourceEconomics
+  :scale: 50
