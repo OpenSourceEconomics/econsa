@@ -19,4 +19,3 @@ setup(
     package_data={"utilities": []},
     include_package_data=True,
 )
-
