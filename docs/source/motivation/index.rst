@@ -6,9 +6,11 @@ Motivation
 
   We will write this once we have a first version of our paper on the topic out. Then we can take most of the material from there. We will NOT use any KW97 model examples here. Just very simple models to make the point. Too much effort to maintain otherwise.
 
-uncertainty quantification, how does the uncertainty in input parameters propagate through the model
+We will first discuss the issue of uncertainty propagation and then discuss sensitivity analysis.
 
-sensitivity analysis, hierarchization of input parameter with respect to the resulting uncertainty.
+**Example**
+
+We will use Ford W. Harris’ economic order quantity model (Harris EOQ, henceforth) (Harris, 1913) as our running example throughout this section
 
 .. toctree::
    :maxdepth: 2
