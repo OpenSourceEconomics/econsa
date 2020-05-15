@@ -14,9 +14,9 @@ jobs:
            activate-environment: econsa
            environment-file: environment.yml
            python-version: 3.7
-    - uses: ammaraskar/sphinx-action@master
-      with:
-          docs-folder: "docs/"
+#    - uses: ammaraskar/sphinx-action@master
+#      with:
+#          docs-folder: "docs/"
 
     - name: run tests
       shell: bash -l {0}
