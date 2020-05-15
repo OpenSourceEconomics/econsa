@@ -23,4 +23,5 @@ Supported by
 .. image:: ./docs/_static/images/ose-logo.jpg
     :target: https://github.com/OpenSourceEconomics
     :width: 10
+    :height: 10
     :scale: 50
