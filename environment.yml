@@ -8,6 +8,7 @@ channels:
 dependencies:
 
   - python=3.7
+  - sphinx>=1.4
   - pandas>=0.25
   - numpy=1.16
   - scipy
@@ -26,3 +27,4 @@ dependencies:
     - black
     - black-nb
     - flake8-nb
+    - nbsphinx
