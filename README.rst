@@ -18,12 +18,14 @@ econsa
 .. image:: https://github.com/OpenSourceEconomics/econsa/workflows/CI/badge.svg
     :target: https://github.com/OpenSourceEconomics/econsa/actions?query=branch%3Amaster
 
+.. image:: https://app.codacy.com/project/badge/Grade/b9d3b1fd4e2a461aa47e212e80f6a0eb
+    :target: https://www.codacy.com/gh/OpenSourceEconomics/econsa?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenSourceEconomics/econsa&amp;utm_campaign=Badge_Grade
+
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
-
 .. image:: https://codecov.io/gh/OpenSourceEconomics/econsa/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/OpenSourceEconomics/econsa
+    :target: https://codecov.io/gh/OpenSourceEconomics/econsa
 
 
 Supported by
