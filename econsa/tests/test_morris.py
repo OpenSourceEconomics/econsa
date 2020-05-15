@@ -2,10 +2,6 @@ import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_almost_equal as aaae
 
-# from morris import _swap_positions_in_cov, _swap_diag_with_pos_in_sample
-# from morris import _update_covariance, _update_mean, _evaluate_model, _calculate_indices
-# from morris import elementary_effects
-from pandas.testing import assert_series_equal
 
 from econsa.morris import (
     _shift_cov,
@@ -75,4 +71,4 @@ def test_ee():
     )
     n_draws = 100
 
-    res = elementary_effects(model_func, params, cov, n_draws)
+    elementary_effects(model_func, params, cov, n_draws)

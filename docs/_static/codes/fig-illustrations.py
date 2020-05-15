@@ -1,6 +1,5 @@
 from functools import partial
 
-from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 import numpy as np
