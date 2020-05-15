@@ -22,6 +22,11 @@ jobs:
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
         pytest
+
+        # We want to make sure proper formatting of the notebooks.
+        flake8-nb; [ $? -eq 0 ] || exit 1
+        black-nb .; [ $? -eq 0 ] || exit 1
+
     - name: run figures
       shell: bash -l {0}
       run: |
