@@ -15,6 +15,11 @@ econsa
 
 ----
 
+
+    I prefer true but imperfet knowledge, even if it leaves much indetermined and unpredictable, to a pretence of exact knowledge that is likely to be false.
+
+    -- Friedrich von Hayek
+
 **econsa** is an open source package for economists that facilitates the sound analysis of computational economic models. It offers suitable methods for uncertainty propagation and global sensitivity analysis.
 
 Supported by
