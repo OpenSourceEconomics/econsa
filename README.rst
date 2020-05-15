@@ -10,10 +10,12 @@ econsa
 .. image:: https://github.com/OpenSourceEconomics/econsa/workflows/CI/badge.svg
     :target: https://github.com/OpenSourceEconomics/econsa/actions?query=branch%3Amaster
 
+----
+
 **econsa** is an open source package for economists that facilitates the sound analysis of computational economic models. It offers suitable methods for uncertainty propagation and global sensitivity analysis.
 
 Supported by
 ------------
 
 .. image:: ./docs/_static/images/ose-logo.jpg
-    :scale: 50%
+    :width: 400
