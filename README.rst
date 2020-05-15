@@ -22,6 +22,10 @@ econsa
     :target: https://github.com/psf/black
 
 
+.. image:: https://codecov.io/gh/OpenSourceEconomics/econsa/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/OpenSourceEconomics/econsa
+
+
 Supported by
 ------------
 
