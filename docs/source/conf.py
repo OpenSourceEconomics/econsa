@@ -63,6 +63,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "nbsphinx",
+    "sphinx.ext.mathjax",
     "sphinx.ext.doctest",
 ]
 
