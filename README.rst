@@ -2,12 +2,14 @@ econsa
 ======
 
 
-    I prefer true but imperfect knowledge, even if it leaves much indetermined and unpredictable, to a pretence of exact knowledge that is likely to be false.
+    I prefer true but imperfect knowledge, even if it leaves much undetermined and unpredictable, to a pretence of exact knowledge that is likely to be false.
 
     -- Friedrich von Hayek
 
 **econsa** is an open source package for economists that facilitates the sound analysis of computational economic models. It offers suitable methods for uncertainty propagation and global sensitivity analysis.
 
+Please visit our `online documentation <https://econsa.readthedocs.io/en/latest/>`_ for
+tutorials and other information.
 
 .. image:: https://readthedocs.org/projects/econsa/badge/?version=latest
     :target: https://econsa.readthedocs.io/en/latest
@@ -26,6 +28,9 @@ econsa
 
 .. image:: https://codecov.io/gh/OpenSourceEconomics/econsa/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/OpenSourceEconomics/econsa
+
+.. image:: https://img.shields.io/badge/zulip-join_chat-brightgreen.svg
+    :target: https://ose.zulipchat.com
 
 
 Supported by
