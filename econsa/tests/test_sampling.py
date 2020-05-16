@@ -5,5 +5,5 @@ This module contains all tests for th sampling setup.
 """
 
 
-def test_mock():
+def test_sampling():
     pass

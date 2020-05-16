@@ -5,5 +5,5 @@ This module contains all tests for th Sobol indices.
 """
 
 
-def test_mock():
+def test_sobol():
     pass
