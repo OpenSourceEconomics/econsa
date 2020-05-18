@@ -31,6 +31,126 @@ from econsa.morris import (
     elementary_effects,
 )
 
+
+# # Harris Model from [Sensitivity analysis: A review of recent advances](https://www.sciencedirect.com/science/article/abs/pii/S0377221715005469)
+
+# ## EOQ Function
+
+def eoq_harris(params, x):
+    """
+    Economic order quantity model by Ford Harris,
+    as seen in Borgonovoa & Plischkeb (2016),
+    https://doi.org/10.1016/j.ejor.2015.06.032
+    Equation: T = (sqrt(S / 2*12*r*M)+sqrt(C))^2,
+    or y = sqrt(24*r*x1*x3 / x2)
+    
+    Args: 
+        params (np.array): 2d numpy array,
+                           cuurrently only contains interest rate,
+                           which is 24*10.
+        x (np.array or list): n-d numpy array with the independent variables,
+                      currently it only takes 3 dims.
+    Output:
+        y (np.array): D-d numpy array with the dependent variables
+    """
+    x_np = np.array(x)
+    
+    y = np.zeros(x_np.T.shape[0])
+    y = np.sqrt((params[0,0] * x_np[0] * x_np[2])/x_np[1])
+    
+    return(y)
+
+
+params = np.zeros(shape=(1,1))
+params[0,0] = 240
+params
+
+# ## Data Generation
+
+# +
+# Set flags
+
+seed = 1234
+n = 10000
+x_min_multiplier = 0.9
+x_max_multiplier = 1.1
+x0_1 = 1230
+x0_2 = 0.0135
+x0_3 = 2.15
+# -
+
+x_min_multiplier*x0_1, x_max_multiplier*x0_1
+
+# no Monte Carlo
+np.random.seed(seed)
+x_1 = np.random.uniform(low=x_min_multiplier*x0_1,
+                        high=x_max_multiplier*x0_1,
+                        size=n)
+x_2 = np.random.uniform(low=x_min_multiplier*x0_2,
+                                  high=x_max_multiplier*x0_2,
+                                  size=n)
+x_3 = np.random.uniform(low=x_min_multiplier*x0_3,
+                                  high=x_max_multiplier*x0_3,
+                                  size=n)
+plt.clf()
+sns.distplot(x_1)
+
+# ### Monte Carlo with `rvs`
+
+np.random.seed(seed)
+x_1 = stats.uniform(x_min_multiplier*x0_1,
+                    x_max_multiplier*x0_1).rvs(10000)
+x_2 = stats.uniform(x_min_multiplier*x0_2,
+                    x_max_multiplier*x0_2).rvs(10000)
+x_3 = stats.uniform(x_min_multiplier*x0_3,
+                    x_max_multiplier*x0_3).rvs(10000)
+
+plt.clf()
+sns.distplot(x_1)
+
+x = np.array([x_1, x_2, x_3])
+
+x
+
+y0 = eoq_harris(params, [x0_1, x0_2, x0_3])
+y0
+
+np.array(x)
+
+y = eoq_harris(params, x)
+
+plt.clf()
+sns.distplot(y, hist_kws=dict(cumulative=True))
+
+plt.clf()
+sns.distplot(y)
+
+# ### Monte Carlo with Chaospy
+
+sample_rule = "random"
+
+np.random.seed(seed)
+x_1 = cp.Uniform(x_min_multiplier*x0_1,
+                 x_max_multiplier*x0_1).sample(n, rule=sample_rule)
+x_2 = cp.Uniform(x_min_multiplier*x0_2,
+                 x_max_multiplier*x0_2).sample(n, rule=sample_rule)
+x_3 = cp.Uniform(x_min_multiplier*x0_3,
+                 x_max_multiplier*x0_3).sample(n, rule=sample_rule)
+
+plt.clf()
+sns.distplot(x_1)
+
+x = np.array([x_1, x_2, x_3])
+x
+
+y = eoq_harris(params, x)
+
+plt.clf()
+sns.distplot(y, hist_kws=dict(cumulative=True))
+
+plt.clf()
+sns.distplot(y)
+
 # # Replicating: [Introducing Copula in Monte Carlo Simulation](https://towardsdatascience.com/introducing-copula-in-monte-carlo-simulation-9ed1fe9f905)
 
 # ## Random Variable Transformation
