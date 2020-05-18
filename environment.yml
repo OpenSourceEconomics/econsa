@@ -29,3 +29,5 @@ dependencies:
     - flake8-nb
     - sphinx_rtd_theme
     - nbsphinx
+    - numpydoc
+    - pydata-sphinx-theme
