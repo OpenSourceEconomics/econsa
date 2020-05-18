@@ -35,8 +35,8 @@ if not on_rtd:
 # -- Project information -----------------------------------------------------
 
 project = "econsa"
-copyright = "2020, Linda Maokomatanda"
-author = "Linda Maokomatanda"
+copyright = "2020, econsa dev-team"
+author = "econsa dev-team"
 
 # The short X.Y version
 version = ""
@@ -63,6 +63,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "nbsphinx",
+    "sphinx.ext.mathjax",
     "sphinx.ext.doctest",
 ]
 

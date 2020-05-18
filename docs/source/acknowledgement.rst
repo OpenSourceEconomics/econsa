@@ -1,21 +1,15 @@
 Acknowledgements
 =================
 
-``econsa`` was designed by Linda Maokomatanda on behalf of
-the OpenSourceEconomics initiative. It is currenlty under the maintainance of
-the OpenSorceEconomics initiative (`OSE
-<https://github.com/OpenSourceEconomics/econsa>`_) as a collaborative
-project.
+``econsa`` is developed and maintained as part of the `OpenSourceEconomics <https://OpenSourceEconomics.github.io>`_ initiative.
 
+**Project Manager**
 
+- Philipp Eisenhauer (`peisenha <https://github.com/peisenha>`_)
 
-Notable contributors are listed below, as well as where you can find and contact them:
+**Developers**
 
-- Linda Maokomatanda (`lindamaok899 <https://github.com/lindamaok899>`_).
-- Janos Gabler (`janosg <https://github.com/janosg>`_).
-
-
-
-
-Should you want to contribute, please contact us via the OSE platforms or browse through our
-issues and submit a Pull Request.
+- Linda Maokomatanda (`lindamaok899 <https://github.com/lindamaok899>`_)
+- Janos Gabler (`janosg <https://github.com/janosg>`_)
+- Tim Mensinger (`timmens <https://github.com/timmens>`_)
+- Leiqiong Wan (`loikein <https://github.com/loikein>`_)
