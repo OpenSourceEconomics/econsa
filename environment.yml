@@ -33,4 +33,3 @@ dependencies:
     - sphinx_rtd_theme
     - nbsphinx
     - numpydoc
-    - pydata-sphinx-theme
