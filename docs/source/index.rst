@@ -26,8 +26,7 @@ Welcome to econsa's documentation!
 
 *I prefer true but imperfect knowledge, even if it leaves much undetermined and unpredictable, to a pretence of exact knowledge that is likely to be false.*
 
-	| -- FRIEDRICH VON HAYEK,
-	| Nobel Price Lecture, 1974
+	| -- FRIEDRICH VON HAYEK, Nobel Price Lecture, 1974
 
 ``econsa`` is an open source package for economists that facilitates the sound analysis of computational economic models. It offers suitable methods for uncertainty propagation and global sensitivity analysis.
 

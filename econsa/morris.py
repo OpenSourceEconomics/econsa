@@ -7,10 +7,6 @@ normal variables. To not get confused, we use the following naming conventions:
 -z refers to standard normal variables
 -x refers to multivariate normal variables.
 
-This is vaguely in line with the paper but more explicit.
-
-Contributor: Janos Gabler
-
 """
 import numba as nb
 import numpy as np
