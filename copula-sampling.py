@@ -50,20 +50,55 @@ def eoq_harris(params, x):
     and takes a value of 10 in both papers.
     
     Args: 
-        params (np.array): 2d numpy array,
-                           cuurrently only contains interest rate,
-                           which is 10.
-        x (np.array or list): n-d numpy array with the independent variables,
-                              currently it only takes 3 dims.
+        params (np.array): 1d numpy array,
+                           cuurrently only need the first param,
+                           which is interest & depreciation rate, r=10.
+        x (np.array or list): 2d numpy array with the independent variables,
+                              currently only need the first 3 columns.
     Output:
-        y (np.array): D-d numpy array with the dependent variables
+        y (np.array): 1d numpy array with the dependent variables.
     """
+    
     x_np = np.array(x)
-    r = params[0,0]
+    r = params.flatten()[0]
     
     y = np.zeros(x_np.T.shape[0])
     y = np.sqrt((24 * r * x_np[0] * x_np[2])/x_np[1])
     
+    return(y)
+
+
+def eoq_harris_partial(params, x, fix_num=0):
+    """
+    Calculate the value of eoq_harris,
+    fixing one x.
+    
+    Args: 
+        params (np.array): 1d numpy array,
+                           cuurrently only need the first param,
+                           which is interest & depreciation rate, r=10.
+        x (np.array or list): 2d numpy array with the independent variables,
+                              currently only need the first 3 columns.
+        fix_num (int): take value of 0~n-1.
+    Output:
+        y (np.array): 2d numpy array with the dependent variables,
+                      keeping the fix_num-th x fixed.
+    """
+    
+    x_np = np.array(x)
+    r = params.flatten()[0]
+    
+    y = np.zeros(shape=(x_np.T.shape[0],x_np.T.shape[0]))
+    
+    if fix_num==0:
+        for i,x_i in enumerate(x_np[fix_num]):
+            y[i] = np.sqrt((24 * r * x_i * x_np[2])/x_np[1])
+    elif fix_num==1:
+        for i,x_i in enumerate(x_np[fix_num]):
+            y[i] = np.sqrt((24 * r * x_np[0] * x_np[2])/x_i)
+    elif fix_num==2:
+        for i,x_i in enumerate(x_np[fix_num]):
+            y[i] = np.sqrt((24 * r * x_np[0] * x_i)/x_np[1])
     return(y)
 
 
@@ -80,10 +115,10 @@ x_max_multiplier = 1.1
 x0_1 = 1230
 x0_2 = 0.0135
 x0_3 = 2.15
+# -
 
 params = np.zeros(shape=(1,1))
 params[0,0] = 10
-# -
 
 x_min_multiplier*x0_1, x_max_multiplier*x0_1
 
@@ -151,11 +186,43 @@ x
 
 y = eoq_harris(params, x)
 
+# ## Graphs
+
+# ### Fig. 2
+
 plt.clf()
 sns.distplot(y, hist_kws=dict(cumulative=True))
 
 plt.clf()
 sns.distplot(y)
+
+# ### Fig. 3
+
+plt.clf()
+sns.regplot(x=x[0], y=y,
+            scatter_kws={"alpha":0.05})
+
+plt.clf()
+sns.regplot(x=x[1], y=y, order=2,
+            scatter_kws={"alpha":0.05})
+
+plt.clf()
+sns.regplot(x=x[2], y=y,
+            scatter_kws={"alpha":0.05})
+
+# ### Fig. 4
+
+y_fix_x_0 = eoq_harris_partial(params, x, fix_num=0)
+
+y_fix_x_0.shape
+
+# +
+# don't try at home:
+# -
+
+plt.clf()
+for item in y_fix_x_0:
+    sns.kdeplot(item)
 
 # # Replicating: [Introducing Copula in Monte Carlo Simulation](https://towardsdatascience.com/introducing-copula-in-monte-carlo-simulation-9ed1fe9f905)
 
