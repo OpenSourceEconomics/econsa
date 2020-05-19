@@ -64,6 +64,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "nbsphinx",
     "sphinx.ext.mathjax",
+    "sphinxcontrib.bibtex",
     "sphinx.ext.doctest",
 ]
 
