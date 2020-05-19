@@ -15,6 +15,8 @@ Any computational economic model :math:`\boldsymbol{M}` provides a mapping betwe
 
 We will first discuss uncertainty propagation and then discuss sensitivity analysis.
 
+See :cite:`1987:nelson` for an introduction to non-standard analysis.
+
 **Example**
 
 We will use Ford W. Harris’ economic order quantity model (Harris EOQ, henceforth) (Harris, 1913) as our running example throughout this section

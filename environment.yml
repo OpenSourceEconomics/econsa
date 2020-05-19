@@ -32,3 +32,5 @@ dependencies:
     - flake8-nb
     - sphinx_rtd_theme
     - nbsphinx
+    - sphinxcontrib-bibtex
+    - numpydoc

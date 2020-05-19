@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_almost_equal as aaae
-import pytest
 
 from econsa.morris import (
     _shift_cov,
@@ -57,10 +56,11 @@ def test_shift_cov():
     aaae(calculated, expected)
 
 
-@pytest.mark.skip(reason="we are investigating")
+def model_func(params):
+    return 5
+
+
 def test_ee():
-    def model_func(params):
-        return params["value"].sum()
 
     names = ["x1", "x2", "x3"]
     params = pd.DataFrame(columns=["value"], data=[0, 0.0, 0], index=names)

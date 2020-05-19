@@ -57,3 +57,4 @@ Supported by
    versions
    acknowledgement
    resources
+   bibliography

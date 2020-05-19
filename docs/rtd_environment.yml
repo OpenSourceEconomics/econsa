@@ -1,6 +1,6 @@
 channels:
   - conda-forge
-  
+
 dependencies:
   - python=3.7
   - ipython
@@ -8,3 +8,5 @@ dependencies:
   - numpydoc
   - sphinx
   - jupyter_client
+  - pip:
+    - sphinxcontrib-bibtex
