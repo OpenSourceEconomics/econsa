@@ -61,7 +61,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
-    "sphinx.ext.napoleon",
+    "numpydoc",
     "nbsphinx",
     "sphinx.ext.mathjax",
     "sphinxcontrib.bibtex",
@@ -95,16 +95,24 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
+# Configuration for numpydoc
+numpydoc_xref_param_type = True
+numpydoc_xref_ignore = {"type", "optional", "default"}
+
+
 # TODO: This needs to be removed once possible.
 nbsphinx_execute = "never"
 nbsphinx_allow_errors = False
+
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+# html_theme = "sphinx_rtd_theme"
+
+html_theme = "pydata_sphinx_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

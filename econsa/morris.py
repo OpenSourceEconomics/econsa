@@ -3,13 +3,13 @@
 We convert frequently between iid uniform, iid standard normal and multivariate
 normal variables. To not get confused, we use the following naming conventions:
 
-- u refers to to uniform variables
-- z refers to standard normal variables
-- x refers to multivariate normal variables.
+-u refers to to uniform variables
+-z refers to standard normal variables
+-x refers to multivariate normal variables.
 
 This is vaguely in line with the paper but more explicit.
 
-Contributor: Janos Gaabler
+Contributor: Janos Gabler
 
 """
 import numba as nb
@@ -17,11 +17,10 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 import chaospy as cp
-from pathlib import Path
 from multiprocessing import Pool
 
 
-def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_cores=-1):
+def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_cores=1):
     """Calculate Morris Indices of a model described by func.
 
     The distribution of the parameters is assumed to be multivariate normal, with
@@ -30,18 +29,27 @@ def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_co
     The algorithm is based on Ge and Menendez, 2017, (GM17): Extending Morris method for
     qualitative global sensitivity analysis of models with dependent inputs.
 
-    Args:
-        func (function): Function that maps parameters into a quantity of interest.
-        params (pd.DataFrame): DataFrame with arbitrary index. There must be a column
-            called value that contains the mean of the parameter distribution.
-        cov (pd.DataFrame): Both the index and the columns are the same as the index
-            of params. The covariance matrix of the parameter distribution.
-        n_draws (int): Number of draws
-        sampling_scheme (str): one of ["sobol", "random"]. Default: "sobol"
+    Parameters
+    ----------
+    func : function
+        Function that maps parameters into a quantity of interest.
+    params : pd.DataFrame
+        DataFrame with arbitrary index. There must be a column
+        called value that contains the mean of the parameter distribution.
+    cov : pd.DataFrame
+        Both the index and the columns are the same as the index
+        of params. The covariance matrix of the parameter distribution.
+    n_draws : int
+        Number of draws
+    sampling_scheme : str
+        One of ["sobol", "random"]. Default: "sobol"
 
-    Returns:
-        mu_ind (float): Absolute mean of independent part of elementary effects
-        sigma_ind (float): Standard deviation of independent part of elementary effects
+    Returns
+    -------
+    mu_ind : float
+        Absolute mean of independent part of elementary effects
+    sigma_ind : float
+        Standard deviation of independent part of elementary effects
 
     """
     u_a, u_b = _get_uniform_base_draws(n_draws, len(params), sampling_scheme)
@@ -56,26 +64,11 @@ def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_co
 
     dep_samples_corr_x, _ = _dependent_draws(z_a, z_b, mean_np, cov_np, "corr")
 
-    evals_ind_path = Path("bld/evals/evals_ind.pickle")
-    if not evals_ind_path.exists():
-        evals_ind = _evaluate_model(func, params, dep_samples_ind_x, n_cores)
-        pd.to_pickle(evals_ind, evals_ind_path)
-    else:
-        evals_ind = pd.read_pickle(evals_ind_path)
+    evals_ind = _evaluate_model(func, params, dep_samples_ind_x, n_cores)
 
-    evals_base_ind_path = Path("bld/evals/evals_base_ind")
-    if not evals_base_ind_path.exists():
-        evals_base_ind = _evaluate_model(func, params, a_sample_ind_x, n_cores)
-        pd.to_pickle(evals_base_ind, evals_base_ind_path)
-    else:
-        evals_base_ind = pd.read_pickle(evals_base_ind_path)
+    evals_base_ind = _evaluate_model(func, params, a_sample_ind_x, n_cores)
 
-    evals_corr_path = Path("bld/evals/evals_corr")
-    if not evals_corr_path.exists():
-        evals_corr = _evaluate_model(func, params, dep_samples_corr_x, n_cores)
-        pd.to_pickle(evals_corr, evals_corr_path)
-    else:
-        evals_corr = pd.read_pickle(evals_corr_path)
+    evals_corr = _evaluate_model(func, params, dep_samples_corr_x, n_cores)
 
     evals_base_corr = _shift_sample(evals_base_ind, -1)
 
