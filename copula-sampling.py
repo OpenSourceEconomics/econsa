@@ -36,6 +36,23 @@ import seaborn as sns
 
 # # Harris Model from [Sensitivity analysis: A review of recent advances](https://www.sciencedirect.com/science/article/abs/pii/S0377221715005469)
 
+# Economic order quantity mode, or Harris model, was developed by [Harris (1990)](https://doi.org/10.1287/opre.38.6.947), to solve the problem of firms determining the ideal order size considering inventory costs and ordering costs.
+#
+# The model takes 4 variables, and produces the total ordering cost $T$:
+#
+# $$T = \frac{1}{2\cdot 12R\cdot M}(CX + S) +\frac{S}{X} + C$$
+#
+# - $M$ denotes the number of goods needed per month
+# - $C$ denotes the unit price of the good
+# - $X$ denotes the order size
+# - $S$ denotes the cost of placing an order (setup cost)
+#
+# and $R$ is the interest and depreciation cost per month ($R=10$ in Harris (1990)), which we treat as an exogenous parameter. Therefore, $T$ is an function of $X$, and we can calculate the optimal $X$:
+#
+# $$X^* = \sqrt{\frac{24R\cdot MS}{C}}$$
+#
+# In sensitivity analysis, $X^*$ is denoted as $y$, the "model output", and the model inputs are $M$, $C$ and $S$, denoted as $\mathbf{x}=(x_1,x_2,x_3)'$.
+
 # ## EOQ Function
 
 def eoq_harris(params, x):
@@ -51,10 +68,10 @@ def eoq_harris(params, x):
     
     Args: 
         params (np.array): 1d numpy array,
-                           cuurrently only need the first param,
+                           cuurrently only take the first param,
                            which is interest & depreciation rate, r=10.
         x (np.array or list): 2d numpy array with the independent variables,
-                              currently only need the first 3 columns.
+                              currently only take the first 3 columns.
     Output:
         y (np.array): 1d numpy array with the dependent variables.
     """
@@ -67,6 +84,9 @@ def eoq_harris(params, x):
     
     return(y)
 
+
+# +
+# function for constructing fig. 4:
 
 def eoq_harris_partial(params, x, fix_num=0):
     """
@@ -101,6 +121,8 @@ def eoq_harris_partial(params, x, fix_num=0):
             y[i] = np.sqrt((24 * r * x_np[0] * x_i)/x_np[1])
     return(y)
 
+
+# -
 
 # ## Data Generation
 
