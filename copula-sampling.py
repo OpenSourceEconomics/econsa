@@ -24,13 +24,15 @@ from multiprocessing import Pool
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from econsa.morris import (
-    _shift_cov,
-    _shift_sample,
-    _uniform_to_standard_normal,
-    elementary_effects,
-)
 
+# +
+# from econsa.morris import (
+#     _shift_cov,
+#     _shift_sample,
+#     _uniform_to_standard_normal,
+#     elementary_effects,
+# )
+# -
 
 # # Harris Model from [Sensitivity analysis: A review of recent advances](https://www.sciencedirect.com/science/article/abs/pii/S0377221715005469)
 
@@ -38,32 +40,32 @@ from econsa.morris import (
 
 def eoq_harris(params, x):
     """
-    Economic order quantity model by Ford Harris,
+    Economic order quantity model by Harris (1990),
+    https://doi.org/10.1287/opre.38.6.947,
     as seen in Borgonovoa & Plischkeb (2016),
     https://doi.org/10.1016/j.ejor.2015.06.032
-    Equation: T = (sqrt(S / 2*12*r*M)+sqrt(C))^2,
-    or y = sqrt(24*r*x1*x3 / x2)
+    
+    Equation: y = sqrt(24*r*x1*x3 / x2),
+    where r is interest & depreciation rate,
+    and takes a value of 10 in both papers.
     
     Args: 
         params (np.array): 2d numpy array,
                            cuurrently only contains interest rate,
-                           which is 24*10.
+                           which is 10.
         x (np.array or list): n-d numpy array with the independent variables,
-                      currently it only takes 3 dims.
+                              currently it only takes 3 dims.
     Output:
         y (np.array): D-d numpy array with the dependent variables
     """
     x_np = np.array(x)
+    r = params[0,0]
     
     y = np.zeros(x_np.T.shape[0])
-    y = np.sqrt((params[0,0] * x_np[0] * x_np[2])/x_np[1])
+    y = np.sqrt((24 * r * x_np[0] * x_np[2])/x_np[1])
     
     return(y)
 
-
-params = np.zeros(shape=(1,1))
-params[0,0] = 240
-params
 
 # ## Data Generation
 
@@ -72,11 +74,15 @@ params
 
 seed = 1234
 n = 10000
+
 x_min_multiplier = 0.9
 x_max_multiplier = 1.1
 x0_1 = 1230
 x0_2 = 0.0135
 x0_3 = 2.15
+
+params = np.zeros(shape=(1,1))
+params[0,0] = 10
 # -
 
 x_min_multiplier*x0_1, x_max_multiplier*x0_1
