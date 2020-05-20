@@ -36,9 +36,9 @@ import seaborn as sns
 
 # # Harris Model from [Sensitivity analysis: A review of recent advances](https://www.sciencedirect.com/science/article/abs/pii/S0377221715005469)
 
-# Economic order quantity mode, or Harris model, was developed by [Harris (1990)](https://doi.org/10.1287/opre.38.6.947), to solve the problem of firms determining the ideal order size considering inventory costs and ordering costs.
+# Economic order quantity model, or Harris model, was developed by [Harris (1990)](https://doi.org/10.1287/opre.38.6.947), to solve the problem of firms determining the ideal order size for one year, considering inventory costs and ordering costs.
 #
-# The model takes 4 variables, and produces the total ordering cost $T$:
+# The model takes four variables, and determins the total ordering cost $T$:
 #
 # $$T = \frac{1}{2\cdot 12R\cdot M}(CX + S) +\frac{S}{X} + C$$
 #
@@ -47,11 +47,21 @@ import seaborn as sns
 # - $X$ denotes the order size
 # - $S$ denotes the cost of placing an order (setup cost)
 #
-# and $R$ is the interest and depreciation cost per month ($R=10$ in Harris (1990)), which we treat as an exogenous parameter. Therefore, $T$ is an function of $X$, and we can calculate the optimal $X$:
+# and $R$ is the interest and depreciation cost per month ($R=10$ in Harris (1990)), which we treat as an exogenous parameter. 
 #
-# $$X^* = \sqrt{\frac{24R\cdot MS}{C}}$$
+# Therefore, $T$ is an function of $X$, and we can calculate the optimal order size $X^*$ by solving:
 #
-# In sensitivity analysis, $X^*$ is denoted as $y$, the "model output", and the model inputs are $M$, $C$ and $S$, denoted as $\mathbf{x}=(x_1,x_2,x_3)'$.
+# $$\begin{aligned}\min_{X} && T &= \frac{1}{2\cdot 12R\cdot M}(CX + S) +\frac{S}{X} + C \\
+# && \frac{\partial T}{\partial X} &= \frac{C}{24R\cdot M} - \frac{S}{X^2} \overset{!}{=} 0 \\
+# && X^* &= \sqrt{\frac{24R\cdot MS}{C}}\end{aligned}$$
+#
+# $X^*$ is called economic order quantity(EOQ).
+#
+# In sensitivity analysis, $X^*$ is denoted as $y$, the model output, and the model inputs are $M$, $C$ and $S$, denoted as $\mathbf{x}=(x_1,x_2,x_3)'$:
+#
+# $$y = \sqrt{\frac{24r\cdot x_1 x_3}{x_2}}$$
+#
+# We are interested in how $y$ changes depending on each $x_i$, in other words, the sensitivity of $y$ with regard to $x_i$.
 
 # ## EOQ Function
 
@@ -77,7 +87,8 @@ def eoq_harris(params, x):
     """
     
     x_np = np.array(x)
-    r = params.flatten()[0]
+    params_np = np.array(params)
+    r = params_np.flatten()[0]
     
     y = np.zeros(x_np.T.shape[0])
     y = np.sqrt((24 * r * x_np[0] * x_np[2])/x_np[1])
@@ -144,7 +155,8 @@ params[0,0] = 10
 
 x_min_multiplier*x0_1, x_max_multiplier*x0_1
 
-# no Monte Carlo
+# ### No Monte Carlo
+
 np.random.seed(seed)
 x_1 = np.random.uniform(low=x_min_multiplier*x0_1,
                         high=x_max_multiplier*x0_1,
@@ -188,7 +200,7 @@ sns.distplot(y, hist_kws=dict(cumulative=True))
 plt.clf()
 sns.distplot(y)
 
-# ### Monte Carlo with Chaospy
+# ### Monte Carlo with Chaospy (Closer to Borgonovoa & Plischkeb (2016))
 
 sample_rule = "random"
 
@@ -243,8 +255,72 @@ y_fix_x_0.shape
 # -
 
 plt.clf()
+# sns.set_palette(cubehelix)
 for item in y_fix_x_0:
     sns.kdeplot(item)
+
+# ## FIg.1 from Harris (1990)
+
+# This figure is using deterministic data, so we must use different data generation process for it.
+
+# ### Data Generation
+
+y = np.arange(300,5200,1)
+
+x_1 = 1000
+x_2 = 0.1
+x_3 = 2
+
+x = np.array([x_1, x_2, x_3])
+
+
+def eoq_harris_total_cost(params, x, y):
+    """
+    Economic order quantity model by Harris (1990),
+    https://doi.org/10.1287/opre.38.6.947,
+    as seen in Borgonovoa & Plischkeb (2016),
+    https://doi.org/10.1016/j.ejor.2015.06.032
+    
+    For plotting convenience, the total cost here excludes ordering cost,
+    since it is assumed to be constant, as in Harris (1990).
+    
+    Args: 
+        params (np.array): 1d numpy array,
+                           cuurrently only take the first param,
+                           which is interest & depreciation rate, r=10.
+        x (np.array or list): 1d numpy array with the independent variables,
+                              unis per month, unit cost, ordering cost.
+        y (np.array): 1d numpy array, the size of order.
+    Output:
+        t (np.array): 1d numpy array, total cost according to each size.
+    """
+    
+    x_np = np.array(x)
+    params_np = np.array(params)
+    r = params_np.flatten()[0]
+    
+    t = np.zeros(y.shape)
+    
+    t_setup = np.zeros(y.shape)
+    t_setup = (1/y) * x[2]
+    
+    t_interest = np.zeros(y.shape)
+    t_interest = 1/(24 * r * x[0]) * (y*x[1] + x[2])
+    
+    t = t_setup + t_interest
+    
+    return(t_setup, t_interest, t)
+
+
+t_setup, t_interest, t = eoq_harris_total_cost(params, x, y)
+
+# ### Plotting
+
+plt.clf()
+sns.lineplot(x=y, y=t_setup)
+sns.lineplot(x=y, y=t_interest)
+sns.lineplot(x=y, y=t)
+plt.axvline(2190, linestyle="--", color="silver")
 
 # # Replicating: [Introducing Copula in Monte Carlo Simulation](https://towardsdatascience.com/introducing-copula-in-monte-carlo-simulation-9ed1fe9f905)
 
