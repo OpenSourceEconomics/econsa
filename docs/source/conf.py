@@ -99,12 +99,6 @@ pygments_style = None
 numpydoc_xref_param_type = True
 numpydoc_xref_ignore = {"type", "optional", "default"}
 
-
-# TODO: This needs to be removed once possible.
-nbsphinx_execute = "never"
-nbsphinx_allow_errors = False
-
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
