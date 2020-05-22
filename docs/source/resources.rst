@@ -14,7 +14,7 @@ We are drawing on related work throughout.
 
 **Books**
 
-* Ghanem, R., Higdon, D., and Owhadi, H. (2017). `*Handbook of uncertainty quantification* <http://tiny.cc/UQ_Handbook>`_. Cham, Switzerland: Springer International Publishing.
+* Ghanem, R., Higdon, D., and Owhadi, H. (2017). *`Handbook of uncertainty quantification <http://tiny.cc/UQ_Handbook>`_.* Cham, Switzerland: Springer International Publishing.
 
 * Saltelli, A., Ratto, M., Terry, A., Campolongo, F., Cariboni, J., Gatelli, D., Saisana, M., and Tarantola, S. (2008). `Global Sensitivity Analysis. The Primer <https://onlinelibrary.wiley.com/doi/book/10.1002/9780470725184>`_. Chichester, UK: John Wiley & Sons Ltd.
 
