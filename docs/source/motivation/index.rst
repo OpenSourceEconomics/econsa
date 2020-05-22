@@ -18,7 +18,9 @@ We will first discuss uncertainty propagation and then discuss sensitivity analy
 
 **Example**
 
-We will use Ford W. Harris’ economic order quantity model (Harris EOQ, henceforth) (Harris, 1913) as our running example throughout this section
+.. todo::
+
+  @loikein Please move here the description of the model along the lines in your notebook and the TESPY docstring. No AUTODOC or anything just a nice write-up that also gives the core equations. This also includes the figure (with description of the basic economics) you created to visualize the tradeoffs. Please add the code for that to docs/_static/codes and add its execution to our GitHub Action. Please make sure all references etc are properly cited in our bibliography section.
 
 .. toctree::
    :maxdepth: 1

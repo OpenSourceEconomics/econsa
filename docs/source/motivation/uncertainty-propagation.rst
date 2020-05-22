@@ -7,6 +7,13 @@ Uncertainty Propagation
 The estimation step provides us with a probabilistic model for the input parameters. Going forward, we treat the model parameters :math:`\boldsymbol{X}` as a simple random vector following a normal distribution with mean :math:`\mu`, covariance matrix :math:`\Sigma`, and joint probability density function :math:`f_{\boldsymbol{X}}`. We are not particularly interested in the uncertainty of each individual parameter of the model. Instead we seek to learn about the induced distribution of the model output :math:`Y` as the uncertainty about the model parameters :math:`\boldsymbol{X}` propagates through the computational model :math:`\boldsymbol{M}`. We want to study the statistical properties of :math:`y`.
 
 
+Example
+-------
+
+.. todo::
+
+  @loikein Please add here a description and figure (no code,we will have that as part of a tutorial) for uncertainty propagation figure 2 in Borgonovo & al reference. Make sure to store all in the same directory as the figures below and follow the naming convention.  
+
 
 Prediction
 ----------
