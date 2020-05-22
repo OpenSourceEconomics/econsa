@@ -7,7 +7,7 @@ We are drawing on related work throughout.
 
 * Feinberg, J., and Langtangen, H. P. (2015). `Chaospy: an open source tool for designing methods of uncertainty quantification <https://www.sciencedirect.com/science/article/pii/S1877750315300119?via%3Dihub>`_. *Journal of Computational Science, 11*, 46-57.
 
-* Herman, J., and Usher, W. (2017). `SALib: an open-source Python library for sensitivity analysis <https://www.theoj.org/joss-papers/joss.00097/10.21105.joss.00097.pdf>`_. *Journal of Open Source Software, 2*(9).
+* Herman, J., and Usher, W. (2017). `SALib: an open-source Python library for sensitivity analysis <https://www.theoj.org/joss-papers/joss.00097/10.21105.joss.00097.pdf>`_. *Journal of Open Source Software, 2* (9).
 
 * Tennoe S., Halnes G., and Einevoll G.T. (2018). `Uncertainpy: a Python toolbox for uncertainty quantification and sensitivity analysis in computational neuroscience <https://doi.org/10.3389/fninf.2018.00049>`_ . *Frontiers in Neuroinformatics, 12*, 49.
 
