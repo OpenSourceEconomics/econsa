@@ -20,7 +20,7 @@ We are drawing on related work throughout.
 
 * Saltelli, A., Tarantola, S., Campolongo, F., and Ratto, M. (2004). `Sensitivity analysis in practice. A guide to assessing scientific models <http://www.andreasaltelli.eu/file/repository/SALTELLI_2004_Sensitivity_Analysis_in_Practice.pdf>`_. Chichester, UK: John Wiley & Sons Ltd.
 
-* Smith, R.C. (2013). `Uncertainty quantification: theory, implementation, and applications <http://tiny.cc/UQ_Theory>`_. Philadelphia, PA: Society for Industrial and Applied Mathematics.
+* Smith, R.C. (2014). `Uncertainty quantification: theory, implementation, and applications <http://tiny.cc/UQ_Theory>`_. Philadelphia, PA: Society for Industrial and Applied Mathematics.
 
 * Sullivan, T.J. (2015). `Introduction to uncertainty quantification <http://tiny.cc/UQ_Introduction>`_. Cham, Switzerland: Springer International Publishing.
 
