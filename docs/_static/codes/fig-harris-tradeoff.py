@@ -15,7 +15,7 @@ def eoq_harris_total_cost(x, y, r=10):
     This function computes the total costs of economic order quantity model,
     based on the model presented in [H1990]_
 
-    For plotting convenience, the total cost here excludes the ordering cost,
+    For plotting convenience, the total cost here excludes the last :math:`c`,
     since it is assumed to be constant, as in Harris (1990).
 
     Parameters

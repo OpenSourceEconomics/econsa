@@ -20,38 +20,47 @@ We will first discuss uncertainty propagation and then discuss sensitivity analy
 
 .. todo::
 
-  @loikein Please move here the description of the model along the lines in your notebook and the TESPY docstring. No AUTODOC or anything just a nice write-up that also gives the core equations. This also includes the figure (with description of the basic economics) you created to visualize the tradeoffs. Please add the code for that to docs/_static/codes and add its execution to our GitHub Action. Please make sure all references etc are properly cited in our bibliography section.
+  @loikein
 
-Let us consider the economic order quantity model. Economic order quantity model, or Harris model, was developed by Ford W. Harris (:cite:`Harris.1990`) to solve the problem of firms determining the ideal order size for one year, considering inventory costs and ordering costs.
+  - [x] move here the description of the model along the lines in your notebook and the TESPY docstring.
+  - [x] include the figure (with description of the basic economics) you created to visualize the tradeoffs. 
+  - [x] add the code for that to docs/_static/codes and add its execution to our GitHub Action
+  - [x] make sure all references etc are properly cited in our bibliography section.
 
-The model takes four variables, and calculates the total ordering cost :math:`T`:
+Let us consider the economic order quantity model. Economic order quantity model, or Harris model, was developed by Ford W. Harris (:cite:`Harris.1990`) to solve the problem of firms determining the ideal order size for one year, considering costs of holding an inventory, and costs of placing an order.
+
+The model takes four variables, and calculates the total ordering :math:`T`, :
 
 .. math::
-  T = \frac{1}{2\times 12R\cdot M}(CX + S) +\frac{S}{X} + C
+  T = \underbrace{\frac{1}{2\times 12 M}I(CX + S)}_{\text{Holding costs}}
+  + \underbrace{\frac{S}{X} + C}_{\text{Ordering costs}}
 
-where :math:`M` denotes the number of units of good needed per month, :math:`C` is the unit price of the good, :math:`X` is the size of order in number of units, and :math:`S` is the cost of placing an order, also known as the setup cost. :math:`I` is the interest and depreciation cost per month, and is treated as an exogenous parameter in most papers (:cite:`Harris.1990,Borgonovo.2016`).
+where :math:`M` denotes the number of units of good needed per month, :math:`C` is the unit price of the good, :math:`X` is the size of order in number of units, and :math:`S` is the cost of placing an order, also known as the setup cost. :math:`I` is the annual interest and depreciation cost, and is often treated as an exogenous parameter (:cite:`Harris.1990,Borgonovo.2016`).
+
+Below is a reproduction of Figure 1 from Harris' original paper. (For scaling convenience, total cost here excludes the last :math:`C`, since it does not change according to the size of order.)
+It shows that keeping :math:`M`, :math:`C` and :math:`S` constant, an increase in the size of order :math:`X` results in a decrease in set-up costs, but an increase in interest and depreciation cost. Therefore, there exists a size of order which minimises the total cost :math:`T`.
 
 .. figure:: ../../_static/images/fig-harris-tradeoff.png
    :align: center
    :alt: Figure that shows the set-up cost, interest & depreciation cost, and total cost of Harris EOQ model.
 
-   An increase in the size of order results in a decrease in set-up costs, but an increase in interest & depreciation cost.
+   Figure 1 of :cite:`Harris.1990`
 
-Therefore, if we know :math:`M` and :math:`C`, :math:`T` is then a function of :math:`X`, so we can calculate the optimal order size :math:`X^*` by solving:
+Consequently, if we know :math:`M`, :math:`C` and :math:`S`, then :math:`T` is a function of :math:`X` that can be solved for the optimal size of order:
 
 .. math::
   \begin{aligned}\min_{X} && T &= \frac{1}{24IM}(CX + S) +\frac{S}{X} + C \\
-  && \frac{\partial T}{\partial X} &= \frac{C}{24IM} - \frac{S}{X^2} \overset{!}{=} 0 \\
+  && \frac{\partial T}{\partial X} &= \frac{C}{24IM} - \frac{S}{X^2} \\
   && X^* &= \sqrt{\frac{24IMS}{C}}\end{aligned}
 
 and :math:`X^*` is called the economic order quantity (EOQ).
 
-In sensitivity analysis, :math:`X^*` is denoted as :math:`y`, the model output, and the model inputs are :math:`M`, :math:`C` and :math:`S`, denoted as :math:`\mathbf{x}=(x_1,x_2,x_3)'`, and :math:`I`, denoted as :math:`r`:
+In sensitivity analysis, :math:`X^*` is denoted as :math:`y`, the model output, and the model inputs are :math:`M`, :math:`C` and :math:`S`, denoted as :math:`\mathbf{x}=(x_1,x_2,x_3)^T`, and :math:`I`, denoted as :math:`r`:
 
 .. math::
   y = \sqrt{\frac{24r x_1 x_3}{x_2}}
 
-We are interested in how :math:`y` changes depending on each :math:`x_i`, in other words, the sensitivity of :math:`y` with regard to each :math:`x_i`. In ``econsa``, 
+We are interested in how :math:`y` changes depending on each :math:`x_i`, in other words, the sensitivity of :math:`y` with regard to each :math:`x_i`.
 
 
 .. toctree::
