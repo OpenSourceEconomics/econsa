@@ -22,7 +22,7 @@ import sys
 
 # Add custom CSS
 def setup(app):
-    app.add_stylesheet("css/custom.css")
+    app.add_css_file("css/custom.css")
 
 
 sys.path.insert(0, os.path.abspath("../.."))
@@ -59,7 +59,6 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "numpydoc",
     "nbsphinx",
@@ -204,3 +203,6 @@ epub_exclude_files = ["search.html"]
 
 
 # -- Extension configuration -------------------------------------------------
+
+# Use new CDN path of MathJax
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
