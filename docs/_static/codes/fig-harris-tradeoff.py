@@ -49,14 +49,14 @@ def eoq_harris_total_cost(x, y, r=10):
 
     t = np.zeros(y.shape)
     t_setup = np.zeros(y.shape)
-    t_setup = (1/y) * s
+    t_setup = (1 / y_np) * s
 
     t_interest = np.zeros(y.shape)
-    t_interest = 1/(24 * r * m) * (y*c + s)
+    t_interest = 1 / (24 * r * m) * (y_np * c + s)
 
     t = t_setup + t_interest
 
-    return(t_setup, t_interest, t)
+    return (t_setup, t_interest, t)
 
 
 # Data generation
