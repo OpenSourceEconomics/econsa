@@ -5,6 +5,10 @@ import numpy as np
 that shows the trade-off in Harris EOQ model,
 where an increase in the size of order results in a decrease in set-up costs,
 but an increase in interest & depreciation cost.
+
+.. [H1990] Harris, F. W. (1990).
+        How Many Parts to Make at Once.
+        Operations Research, 38(6), 947–950.
 """
 
 # Helper function

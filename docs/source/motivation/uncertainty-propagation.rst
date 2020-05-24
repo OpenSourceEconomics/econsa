@@ -15,7 +15,14 @@ Example
   @loikein
 
   - [ ] add here a description and figure (no code) for uncertainty propagation figure 2 in Borgonovo & al reference. 
-  - [ ] add the code for that to docs/_static/codes and add its execution to our GitHub Action
+  - [x] add the code for that to docs/_static/codes and add its execution to our GitHub Action
+
+.. figure:: ../../_static/images/fig-borgonovo-cdf.png
+   :align: center
+   :alt: Figure of uncertainty propagation in Harris EOQ model.
+
+   An expansion of Figure 2 of :cite:`Borgonovo.2016`
+
 
 
 Prediction
