@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Create figures
+"""Create figures.
 
 This script supports our CI setup as it simply runs all files that create figures for our
 documentation.
