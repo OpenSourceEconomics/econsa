@@ -42,6 +42,8 @@ jobs:
       shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
+        source .envrc
+
         cd docs/_static/codes
         python fig-illustrations.py
         python fig-harris-tradeoff.py
