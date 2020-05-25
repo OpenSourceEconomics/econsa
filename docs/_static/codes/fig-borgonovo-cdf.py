@@ -29,9 +29,9 @@ c_0 = 2.15
 r = 0.1
 
 np.random.seed(seed)
-m = cp.Uniform(x_min_multiplier*m_0, x_max_multiplier*m_0).sample(n, rule="random")
-s = cp.Uniform(x_min_multiplier*s_0, x_max_multiplier*s_0).sample(n, rule="random")
-c = cp.Uniform(x_min_multiplier*c_0, x_max_multiplier*c_0).sample(n, rule="random")
+m = cp.Uniform(x_min_multiplier * m_0, x_max_multiplier * m_0).sample(n, rule="random")
+s = cp.Uniform(x_min_multiplier * s_0, x_max_multiplier * s_0).sample(n, rule="random")
+c = cp.Uniform(x_min_multiplier * c_0, x_max_multiplier * c_0).sample(n, rule="random")
 x = np.array([m, s, c])
 
 y = eoq_harris(x, r)
