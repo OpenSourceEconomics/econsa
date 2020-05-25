@@ -14,7 +14,7 @@ Example
 
   @loikein
 
-  - [ ] add here a description and figure (no code) for uncertainty propagation figure 2 in Borgonovo & al reference. 
+  - [x] add here a description and figure (no code) for uncertainty propagation figure 2 in Borgonovo & al reference. 
   - [x] add the code for that to docs/_static/codes and add its execution to our GitHub Action
 
 Let us take a closer look at the economic order quantity model.
