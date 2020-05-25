@@ -1,22 +1,19 @@
-# -*- coding: utf-8 -*-
-import numpy as np
-import chaospy as cp
-import matplotlib.pyplot as plt
-import seaborn as sns
-from temfpy.uncertainty_quantification import eoq_harris  # noqa: F401
+"""We replicate and expand the figure 2 in [BP2016]_ that shows the uncertainty propagation in
+Harris EOQ model. By propagating uncertainty in input variables, the output variable y becomes a
+random variable.
 
+.. [BP2016] Borgonovo, E., & Plischke, E. (2016). Sensitivity analysis: A review of recent
+advances. European Journal of Operational Research, 248(3), 869–887.
 
-"""We replicate and expand the figure 2 in [BP2016]_
-that shows the uncertainty propagation in Harris EOQ model.
-By propagating uncertainty in input variables,
-the output variable y becomes a random variable.
-
-.. [BP2016] Borgonovo, E., & Plischke, E. (2016).
-        Sensitivity analysis: A review of recent advances.
-        European Journal of Operational Research, 248(3), 869–887.
 """
 
-# Data generation
+import matplotlib.pyplot as plt
+import seaborn as sns
+import chaospy as cp
+import numpy as np
+
+from temfpy.uncertainty_quantification import eoq_harris  # noqa: F401
+
 
 seed = 123
 n = 10000
@@ -39,6 +36,8 @@ y = eoq_harris(x, r)
 
 # Start plotting
 
+# TODO: Let's just use the theoretical distribution for the input parameters and have a separate
+#  figure for the y.
 plt.clf()
 fig, ax = plt.subplots(2, 2)
 
