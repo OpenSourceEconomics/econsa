@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 """We create replicate the figure 1 in [H1990]_
 that shows the trade-off in Harris EOQ model,
 where an increase in the size of order results in a decrease in set-up costs,
