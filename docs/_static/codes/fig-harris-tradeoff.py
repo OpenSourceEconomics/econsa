@@ -68,17 +68,19 @@ t_setup, t_interest, t = eoq_harris_total_cost(x, y)
 # Start plotting
 fig, ax = plt.subplots()
 
-ax.plot(y, t_setup, label="Set-up Cost")
-ax.plot(y, t_interest, label="Interest and Depreciation Cost")
-ax.plot(y, t, label="Total Cost")
+ax.plot(y, t_setup, label="Setup")
+ax.plot(y, t_interest, label="Interest and Depreciation")
+ax.plot(y, t, label="Total")
 ax.axvline(2190, linestyle="--", color="lightgrey")
 
 ax.axes.get_yaxis().set_ticklabels([])
 ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:,.0f}"))
 
+# TODO: Let's add X^* to the x-axis., then update the figure for the docs.
+
 ax.legend()
 
-ax.set_xlabel("Size of Order")
+ax.set_xlabel("Size of order $X$")
 ax.set_ylabel("Costs")
 
 fig.savefig("fig-harris-tradeoff")

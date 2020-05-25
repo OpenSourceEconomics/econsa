@@ -12,7 +12,7 @@ import seaborn as sns
 import chaospy as cp
 import numpy as np
 
-from temfpy.uncertainty_quantification import eoq_harris  # noqa: F401
+from temfpy.uncertainty_quantification import eoq_harris
 
 
 seed = 123
