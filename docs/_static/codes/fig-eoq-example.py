@@ -99,6 +99,7 @@ ax.set_ylabel("Cost")
 fig.savefig("fig-eoq-tradeoff")
 
 # We also want a plot on uncertainty propagation.
+
 seed = 123
 n = 10000
 
