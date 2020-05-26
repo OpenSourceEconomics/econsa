@@ -7,3 +7,4 @@ dependencies:
   - nbsphinx
   - numpydoc
   - sphinx
+  - jupyter_client

@@ -94,8 +94,8 @@ exclude_patterns = []
 pygments_style = None
 
 # TODO: This needs to be removed once possible.
-nbsphinx_allow_errors = True
-
+nbsphinx_execute = "never"
+nbsphinx_allow_errors = False
 
 # -- Options for HTML output -------------------------------------------------
 
