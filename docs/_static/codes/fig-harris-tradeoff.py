@@ -69,7 +69,7 @@ t_setup, t_interest, t = eoq_harris_total_cost(x, y)
 fig, ax = plt.subplots()
 
 ax.plot(y, t_setup, label="Setup")
-ax.plot(y, t_interest, label="Interest and Depreciation")
+ax.plot(y, t_interest, label="Capital")
 ax.plot(y, t, label="Total")
 ax.axvline(2190, linestyle="--", color="lightgrey")
 
@@ -80,7 +80,7 @@ ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:,.0f}"))
 
 ax.legend()
 
-ax.set_xlabel("Size of order $X$")
-ax.set_ylabel("Costs")
+ax.set_xlabel("Size of order")
+ax.set_ylabel("Cost")
 
 fig.savefig("fig-harris-tradeoff")
