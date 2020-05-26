@@ -47,10 +47,10 @@ ax[0].fill(
         x_min_multiplier * m_0,
         x_min_multiplier * m_0,
         x_max_multiplier * m_0,
-        x_max_multiplier * m_0
+        x_max_multiplier * m_0,
     ],
     [0, h_m, h_m, 0],
-    alpha=0.5
+    alpha=0.5,
 )
 ax[0].set_ylim(bottom=0)
 ax[0].set_xlabel(r"$X_1$")
@@ -62,10 +62,10 @@ ax[1].fill(
         x_min_multiplier * s_0,
         x_min_multiplier * s_0,
         x_max_multiplier * s_0,
-        x_max_multiplier * s_0
+        x_max_multiplier * s_0,
     ],
     [0, h_s, h_s, 0],
-    alpha=0.5
+    alpha=0.5,
 )
 ax[1].set_ylim(bottom=0)
 ax[1].set_xlabel(r"$X_2$")
@@ -77,10 +77,10 @@ ax[2].fill(
         x_min_multiplier * c_0,
         x_min_multiplier * c_0,
         x_max_multiplier * c_0,
-        x_max_multiplier * c_0
+        x_max_multiplier * c_0,
     ],
     [0, h_c, h_c, 0],
-    alpha=0.5
+    alpha=0.5,
 )
 ax[2].set_ylim(bottom=0)
 ax[2].set_xlabel(r"$X_3$")
