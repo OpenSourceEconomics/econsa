@@ -1,2 +1,3 @@
+---
 exclude_paths:
-  - .conda/build.sh
+  - '.conda/build.sh'
