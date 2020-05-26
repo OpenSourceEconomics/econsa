@@ -1,3 +1,4 @@
 ---
 exclude_paths:
   - '.conda/build.sh'
+  - 'docs/source/conf.py'
