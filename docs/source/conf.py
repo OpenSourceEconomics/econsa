@@ -126,7 +126,6 @@ html_static_path = []
 # html_sidebars = {}
 
 
-
 # -- Options for nbsphinx  ----------------------------------------
 nbsphinx_execute = "auto"
 
