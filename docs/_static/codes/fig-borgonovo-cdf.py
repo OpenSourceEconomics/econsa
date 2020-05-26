@@ -94,5 +94,4 @@ fig, ax = plt.subplots()
 sns.distplot(y)
 ax.set_xlabel(r"$y$")
 
-fig.tight_layout()
 fig.savefig("fig-borgonovo-cdf-y")
