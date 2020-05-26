@@ -1,4 +1,4 @@
-Quantitative Sensitivity Analysis
+Quantitative sensitivity analysis
 =================================
 
 ``econsa`` provides several algorithms for quantitative sensitivity analysis.

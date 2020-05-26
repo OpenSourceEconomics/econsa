@@ -2,10 +2,10 @@
 Tutorials
 =========
 
-We provide several tutorials that showcase the use of `econsa`.
+We provide several tutorials that showcase the use case for ``econsa``.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 0
 
-   eoq_example
+   eoq-model
    qualitative_analysis

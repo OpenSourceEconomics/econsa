@@ -12,12 +12,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
 import os
 import sys
+
+sys.path.insert(0, os.path.abspath("../.."))
 
 
 # Add custom CSS
@@ -126,6 +124,20 @@ html_static_path = []
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+
+
+
+# -- Options for nbsphinx  ----------------------------------------
+nbsphinx_execute = "auto"
+
+nbsphinx_prolog = r"""
+{% set docname = 'docs/source/' + env.doc2path(env.docname, base=None) %}
+
+.. only:: html
+
+    .. nbinfo::
+        Download the notebook :download:`here <https://nbviewer.jupyter.org/github/OpenSourceEconomics/econsa/blob/master/{{ docname }}>`!
+"""
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
