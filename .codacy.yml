@@ -2,3 +2,4 @@
 exclude_paths:
   - '.conda/build.sh'
   - 'docs/source/conf.py'
+  - 'configurations/ipython/profile_default/startup/start.py'
