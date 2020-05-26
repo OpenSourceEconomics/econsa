@@ -1,3 +1,9 @@
+exclude: |
+  (?x)(
+        ^docs/|
+        ^econsa/morris.py|
+        ^econsa/tests/test_morris.py
+  )
 repos:
 
 -   repo: https://github.com/asottile/reorder_python_imports

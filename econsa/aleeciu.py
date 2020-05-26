@@ -6,7 +6,11 @@ https://github.com/aleeciu/GSA_dependent_variables except function
 import numpy as np
 import pandas as pd
 from SALib.sample import sobol_sequence
-from scipy.stats import norm, uniform, lognorm, gumbel_r, exponweib
+from scipy.stats import exponweib
+from scipy.stats import gumbel_r
+from scipy.stats import lognorm
+from scipy.stats import norm
+from scipy.stats import uniform
 
 
 def kucherenko_indices(func, covariance, mean, problem, N):
@@ -33,21 +37,21 @@ def kucherenko_indices(func, covariance, mean, problem, N):
 def kucherenko_sampling(problem, N, cov, mu, s=1):
     """
     Implementation of the alghoritm proposed in:
-     
-    S. Kucherenko, S. Tarantola, P. Annoni. Estimation of global sensitivity indices for models with dependent variables
-    Comput. Phys. Commun., 183 (4) (2012), pp. 937-946
-     
+
+    S. Kucherenko, S. Tarantola, P. Annoni. Estimation of global sensitivity indices for
+    models with dependent variables Comput. Phys. Commun., 183 (4) (2012), pp. 937-946
+
     to generate two sets of independent and conditional variables.
-     
+
     --------
     problem: dict
-         
+
     N: int
          independent variables
-         
-    mu, cov: 
+
+    mu, cov:
          mean of variables; covariance matrix
-         
+
     s: int
         splitting position between independent and conditional varaibles
     """
@@ -88,18 +92,18 @@ def kucherenko_sampling(problem, N, cov, mu, s=1):
 def sobol_indexes(fun, x, xc, problem, s=1):
     """
     Compute Sobol Indexes
-     
+
     --------
     fun: function
-     
+
     x: array_like
         The independent vector
-        
+
     xc: array_like
          The conditional vector
-         
+
     problem: dict
-         
+
     s: int
         splitting position between independent and conditional variables
     """
@@ -186,19 +190,19 @@ def conditional_sampling(u2, x1, mu_x1, mu_x2, cov, s, lower_cond=True):
 def build_cov_mu(cov, mu, factors):
     """
     Return ordered covariance matrix
-    
+
     ------
     cov: DataFrame
          covariance matrix in the original order
-         
+
     mu: array_like
-         vector of mean values in the original order         
-         
+         vector of mean values in the original order
+
     factors: list
-         list of input variables of interest   
+         list of input variables of interest
     """
 
-    new_factors_order = factors + [f for f in cov.columns if not f in factors]
+    new_factors_order = factors + [f for f in cov.columns if f not in factors]
     ordered_cov = cov.loc[new_factors_order, new_factors_order]
     ordered_mu = mu[new_factors_order]
 

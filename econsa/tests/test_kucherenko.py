@@ -6,15 +6,14 @@ et al. 2012.
 All references to Tables, Equation and so on correspond to references in Kucherenko et
 al. 2012.
 """
+from itertools import product
+
 import numpy as np
 import pandas as pd
-
-from itertools import product
+import pytest
 
 from econsa.aleeciu import build_cov_mu
 from econsa.aleeciu import kucherenko_indices
-
-import pytest
 
 
 @pytest.fixture
