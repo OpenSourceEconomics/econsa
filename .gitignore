@@ -1,3 +1,11 @@
+# Folders
+literature/
+.idea/
+UQLab/
+dependent_morris/
+
+notebook.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -6,7 +6,6 @@ channels:
   - opensourceeconomics
 
 dependencies:
-
   - python=3.7
   - sphinx>=1.4
   - pandas>=0.25
@@ -25,7 +24,8 @@ dependencies:
   - jupyterlab
   - nbsphinx
   - pip:
-    - salib==1.3.8
+    - SALib
+    # - salib==1.3.8
     - isort
     - black
     - black-nb
