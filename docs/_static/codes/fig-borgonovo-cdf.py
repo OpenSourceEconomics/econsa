@@ -1,4 +1,6 @@
-"""We replicate and expand the figure 2 in [BP2016]_ that shows the uncertainty propagation in
+"""Plot uncertainty propagation.
+
+We replicate and expand the figure 2 in [BP2016]_ that shows the uncertainty propagation in
 Harris EOQ model. By propagating uncertainty in input variables, the output variable y becomes a
 random variable.
 
@@ -34,24 +36,39 @@ x = np.array([m, s, c])
 
 y = eoq_harris(x, r)
 
-# Start plotting
 
-# TODO: Let's just use the theoretical distribution for the input parameters and have a separate
-#  figure for the y.
-plt.clf()
-fig, ax = plt.subplots(2, 2)
+# Theoretical density for x
+fig, ax = plt.subplots(1, 3, figsize=(12, 4))
 
-sns.distplot(m, ax=ax[0, 0])
-ax[0, 0].set_xlabel(r"$x_1$")
+h_m = 1 / (x_max_multiplier * m_0 - x_min_multiplier * m_0)
+ax[0].plot([x_min_multiplier * m_0, x_max_multiplier * m_0], [h_m, h_m], linewidth=2)
+ax[0].fill([x_min_multiplier * m_0, x_min_multiplier * m_0,
+            x_max_multiplier * m_0, x_max_multiplier * m_0], [0, h_m, h_m, 0], alpha=0.5)
+ax[0].set_ylim(bottom=0)
+ax[0].set_xlabel(r"$x_1$")
 
-sns.distplot(s, ax=ax[0, 1])
-ax[0, 1].set_xlabel(r"$x_2$")
+h_s = 1 / (x_max_multiplier * s_0 - x_min_multiplier * s_0)
+ax[1].plot([x_min_multiplier * s_0, x_max_multiplier * s_0], [h_s, h_s], linewidth=2)
+ax[1].fill([x_min_multiplier * s_0, x_min_multiplier * s_0,
+            x_max_multiplier * s_0, x_max_multiplier * s_0], [0, h_s, h_s, 0], alpha=0.5)
+ax[1].set_ylim(bottom=0)
+ax[1].set_xlabel(r"$x_2$")
 
-sns.distplot(c, ax=ax[1, 0])
-ax[1, 0].set_xlabel(r"$x_3$")
-
-sns.distplot(y, ax=ax[1, 1])
-ax[1, 1].set_xlabel(r"$y$")
+h_c = 1 / (x_max_multiplier * c_0 - x_min_multiplier * c_0)
+ax[2].plot([x_min_multiplier * c_0, x_max_multiplier * c_0], [h_c, h_c], linewidth=2)
+ax[2].fill([x_min_multiplier * c_0, x_min_multiplier * c_0,
+            x_max_multiplier * c_0, x_max_multiplier * c_0], [0, h_c, h_c, 0], alpha=0.5)
+ax[2].set_ylim(bottom=0)
+ax[2].set_xlabel(r"$x_3$")
 
 fig.tight_layout()
-fig.savefig("fig-borgonovo-cdf")
+fig.savefig("fig-borgonovo-cdf-x")
+
+
+# Empirical density for y
+fig, ax = plt.subplots()
+sns.distplot(y)
+ax.set_xlabel(r"$y$")
+
+fig.tight_layout()
+fig.savefig("fig-borgonovo-cdf-y")

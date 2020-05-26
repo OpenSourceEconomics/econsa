@@ -3,7 +3,7 @@ font.size: 20
 lines.linewidth: 3
 image.cmap: jet
 
-axes.labelsize      : 30
+axes.labelsize      : 15
 
 backend: Agg
 axes.spines.right: False

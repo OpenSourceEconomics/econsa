@@ -1,3 +1,10 @@
+"""Illustrations.
+
+We create an illustration that shows the properties of the distribution we are interested in.
+We choose a skewed normal distribution to already point to the fact that the median is not equal
+to the mean.
+"""
+
 from functools import partial
 
 import matplotlib.pyplot as plt
@@ -7,11 +14,6 @@ import numpy as np
 
 np.random.seed(123)
 
-
-"""We create an illustration that shows the properties of the distribution we are interested in.
-We choose a skewed normal distribution to already point to the fact that the median is not equal
-to the mean.
-"""
 rv = stats.skewnorm(a=6)
 
 confi_lower, median, confi_upper = rv.ppf([0.025, 0.5, 0.975])

@@ -1,4 +1,6 @@
-"""We create replicate the figure 1 in [H1990]_ that shows the trade-off in Harris EOQ model,
+"""Plot trade-off in Harris EOQ model.
+
+We create replicate the figure 1 in [H1990]_ that shows the trade-off in Harris EOQ model,
 where an increase in the size of order results in a decrease in set-up costs, but an increase in
 interest & depreciation cost.
 
@@ -7,7 +9,7 @@ interest & depreciation cost.
 """
 
 import matplotlib.pyplot as plt
-import matplotlib as mpl
+# import matplotlib as mpl
 import numpy as np
 
 
@@ -59,7 +61,7 @@ def eoq_harris_total_cost(x, y, r=10):
 
 m, c, s = 1000, 0.1, 2
 
-y = np.arange(300, 5200, 1)
+y = np.arange(500, 4000, 1)
 x = [m, s, c]
 
 t_setup, t_interest, t = eoq_harris_total_cost(x, y)
@@ -73,10 +75,23 @@ ax.plot(y, t_interest, label="Capital")
 ax.plot(y, t, label="Total")
 ax.axvline(2190, linestyle="--", color="lightgrey")
 
+# Ignore y-axis tick labels
 ax.axes.get_yaxis().set_ticklabels([])
-ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:,.0f}"))
 
-# TODO: Let's add X^* to the x-axis., then update the figure for the docs.
+# Set x-axis ticks position
+pos = [1000, 2000, 2190, 3000, 4000]
+lab = ["1,000", "2,000", r"$X^*$", "3,000", "4,000"]
+ax.set_xticks(pos)
+ax.set_xticklabels(lab)
+
+# +
+# Note: this does not work because we want to label X*,
+# but any manual change to the labels will be overwritten by the formatter
+# ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:,.0f}"))
+# -
+
+# No collide between labels
+ax.xaxis.get_majorticklabels()[1].set_horizontalalignment("right")
 
 ax.legend()
 
