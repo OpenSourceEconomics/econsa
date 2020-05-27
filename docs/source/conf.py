@@ -12,17 +12,15 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
-
 import os
 import sys
+
+sys.path.insert(0, os.path.abspath("../.."))
 
 
 # Add custom CSS
 def setup(app):
-    app.add_stylesheet("css/custom.css")
+    app.add_css_file("css/custom.css")
 
 
 sys.path.insert(0, os.path.abspath("../.."))
@@ -59,7 +57,6 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.mathjax",
     "sphinx.ext.viewcode",
     "numpydoc",
     "nbsphinx",
@@ -99,12 +96,6 @@ pygments_style = None
 numpydoc_xref_param_type = True
 numpydoc_xref_ignore = {"type", "optional", "default"}
 
-
-# TODO: This needs to be removed once possible.
-nbsphinx_execute = "never"
-nbsphinx_allow_errors = False
-
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -133,6 +124,19 @@ html_static_path = []
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+
+
+# -- Options for nbsphinx  ----------------------------------------
+nbsphinx_execute = "auto"
+
+nbsphinx_prolog = r"""
+{% set docname = 'docs/source/' + env.doc2path(env.docname, base=None) %}
+
+.. only:: html
+
+    .. nbinfo::
+        Download the notebook :download:`here <https://nbviewer.jupyter.org/github/OpenSourceEconomics/econsa/blob/master/{{ docname }}>`!
+"""
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -210,3 +214,6 @@ epub_exclude_files = ["search.html"]
 
 
 # -- Extension configuration -------------------------------------------------
+
+# Use new CDN path of MathJax
+mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"

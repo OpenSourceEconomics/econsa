@@ -19,11 +19,20 @@ jobs:
       shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
+        source .envrc
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
         flake8-nb; [ $? -eq 0 ] || exit 1
         black-nb .; [ $? -eq 0 ] || exit 1
+
+        # We want to pull the submodules.
+        # This can be removed once temfpy is live on conda.
+        git submodule update --init --recursive
+
+        # We want to local build of the documentation to succeed. This can be
+        # removed once readthedocs.org is part of PR testing setup.
+        cd docs; make html; cd $PROJECT_ROOT
 
     - name: upload coverage to Codecov
       uses: codecov/codecov-action@v1
@@ -34,4 +43,5 @@ jobs:
       shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
-        cd docs/_static/codes; python fig-illustrations.py
+        source .envrc
+        run-figures

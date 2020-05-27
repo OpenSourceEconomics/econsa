@@ -46,14 +46,13 @@ Supported by
 
 .. toctree::
    :hidden:
-   :maxdepth: 2
+   :maxdepth: 1
 
-   getting_started/index
    motivation/index
    methods/index
    tutorials/index
    projects
    versions
-   acknowledgement
+   acknowledgment
    resources
    bibliography

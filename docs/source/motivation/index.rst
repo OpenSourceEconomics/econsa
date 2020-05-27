@@ -14,14 +14,11 @@ Any computational economic model :math:`\boldsymbol{M}` provides a mapping betwe
 .. math::
   \boldsymbol{M} : \boldsymbol{x} \in \mathcal{D}_\boldsymbol{X} \mapsto y = \boldsymbol{M}(\boldsymbol{x})
 
-We will first discuss uncertainty propagation and then discuss sensitivity analysis.
-
-**Example**
-
-We will use Ford W. Harris’ economic order quantity model (Harris EOQ, henceforth) (Harris, 1913) as our running example throughout this section
+We follow :cite:`Borgonovo.2016` and use the **Economic Order Quantity (EOQ)** model (:cite:`Harris.1990`) as a running example throughout our documentation. We thus start by explaining its basic setup first and then discuss uncertainty propagation and sensitivity analysis.
 
 .. toctree::
    :maxdepth: 1
 
+   eoq-model
    uncertainty-propagation
    sensitivity-analysis
