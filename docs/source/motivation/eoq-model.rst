@@ -19,7 +19,7 @@ The figure below reproduces the fundamental economic trade-offs of the model for
 
 .. image:: ../../_static/images/fig-eoq-tradeoff.png
    :align: center
-   :alt: Increase in size of order causes decrease in setup cose and increase in capital cost.
+   :alt: Increase in size of order causes decrease in setup cost and increase in capital cost.
 
 Going forward, we treat the annual interest and depreciation rate :math:`R` as an exogenous parameter and set it to 10%. We can map the example to our more general notation by denoting the optimal order quantity as :math:`y` and collecting the three remaining input parameters in :math:`\mathbf{x}` as follows:
 
