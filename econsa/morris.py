@@ -332,7 +332,7 @@ def _calculate_cumulative_indices(evals, evals_a, deltas, params_index):
         sigma (pd.DataFrame): ...
 
     """
-    n_draws, n_params = evals.shape
+    n_draws, _ = evals.shape
     ee = np.abs((evals - evals_a) / deltas)
 
     ee_df = pd.DataFrame(data=ee, columns=params_index, index=np.arange(n_draws) + 1)

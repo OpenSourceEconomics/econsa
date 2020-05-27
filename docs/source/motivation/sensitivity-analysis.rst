@@ -1,4 +1,4 @@
-Sensitivity Analysis
+Sensitivity analysis
 ====================
 
 sensitivity analysis, hierarchization of input parameter with respect to the resulting uncertainty.

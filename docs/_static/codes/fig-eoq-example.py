@@ -8,13 +8,17 @@ interest & depreciation cost.
 947–950.
 """
 
-import matplotlib.pyplot as plt
 
-# import matplotlib as mpl
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import seaborn as sns
+import chaospy as cp
 import numpy as np
 
+from temfpy.uncertainty_quantification import eoq_model
 
-def eoq_harris_total_cost(x, y, r=10):
+
+def eoq_model_total_cost(x, y, r=10):
     r"""Economic order quantity model.
 
     This function computes the total costs of economic order quantity model, based on the model
@@ -65,7 +69,7 @@ m, c, s = 1000, 0.1, 2
 y = np.arange(500, 4000, 1)
 x = [m, s, c]
 
-t_setup, t_interest, t = eoq_harris_total_cost(x, y)
+t_setup, t_interest, t = eoq_model_total_cost(x, y)
 
 
 # Start plotting
@@ -85,13 +89,6 @@ lab = ["1,000", "2,000", r"$X^*$", "3,000", "4,000"]
 ax.set_xticks(pos)
 ax.set_xticklabels(lab)
 
-# +
-# Note: this does not work because we want to label X*,
-# but any manual change to the labels will be overwritten by the formatter
-# ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:,.0f}"))
-# -
-
-# No collide between labels
 ax.xaxis.get_majorticklabels()[1].set_horizontalalignment("right")
 
 ax.legend()
@@ -99,4 +96,31 @@ ax.legend()
 ax.set_xlabel("Size of order")
 ax.set_ylabel("Cost")
 
-fig.savefig("fig-harris-tradeoff")
+fig.savefig("fig-eoq-tradeoff")
+
+# We also want a plot on uncertainty propagation.
+
+seed = 123
+n = 10000
+
+
+m_0, c_0, s_0 = 1230, 0.0135, 2.15
+
+np.random.seed(seed)
+
+x = list()
+for center in [m_0, c_0, s_0]:
+    x.append(cp.Uniform(0.9 * center, 1.1 * center).sample(n, rule="random"))
+y = eoq_model(x)
+
+fig, ax = plt.subplots()
+
+sns.distplot(y, ax=ax)
+
+ax.set_xlabel(r"$y$")
+ax.set_ylabel(r"$f_y$")
+
+ax.xaxis.set_major_formatter(mpl.ticker.StrMethodFormatter("{x:,.0f}"))
+ax.axes.get_yaxis().set_ticklabels([])
+
+fig.savefig("fig-eoq-uncertainty-propagation")
