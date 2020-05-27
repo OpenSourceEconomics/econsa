@@ -18,24 +18,57 @@ import numpy as np
 from scipy.stats import norm
 
 
-def kucherenko_indices(func, sampling_mean, sampling_cov, *args, **kwargs):
+def kucherenko_indices(
+    func, sampling_mean, sampling_cov, n_draws=10_000, sampling_scheme="sobol", n_jobs=1
+):
     """Compute Kucherenko indices.
 
+    Kucherenko indices aim to describe the importance of inputs on the variability
+    of the output of some function. Usually one assumes that a parameter vector has been
+    estimated on the input space. Most often, estimation procedures provide not only
+    a point estimate but a complete distribution of the estimate. In the case of maximum
+    likelihood this is for example the asymptotic normal distribution, which is
+    parameterized over the mean and covariance. Here we describe the distribution of the
+    input parameters over its ``sampling_mean`` and ``sampling_cov``.
+
     Args:
-        func:
-        sampling_mean:
-        sampling_cov:
-        *args:
-        **kwargs:
+        func (callable): Function whose input-output relation we wish to analyze using
+            the Kucherenko indices.
+        sampling_mean: Expected value of the distribution on the input space.
+        sampling_cov: Covariance of the distribution on the input space.
+        sampling_scheme: Sampling scheme that is used for the creation of a base uniform
+            sequence from which the multivariate normal Monte Carlo sequence is drawn.
+            Options are "random" and "sobol". Default is "sobol", which creates a Quasi
+            Monte Carlo sequence that has favorable properties in lower dimensions;
+            however if the number of parameters (``len(mean)``) exceeds ~20 "random"
+            can start to perform better. See https://tinyurl.com/p6grk3j.
+        n_draws: Number of Monte Carlo draws for the estimation of the indices. Default
+            is 10_000.
+        n_jobs (int): Number of jobs to use for parallelization using ``joblib``.
+            Default is 1.
 
     Returns:
-        first_order: First order indices.
-        total: Total indices.
-    """
-    samples = _kucherenko_samples(sampling_mean, sampling_cov, *args, **kwargs)
-    first_order, total = _general_sobol_indices(func, samples, *args, **kwargs)
+        out (list): List of tuples.
 
-    return first_order, total
+    """
+    n_params = len(sampling_mean)
+
+    shifted_cov = sampling_cov.copy()
+    shifted_mean = sampling_mean.copy()
+
+    out = []
+    for _ in range(n_params):
+        samples = _kucherenko_samples(
+            shifted_mean, shifted_cov, n_draws, sampling_scheme
+        )
+        first_order, total = _general_sobol_indices(func, samples)
+
+        shifted_cov = _shift_cov(shifted_cov, 1)
+        shifted_mean = _shift_mean(shifted_mean, 1)
+
+        out.append((first_order, total))
+
+    return out
 
 
 def _general_sobol_indices(func, samples, *args, **kwargs):
@@ -44,7 +77,7 @@ def _general_sobol_indices(func, samples, *args, **kwargs):
     Computes general Sobol indices using
 
     Args:
-        func:
+        func
         samples:
         *args:
         **kwargs:
@@ -55,7 +88,7 @@ def _general_sobol_indices(func, samples, *args, **kwargs):
     return None, None
 
 
-def _kucherenko_samples(mean, cov, n_draws, sampling_scheme, *args, **kwargs):
+def _kucherenko_samples(mean, cov, n_draws, sampling_scheme):
     """Draw samples from independent and conditional distribution.
 
     TODO:
@@ -140,12 +173,12 @@ def _standard_normal_to_multivariate_normal(draws, mean, cov):
     """Transform standard normal draws to multivariate normal.
 
     Args:
-        draws (np.ndarray):
-        mean (np.ndarray):
-        cov (np.ndarray):
+        draws (np.ndarray): Draws from a standard normal distribution.
+        mean (np.ndarray): Mean of the new distribution.
+        cov (np.ndarray): Covariance of the new distribution.
 
     Returns:
-        multivariate_draws (np.ndarray):
+        multivariate_draws (np.ndarray): Draws from the multivariate normal.
 
     """
     cholesky = np.linalg.cholesky(cov)
@@ -172,7 +205,6 @@ def _conditional_mean(y, mean_z, mean_y, cov_y, cov_zy):
     """
     update = cov_zy.dot(np.linalg.inv(cov_y)).dot(y - mean_y)
     mean_z_given_y = mean_z + update
-
     return mean_z_given_y
 
 
@@ -183,8 +215,8 @@ def _conditional_covariance(cov_z, cov_y, cov_zy):
     Kucherenko et al. 2012 [Equation 3.5] or https://tinyurl.com/jbsrcue.
 
     Args:
-        cov_z (np.ndarray): Covariance-variance matrix of variable `z`.
-        cov_y (np.ndarray): Covariance-variance matrix of variable `y`.
+        cov_z (np.ndarray): Variance-Covariance matrix of variable `z`.
+        cov_y (np.ndarray): Variance-Covariance matrix of variable `y`.
         cov_zy (np.ndarray): Covariance of variables `z` and `y`.
 
     Returns:
@@ -192,39 +224,8 @@ def _conditional_covariance(cov_z, cov_y, cov_zy):
 
     """
     update = cov_zy.dot(np.linalg.inv(cov_y)).dot(cov_zy.T)
-    covariance_z_given_y = cov_z + update
-
-    return covariance_z_given_y
-
-
-def _marginal_mean_and_covariance(mean, cov):
-    """Return marginal mean and covariance.
-
-    Returns the marginal mean and covariance of the variable defined by the first
-    element of mean and all other elements, as well as the covariance between the first
-    element and all other. That is, let X=(X1,...,Xn) be a random vector with expected
-    value equal to ``mean`` and covariance-variance matrix equal to ``cov``. Then we
-    consider the mean and variance of Y = X1 and Z = (X2,...,Xn), as well as the
-    covariance vector of Y with each element in Z.
-
-    Args:
-        mean (np.ndarray): Mean vector.
-        cov (np.ndarray): Variance-Covariance matrix.
-
-    Returns:
-        mean_y, mean_z, cov_y, cov_z, cov_zy (np.ndarray): Mean of Y and Z, Variance-
-            covariance matrix of Y and Z and covariance vector between Y and Z.
-
-    """
-    mean_y = mean[:1]
-    mean_z = mean[1:]
-
-    cov_y = cov[:1, :1]
-    cov_z = cov[1:, 1:]
-
-    cov_zy = cov[1:, 0]
-
-    return mean_y, mean_z, cov_y, cov_z, cov_zy
+    cov_z_given_y = cov_z + update
+    return cov_z_given_y
 
 
 def _get_uniform_base_draws(n_draws, n_params, sampling_scheme):
@@ -398,3 +399,50 @@ def _shift_cov(cov, k):
     old_order = np.arange(m).astype(int)
     new_order = _shift_sample(old_order, k).astype(int)
     return cov[new_order][:, new_order]
+
+
+def _shift_mean(mean, k):
+    """Re-sort a mean vector such that the fist k elements are moved to the end.
+
+    Args:
+        mean (np.ndarray): One dimensional array of shape (m)
+        k (int): 0 <= k <= m
+
+    Returns:
+        shifted (np.ndarray): Same shape as mean.
+
+    """
+    m = len(mean)
+    old_order = np.arange(m).astype(int)
+    new_order = _shift_sample(old_order, k).astype(int)
+    return mean[new_order]
+
+
+def _marginal_mean_and_covariance(mean, cov):
+    """Return marginal mean and covariance.
+
+    Returns the marginal mean and covariance of the variable defined by the first
+    element of mean and all other elements, as well as the covariance between the first
+    element and all other. That is, let X=(X1,...,Xn) be a random vector with expected
+    value equal to ``mean`` and covariance-variance matrix equal to ``cov``. Then we
+    consider the mean and variance of Y = X1 and Z = (X2,...,Xn), as well as the
+    covariance vector of Y with each element in Z.
+
+    Args:
+        mean (np.ndarray): Mean vector.
+        cov (np.ndarray): Variance-Covariance matrix.
+
+    Returns:
+        mean_y, mean_z, cov_y, cov_z, cov_zy (np.ndarray): Mean of Y and Z, Variance-
+            covariance matrix of Y and Z and covariance vector between Y and Z.
+
+    """
+    mean_y = mean[:1]
+    mean_z = mean[1:]
+
+    cov_y = cov[:1, :1]
+    cov_z = cov[1:, 1:]
+
+    cov_zy = cov[1:, 0]
+
+    return mean_y, mean_z, cov_y, cov_z, cov_zy
