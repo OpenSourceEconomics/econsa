@@ -17,8 +17,9 @@ The economic order quantity :math:`X^*` is determined as:
 
 The figure below reproduces the fundamental economic trade-offs of the model for a fixed parameterization of :math:`M`, :math:`C`, :math:`S`, and :math:`R`. An increase in the size of order :math:`X` results in a decrease in the setup cost per unit, but at the same time, capital cost increases as the stock of inventory increase.
 
-.. figure:: ../../_static/images/fig-eoq-tradeoff.png
+.. image:: ../../_static/images/fig-eoq-tradeoff.png
    :align: center
+   :alt: Increase in size of order causes decrease in setup cose and increase in capital cost.
 
 Going forward, we treat the annual interest and depreciation rate :math:`R` as an exogenous parameter and set it to 10%. We can map the example to our more general notation by denoting the optimal order quantity as :math:`y` and collecting the three remaining input parameters in :math:`\mathbf{x}` as follows:
 

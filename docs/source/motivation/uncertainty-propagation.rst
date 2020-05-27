@@ -5,6 +5,6 @@ We start from a probabilistic model for the input parameters that is informed by
 
 We now return to the example of the **EOQ** model. We specify a uniform distribution centered around :math:`\mathbf{x^0}=(M, C, S) = (1230, 0.0135, 2.15)` and spread the support 10% above and below the center. We solve for the optimal economic order quantity :math:`Y` for :math:`1,000` random input parameters and end up with the distribution :math:`f_{Y}` below.
 
-.. figure:: ../../_static/images/fig-eoq-uncertainty-propagation.png
+.. image:: ../../_static/images/fig-eoq-uncertainty-propagation.png
    :align: center
-   :width: 70%
+   :alt: Density of Y
