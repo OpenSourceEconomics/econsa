@@ -6,7 +6,7 @@ econsa
 
     -- Friedrich von Hayek, Nobel Prize Lecture
 
-**econsa** is an open source package for economists that facilitates the sound analysis of computational economic models. It offers suitable methods for uncertainty propagation and global sensitivity analysis. Please visit our `online documentation <https://econsa.readthedocs.io/en/latest/>`_ for tutorials and other information.
+``econsa`` is an open-source package for economists that facilitates the sound analysis of computational economic models. It offers suitable methods for uncertainty propagation and global sensitivity analysis. Please visit our `online documentation <https://econsa.readthedocs.io/en/latest/>`_ for details.
 
 .. image:: https://readthedocs.org/projects/econsa/badge/?version=latest
     :target: https://econsa.readthedocs.io/en/latest
