@@ -1,10 +1,13 @@
-# Folders
+# Folders (timmens)
 literature/
 .idea/
 UQLab/
 dependent_morris/
+notebooks/
 
-notebook.ipynb
+# Files (timmens)
+econsa/scribble.py
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
