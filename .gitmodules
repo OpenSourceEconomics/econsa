@@ -1,0 +1,3 @@
+[submodule "submodules/temfpy"]
+	path = submodules/temfpy
+	url = https://github.com/OpenSourceEconomics/temfpy.git
