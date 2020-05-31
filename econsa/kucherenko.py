@@ -5,22 +5,36 @@ P. Annoni in "Estimation of global sensitivity indices for models with dependent
 variables" --(Comput. Phys. Commun., 183 (4) (2012), pp. 937-946)
 
 References to Tables, Equations, etc. correspond to references in the paper mentioned
-above.
+above. Variable names resemble variable names in the paper or try to be self-
+explainatory.
+
 TODO:
-    - Parameters in data frame (value column is numpy array)
-    - Rewrite code from module aleeciu to adhere to our standards
+    - Add possibility that input data is a pandas data frame
 """
+import warnings
 from collections import namedtuple
 
 import chaospy as cp
+import joblib
 import numba as nb
 import numpy as np
 import pandas as pd
+from joblib import delayed
+from joblib import Parallel
+from pytest import approx
 from scipy.stats import norm
 
 
 def kucherenko_indices(
-    func, sampling_mean, sampling_cov, n_draws=10_000, sampling_scheme="sobol", n_jobs=1
+    func,
+    sampling_mean,
+    sampling_cov,
+    n_draws=10_000,
+    sampling_scheme="sobol",
+    n_jobs=1,
+    parallel_backend="loky",
+    skip=0,
+    seed_list=None,
 ):
     """Compute Kucherenko indices.
 
@@ -34,7 +48,7 @@ def kucherenko_indices(
 
     Args:
         func (callable): Function whose input-output relation we wish to analyze using
-            the Kucherenko indices.
+            the Kucherenko indices. Must be broadcastable.
         sampling_mean (np.ndarray): Expected value of the distribution on the input
             space.
         sampling_cov (np.ndarray): Covariance of the distribution on the input space.
@@ -48,35 +62,114 @@ def kucherenko_indices(
             Default is 10_000.
         n_jobs (int): Number of jobs to use for parallelization using ``joblib``.
             Default is 1.
+        parallel_backend (str): Backend which will be used by ``joblib``.
+        skip (int): How many values to skip of the Sobol sequence. Default is 0.
+        seed_list (list or tuple): List-like object of the same length as
+            ``sampling_mean`` containing (integer) seeds for the random number generator
+            that will be evaluated before the sampling step for each variable. If set to
+            None, range(len(``sampling_mean``)) will be used. Default is None.
 
     Returns:
         df_indices (pd.DataFrame): Data frame containing first_order and total order
             Kucherenko indices.
 
     """
+    # assert input
     n_params = len(sampling_mean)
 
-    shifted_cov = sampling_cov.copy()
-    shifted_mean = sampling_mean.copy()
-
-    index = pd.MultiIndex.from_product(
-        (range(n_params), ["first_order", "total"]), names=["variable", "type"]
+    assert sampling_cov.shape == (n_params, n_params,), (
+        "Argument 'sampling_cov' does not have a compatible dimension with argument "
+        "'sampling_mean'."
     )
-    df_indices = pd.DataFrame(columns=["value"], index=index)
+    assert (
+        isinstance(n_draws, int) and n_draws > 0
+    ), "Argument 'n_draws' must be a positive integer."
+    assert sampling_scheme in {
+        "random",
+        "sobol",
+    }, "Argument 'sampling_scheme' must be in {'random', 'sobol'}."
+    assert (
+        isinstance(n_jobs, int) and n_jobs >= 1
+    ), "Argument 'n_jobs' must be a positive integer."
 
-    for k in range(n_params):
-        shifted_cov = _shift_cov(shifted_cov, k)
-        shifted_mean = _shift_mean(shifted_mean, k)
-
-        shifted_samples = _kucherenko_samples(
-            shifted_mean, shifted_cov, n_draws, sampling_scheme
+    if seed_list is not None and len(seed_list) != n_params:
+        warnings.warn(
+            "Argument 'seed_list' does not has the same length as argument"
+            "'sampling_mean'; Using seed_list = range(len(sampling_mean)).",
+            UserWarning,
         )
-        first_order, total = _general_sobol_indices(func, shifted_samples, k)
+        seed_list = range(n_params)
+    seed_list = seed_list if seed_list is not None else range(n_params)
 
-        df_indices.loc[(k, "first_order"), "value"] = first_order
-        df_indices.loc[(k, "total"), "value"] = total
+    # parallelize computation
+    kwargs = {
+        "func": func,
+        "sampling_mean": sampling_mean,
+        "sampling_cov": sampling_cov,
+        "n_draws": n_draws,
+        "sampling_scheme": sampling_scheme,
+        "skip": skip,
+    }
+    with joblib.parallel_backend(backend=parallel_backend, n_jobs=n_jobs):
+        indices = Parallel()(
+            delayed(_kucherenko_indices_single_variable)(k, seed, **kwargs)
+            for k, seed in zip(range(n_params), seed_list)
+        )
 
+    # store results
+    df_indices = (
+        pd.DataFrame(indices)
+        .melt(
+            id_vars="var",
+            value_vars=["first_order", "total"],
+            var_name="type",
+            value_name="value",
+        )
+        .set_index(["var", "type"])
+        .sort_index()
+    )
     return df_indices
+
+
+def _kucherenko_indices_single_variable(
+    k, seed, func, sampling_mean, sampling_cov, n_draws, sampling_scheme, skip
+):
+    """Compute Kucherenko indices for the k-th variable.
+
+    Args:
+        k (int): Variable index for which the Sobol indices should be computed.
+        seed (int): Random number generator seed.
+        func (callable): Function whose input-output relation we wish to analyze using
+            the Kucherenko indices. Must be broadcastable.
+        sampling_mean (np.ndarray): Expected value of the distribution on the input
+            space.
+        sampling_cov (np.ndarray): Covariance of the distribution on the input space.
+        sampling_scheme (str): Sampling scheme that is used for the creation of a base
+            uniform sequence from which the multivariate normal Monte Carlo sequence is
+            drawn. Options are "random" and "sobol". Default is "sobol", which creates a
+            Quasi Monte Carlo sequence that has favorable properties in lower
+            dimensions; however if the number of parameters (``len(mean)``) exceeds ~20
+            "random" can start to perform better. See https://tinyurl.com/p6grk3j.
+        n_draws (int): Number of Monte Carlo draws for the estimation of the indices.
+            Default is 10_000.
+        skip (int): How many values to skip of the Sobol sequence. Default is 0.
+
+    Returns:
+        indices (dict): Resulting Kucherenko/Sobol indices for the k-th variable,
+            stored in a dictionary with keys "var" (representing the k-th variable) and
+            "first_order" and "total" denoting the first_order and total Sobol indices.
+
+    """
+    shifted_cov = _shift_cov(sampling_cov, k)
+    shifted_mean = _shift_mean(sampling_mean, k)
+
+    shifted_samples = _kucherenko_samples(
+        shifted_mean, shifted_cov, n_draws, sampling_scheme, seed, skip
+    )
+    first_order, total = _general_sobol_indices(func, shifted_samples, k)
+
+    indices = {"var": k, "first_order": first_order, "total": total}
+    return indices
 
 
 def _general_sobol_indices(func, shifted_samples, k=0):
@@ -89,7 +182,7 @@ def _general_sobol_indices(func, shifted_samples, k=0):
 
     Args:
         func (callable): Function whose input-output relation we wish to analyze using
-            the Kucherenko indices.
+            the Kucherenko indices. Must be broadcastable.
         shifted_samples (namedtuple): Namedtuple which stores the independent and
             conditional Kucherenko samples. Samples are stored under attribute names
             'independent' and 'conditional', resp. Samples are ordered such that the
@@ -100,20 +193,20 @@ def _general_sobol_indices(func, shifted_samples, k=0):
         first_order, total (float): First order and total order general sobol indices.
 
     """
-    independent = shifted_samples.independent
-    conditional = shifted_samples.conditional
+    shifted_indep = shifted_samples.independent
+    shifted_cond = shifted_samples.conditional
 
-    y_zc = np.concatenate((independent[:, :1], conditional[:, 1:]), axis=1)
-    yc_z = np.concatenate((conditional[:, :1], independent[:, 1:]), axis=1)
+    y_zc = np.concatenate((shifted_indep[:, :1], shifted_cond[:, 1:]), axis=1)
+    yc_z = np.concatenate((shifted_cond[:, :1], shifted_indep[:, 1:]), axis=1)
 
-    unshifted_independent = _unshift_samples(independent, k)
-    unshifted_y_zc = _unshift_samples(y_zc, k)
-    unshifted_yc_z = _unshift_samples(yc_z, k)
+    independent = _unshift_array(shifted_indep, k)
+    y_zc = _unshift_array(y_zc, k)
+    yc_z = _unshift_array(yc_z, k)
 
-    f_y_z = func(unshifted_independent.T)
+    f_y_z = func(independent)
 
-    f_y_zc = func(unshifted_y_zc.T)
-    f_yc_z = func(unshifted_yc_z.T)
+    f_y_zc = func(y_zc)
+    f_yc_z = func(yc_z)
 
     mean_sq_yz = np.mean(f_y_z ** 2)
     sq_mean_yz = np.mean(f_y_z) ** 2
@@ -128,7 +221,7 @@ def _general_sobol_indices(func, shifted_samples, k=0):
     return first_order, total
 
 
-def _kucherenko_samples(mean, cov, n_draws, sampling_scheme):
+def _kucherenko_samples(mean, cov, n_draws, sampling_scheme, seed, skip):
     """Draw samples from independent and conditional distribution.
 
     TODO:
@@ -147,6 +240,8 @@ def _kucherenko_samples(mean, cov, n_draws, sampling_scheme):
             the distribution of which we want to sample.
         n_draws (int):
         sampling_scheme (str): One of ["sobol", "random"].
+        seed (int): Random number generator seed.
+        skip (int): How many values to skip of the Sobol sequence.
 
     Returns:
         samples (namedtuple): Namedtuple which stores the independent and conditional
@@ -156,15 +251,14 @@ def _kucherenko_samples(mean, cov, n_draws, sampling_scheme):
     n_params = len(mean)  # In the paper this variable is referred to as "n".
 
     # a) Draw uniform distributed (base) samples
-    u, u_prime = _get_uniform_base_draws(n_draws, n_params, sampling_scheme)
+    u, u_prime = _get_uniform_base_draws(n_draws, n_params, sampling_scheme, seed, skip)
 
     # b) with s = 1. Split uniform sample in two groups.
     v_prime = u_prime[:, :1]
     w_prime = u_prime[:, 1:]
 
     # c) Transform uniform draws to multivariate normal draws.
-    u_normal = _uniform_to_standard_normal(u)
-    x = _standard_normal_to_multivariate_normal(u_normal, mean, cov)
+    x = _uniform_to_multivariate_normal(u, mean, cov)
 
     # d) Split multivariate normal sample in two groups.
     y = x[:, :1]
@@ -207,6 +301,140 @@ def _kucherenko_samples(mean, cov, n_draws, sampling_scheme):
     return samples
 
 
+def _conditional_mean(y, mean_z, mean_y, cov_y, cov_yz):
+    """Compute conditional mean of normal marginal.
+
+    Compute conditional mean of variable z given a realization of variable y. See either
+    Kucherenko et al. 2012 [Equation 3.4] or https://tinyurl.com/jbsrcue.
+
+    For the below example consider the case of two variables z and y. Let the expected
+    value be E([z, y]) = [-1, 2] and the covariance Cov([z, y]) = [[1, 0.5], [0.5, 2]].
+    Applying the formula for conditional expectation for normal variables we then get
+
+            E(z|y=y) = E(z) + cov(z, y) * (1 / var(y)) * (y - E(y))
+                     = E(z) + (1 / 4) * (y - E(y))
+                     = -1 + (1/4) * (y - 2)
+
+    Args:
+        y (np.ndarray): Array on which to condition on.
+        mean_z (np.ndarray): Mean of variable `z`.
+        mean_y (np.ndarray): Mean of variable `y`.
+        cov_y (np.ndarray): Covariance-variance matrix of variable `y`.
+        cov_yz (np.ndarray): Covariance of variables `z` and `y`.
+
+    Returns:
+        mean_z_given_y (np.ndarray): Conditional mean of `z` given the realization y.
+
+    Example:
+    >>> import numpy as np
+    >>> mean = np.array([-1., 2.])
+    >>> cov = np.array([[1, 0.5], [0.5, 2]])
+    >>> y = np.array([0, 1, 2, 1, 2]).reshape(-1, 1)
+    >>> mean_z = mean[:1]
+    >>> mean_y = mean[1:]
+    >>> cov_y = cov[1:, 1:]
+    >>> cov_yz = cov[0, 1:]
+    >>> mean_z_given_y = _conditional_mean(y, mean_z, mean_y, cov_y, cov_yz)
+    >>> mean_z_given_y
+    array([-1.5 , -1.25, -1.  , -1.25, -1.  ])
+
+    """
+    update = cov_yz.dot(np.linalg.inv(cov_y)).dot((y - mean_y).T).T
+    mean_z_given_y = mean_z + update
+    return mean_z_given_y
+
+
+def _conditional_covariance(cov_z, cov_y, cov_zy):
+    """Compute conditional covariance of normal marginal.
+
+    Compute conditional covariance of variable z given variable y. See either
+    Kucherenko et al. 2012 [Equation 3.5] or https://tinyurl.com/jbsrcue.
+
+    For the below example consider the case of two variables z and y. Let the expected
+    value be E([z, y]) = [-1, 2] and the covariance Cov([z, y]) = [[1, 0.5], [0.5, 2]].
+    Applying the formula for conditional covariance for normal variables we then get
+
+            Var(z|y=y) = var(z) - cov(z, y) * (1 / var(y)) * cov(y, z)
+                       = var(z) - cov(z, y) ** 2 / var(y)
+                       = 1 - (0.5) ** 2 / 2
+                       = 0.875
+
+    Args:
+        cov_z (np.ndarray): Variance-Covariance matrix of variable `z`.
+        cov_y (np.ndarray): Variance-Covariance matrix of variable `y`.
+        cov_zy (np.ndarray): Covariance of variables `z` and `y`.
+
+    Returns:
+        cov_z_given_y (np.ndarray): Conditional covariance of `z` given `y`.
+
+    Example:
+    >>> import numpy as np
+    >>> cov = np.array([[1, 0.5], [0.5, 2]])
+    >>> cov_z = cov[:1, :1]
+    >>> cov_y = cov[1:, 1:]
+    >>> cov_yz = cov[0, 1:]
+    >>> cov_z_given_y = _conditional_covariance(cov_z, cov_y, cov_yz)
+    >>> cov_z_given_y
+    array([[0.875]])
+
+    """
+    update = cov_zy.dot(np.linalg.inv(cov_y)).dot(cov_zy.T)
+    cov_z_given_y = cov_z - update
+    return cov_z_given_y
+
+
+def _get_uniform_base_draws(n_draws, n_params, sampling_scheme, seed=0, skip=0):
+    """Get uniform random draws.
+
+    TODO:
+        - Should we replace random by quasi-random?
+        - Should we de-correlate the result as a finite sample correction.
+
+    Args:
+        n_draws (int): Number of uniform draws to generate.
+        n_params (int): Number of parameters of model.
+        sampling_scheme (str): one of ["sobol", "random"]
+        seed (int): Random number generator seed; default is 0.
+        skip (int): How many values to skip of the Sobol sequence.
+
+    Returns:
+        u, u_prime (np.ndarray): Arrays of shape (n_draws, n_params-1) and (n_draws,1)
+            with i.i.d draws from a uniform [0, 1] distribution.
+
+    """
+    np.random.seed(seed)
+
+    if sampling_scheme == "sobol":
+        draws = cp.generate_samples(
+            order=n_draws + skip, domain=2 * n_params, rule="S"
+        ).T
+    elif sampling_scheme == "random":
+        draws = np.random.uniform(size=(n_draws, 2 * n_params))
+        # draws = np.random.uniform(low=1e-5, high=1-1e-5, size=(n_draws, 2 * n_params))
+    else:
+        raise ValueError("Argument 'sampling_scheme' is not in {'sobol', 'random'}.")
+
+    skip = skip if sampling_scheme == "sobol" else 0
+
+    u = draws[skip:, :n_params]
+    u_prime = draws[skip:, n_params:]
+    return u, u_prime
+
+
+def _uniform_to_standard_normal(uniform):
+    """Convert i.i.d uniform draws to i.i.d standard normal draws.
+
+    Args:
+        uniform (np.ndarray): Can have any shape.
+
+    Returns
+        standard_normal (np.ndarray): Same shape as uniform.
+
+    """
+    standard_normal = norm.ppf(uniform)
+    return standard_normal
+
+
 def _standard_normal_to_multivariate_normal(draws, mean, cov):
     """Transform standard normal draws to multivariate normal.
 
@@ -221,99 +449,46 @@ def _standard_normal_to_multivariate_normal(draws, mean, cov):
         multivariate_draws (np.ndarray): Draws from the multivariate normal. Shape has
             the form (n_draws, n_params).
 
+    Example:
+    >>> import numpy as np
+    >>> draws = np.random.randn(10_000, 2)
+    >>> mean = np.array([-1., 2])
+    >>> cov = np.array([[1, 0.5], [0.5, 2]])
+    >>> m_draws = _standard_normal_to_multivariate_normal(draws, mean, cov)
+    >>> assert m_draws.mean(axis=0) == approx(mean, abs=0.1)
+    >>> assert np.cov(m_draws, rowvar=False) == approx(cov, abs=0.1)
+
     """
     cholesky = np.linalg.cholesky(cov)
     multivariate_draws = mean + cholesky.dot(draws.T).T
     return multivariate_draws
 
 
-def _conditional_mean(y, mean_z, mean_y, cov_y, cov_yz):
-    """Compute conditional mean of normal marginal.
-
-    Compute conditional mean of variable z given a realization of variable y. See either
-    Kucherenko et al. 2012 [Equation 3.4] or https://tinyurl.com/jbsrcue.
+def _uniform_to_multivariate_normal(uniform, mean, cov):
+    """Transform uniform draws to multivariate normal.
 
     Args:
-        y (np.ndarray): Array on which to condition on.
-        mean_z (np.ndarray): Mean of variable `z`.
-        mean_y (np.ndarray): Mean of variable `y`.
-        cov_y (np.ndarray): Covariance-variance matrix of variable `y`.
-        cov_yz (np.ndarray): Covariance of variables `z` and `y`.
+        uniform (np.ndarray): Uniform draws with shape (n_draws, n_params).
+        mean (np.ndarray): Mean of the new distribution. Must have length n_params.
+        cov (np.ndarray): Covariance of the new distribution. Must have shape
+            (n_params, n_params).
 
     Returns:
-        mean_z_given_y (np.ndarray): Conditional mean of `z` given the realization y.
+        normal (np.ndarray): Draws from the multivariate normal. Shape has the form
+            (n_draws, n_params).
 
+    Example:
+    >>> import numpy as np
+    >>> draws = np.random.uniform(size=(10_000, 2))
+    >>> mean = np.array([-1., 2])
+    >>> cov = np.array([[1, 0.5], [0.5, 2]])
+    >>> m_draws = _uniform_to_multivariate_normal(draws, mean, cov)
+    >>> assert m_draws.mean(axis=0) == approx(mean, abs=0.1)
+    >>> assert np.cov(m_draws, rowvar=False) == approx(cov, abs=0.1)
     """
-    update = cov_yz.dot(np.linalg.inv(cov_y)).dot((y - mean_y).T).T
-    mean_z_given_y = mean_z + update
-    return mean_z_given_y
-
-
-def _conditional_covariance(cov_z, cov_y, cov_zy):
-    """Compute conditional covariance of normal marginal.
-
-    Compute conditional covariance of variable z given variable y. See either
-    Kucherenko et al. 2012 [Equation 3.5] or https://tinyurl.com/jbsrcue.
-
-    Args:
-        cov_z (np.ndarray): Variance-Covariance matrix of variable `z`.
-        cov_y (np.ndarray): Variance-Covariance matrix of variable `y`.
-        cov_zy (np.ndarray): Covariance of variables `z` and `y`.
-
-    Returns:
-        cov_z_given_y (np.ndarray): Conditional covariance of `z` given `y`.
-
-    """
-    update = cov_zy.dot(np.linalg.inv(cov_y)).dot(cov_zy.T)
-    cov_z_given_y = cov_z + update
-    return cov_z_given_y
-
-
-def _get_uniform_base_draws(n_draws, n_params, sampling_scheme):
-    """Get uniform random draws.
-
-    Questions:
-    - Should we replace random by quasi-random?
-    - Should we de-correlate the result as a finite sample correction.
-
-    Args:
-        n_draws (int): Number of uniform draws to generate.
-        n_params (int): Number of parameters of model.
-        sampling_scheme (str): one of ["sobol", "random"]
-
-    Returns:
-        u, u_prime (np.ndarray): Arrays of shape (n_draws, n_params) with i.i.d draws
-            from a uniform [0, 1] distribution.
-
-    """
-    if sampling_scheme == "sobol":
-        draws = cp.generate_samples(order=n_draws * 2 * n_params, rule="S").reshape(
-            n_draws, -1
-        )
-
-    elif sampling_scheme == "random":
-        draws = np.random.uniform(low=1e-5, high=1 - 1e-5, size=(n_draws, 2 * n_params))
-
-    else:
-        raise ValueError("Argument 'sampling_scheme' is not in {'sobol', 'random'}.")
-
-    u = draws[:, :n_params]
-    u_prime = draws[:, n_params:]
-
-    return u, u_prime
-
-
-def _uniform_to_standard_normal(uniform):
-    """Convert i.i.d uniform draws to i.i.d standard normal draws.
-
-    Args:
-        uniform (np.ndarray): Can have any shape.
-
-    Returns
-        standard_normal (np.ndarray): Same shape as uniform.
-
-    """
-    return norm.ppf(uniform)
+    standard_normal = _uniform_to_standard_normal(uniform)
+    normal = _standard_normal_to_multivariate_normal(standard_normal, mean, cov)
+    return normal
 
 
 @nb.guvectorize(
@@ -330,19 +505,19 @@ def _shift_sample(sample, k, out):
     guvectorize is not used for speed, but to get automatic broadcasting.
 
     Args:
-        sample (np.ndarray): Array of shape [..., m]
-        k (int): 0 <= k <= m
+        sample (np.ndarray): Array of shape [..., n_params]
+        k (int): 0 <= k <= n_params
 
     Returns:
         shifted (np.ndarray): Same shape as sample.
 
     """
-    m = len(sample)
+    n_params = len(sample)
     for old_pos in range(k):
-        new_pos = m - k + old_pos
+        new_pos = n_params - k + old_pos
         out[new_pos] = sample[old_pos]
 
-    for new_pos, old_pos in enumerate(range(k, m)):
+    for new_pos, old_pos in enumerate(range(k, n_params)):
         out[new_pos] = sample[old_pos]
 
 
@@ -350,58 +525,151 @@ def _shift_cov(cov, k):
     """Re-sort a covariance matrix such that the fist k elements are moved to the end.
 
     Args:
-        cov (np.ndarray): Two dimensional array of shape (m, m)
-        k (int): 0 <= k <= m
+        cov (np.ndarray): Two dimensional array of shape (n_params, n_params)
+        k (int): 0 <= k <= n_params
 
     Returns:
         shifted (np.ndarray): Same shape as cov.
 
+    Example:
+    >>> import numpy as np
+    >>> cov = np.array([[1, 0, 0], [0, 2, 0.5], [0, 0.5, 3]])
+    >>> _shift_cov(cov, 2)
+    array([[3. , 0. , 0.5],
+           [0. , 1. , 0. ],
+           [0.5, 0. , 2. ]])
+
     """
-    m = len(cov)
-    old_order = np.arange(m).astype(int)
+    n_params = len(cov)
+    old_order = np.arange(n_params).astype(int)
     new_order = _shift_sample(old_order, k).astype(int)
-    return cov[new_order][:, new_order]
+
+    shifted = cov.copy()[new_order][:, new_order]
+    return shifted
+
+
+def _unshift_cov(cov, k):
+    """Re-sort a covariance matrix such that the last k elements are moved to the start.
+
+    Args:
+        cov (np.ndarray): Two dimensional array of shape (n_params, n_params)
+        k (int): 0 <= k <= n_params
+
+    Returns:
+        unshifted (np.ndarray): Same shape as cov.
+
+    Example:
+    >>> import numpy as np
+    >>> cov = np.array([[1, 0, 0], [0, 2, 0.5], [0, 0.5, 3]])
+    >>> shifted = _shift_cov(cov, 2)
+    >>> _unshift_cov(shifted, 2)
+    array([[1. , 0. , 0. ],
+           [0. , 2. , 0.5],
+           [0. , 0.5, 3. ]])
+
+    """
+    n_params = len(cov)
+    unshifted = _shift_cov(cov, n_params - k)
+    return unshifted
 
 
 def _shift_mean(mean, k):
     """Re-sort a mean vector such that the fist k elements are moved to the end.
 
     Args:
-        mean (np.ndarray): One dimensional array of shape (m)
-        k (int): 0 <= k <= m
+        mean (np.ndarray): One dimensional array of shape (n_params).
+        k (int): 0 <= k <= n_params.
 
     Returns:
         shifted (np.ndarray): Same shape as mean.
 
+    Example:
+    >>> import numpy as np
+    >>> mean = np.arange(10)
+    >>> _shift_mean(mean, 5)
+    array([5, 6, 7, 8, 9, 0, 1, 2, 3, 4])
+
     """
-    m = len(mean)
-    old_order = np.arange(m).astype(int)
+    n_params = len(mean)
+    old_order = np.arange(n_params).astype(int)
     new_order = _shift_sample(old_order, k).astype(int)
-    return mean[new_order]
+
+    shifted = mean.copy()[new_order]
+    return shifted
 
 
-def _unshift_samples(samples, k):
-    """Unshift samples produced by ``_kucherenko_samples``.
-
-    Samples produced by function ``_kucherenko_samples`` are shifted by order k if the
-    input arguments are shifted by order k. That is, we call ``_kucherenko_samples``
-    with mean and covariance where the first k elements are shifted to the end. This
-    function repairs this shift by *unshifting* the samples such that the original
-    order is restored.
+def _unshift_mean(mean, k):
+    """Re-sort a mean vector such that the fist k elements are moved to the end.
 
     Args:
-        samples (np.ndarray): Samples produced by function ``_kucherenko_samples``.
-        k (int): Value by how many indeces the inputs to ``_kucherenko_samples`` were
-            shifted.
+        mean (np.ndarray): One dimensional array of shape (n_params).
+        k (int): 0 <= k <= n_params.
 
     Returns:
-        unshifted (namedtuple): The unshifted samples with same attributes as argument
-            samples.
+        unshifted (np.ndarray): Same shape as mean.
+
+    Example:
+    >>> import numpy as np
+    >>> mean = np.arange(10)
+    >>> _shift_mean(mean, 5)
+    array([5, 6, 7, 8, 9, 0, 1, 2, 3, 4])
 
     """
-    n_params = samples.shape[1]
-    old_order = np.arange(n_params).astype(int)
-    new_order = _shift_sample(old_order, n_params - k).astype(int)
+    n_params = len(mean)
+    unshifted = _shift_mean(mean, n_params - k)
+    return unshifted
 
-    unshifted = samples.copy()[:, new_order]
+
+def _shift_array(arr, k):
+    """Re-sort a 2d array such that the fist k columns are moved to the end.
+
+    Args:
+        arr (np.ndarray): Two dimensional array of shape (n_draws, n_params).
+        k (int): 0 <= k <= n_params.
+
+    Returns:
+        shifted (np.ndarray): Same shape as array.
+
+    Example:
+    >>> import numpy as np
+    >>> arr = np.arange(10).reshape(2, 5)
+    >>> _shift_array(arr, 3)
+    array([[3, 4, 0, 1, 2],
+           [8, 9, 5, 6, 7]])
+
+    """
+    n_params = arr.shape[1]
+
+    old_order = np.arange(n_params).astype(int)
+    new_order = _shift_sample(old_order, k).astype(int)
+
+    shifted = arr.copy()[:, new_order]
+    return shifted
+
+
+def _unshift_array(arr, k):
+    """Re-sort a 2d array such that the last k columns are moved to the beginning.
+
+    If ``arr`` was produced by calling ``_shift_array`` on some original array arr_0
+    with shift k_0, then calling ``_unshift_array`` on ``arr``, with ``k`` equal to
+    the number of columns of ``arr`` minus k_0, recovers the original array arr_0.
+
+    Args:
+        arr (np.ndarray): Two dimensional array of shape (n_draws, n_params).
+        k (int): 0 <= k <= n_params.
+
+    Returns:
+        unshifted (np.ndarray): Same shape as array.
+
+    Example:
+    >>> import numpy as np
+    >>> arr = np.arange(10).reshape(2, 5)
+    >>> shifted = _shift_array(arr, 3)
+    >>> _unshift_array(shifted, 3)
+    array([[0, 1, 2, 3, 4],
+           [5, 6, 7, 8, 9]])
+
+    """
+    n_params = arr.shape[1]
+    unshifted = _shift_array(arr, n_params - k)
     return unshifted
