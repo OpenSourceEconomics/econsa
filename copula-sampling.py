@@ -14,343 +14,351 @@
 #     name: python3
 # ---
 
-# import numba as nb
+# +
 import numpy as np
 import pandas as pd
 import scipy.stats as stats
 import chaospy as cp
-# from pathlib import Path
-# from multiprocessing import Pool
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# import numba as nb
 
-# +
-# from temfpy.uncertainty_quantification import eoq_model
+# from pathlib import Path
+# from multiprocessing import Pool
 # -
+
+from temfpy.uncertainty_quantification import eoq_model
 
 # # Harris Model from [Sensitivity analysis: A review of recent advances](https://www.sciencedirect.com/science/article/abs/pii/S0377221715005469)
 
-# Economic order quantity model, or Harris model, was developed by [Harris (1990)](https://doi.org/10.1287/opre.38.6.947), to solve the problem of firms determining the ideal order size for one year, considering inventory costs and ordering costs.
-#
-# The model takes four variables, and determins the total ordering cost $T$:
-#
-# $$T = \frac{1}{2\cdot 12R\cdot M}(CX + S) +\frac{S}{X} + C$$
-#
-# - $M$ denotes the number of goods needed per month
-# - $C$ denotes the unit price of the good
-# - $X$ denotes the order size
-# - $S$ denotes the cost of placing an order (setup cost)
-#
-# and $R$ is the interest and depreciation cost per month ($R=10$ in Harris (1990)), which we treat as an exogenous parameter. 
-#
-# Therefore, $T$ is an function of $X$, and we can calculate the optimal order size $X^*$ by solving:
-#
-# $$\begin{aligned}\min_{X} && T &= \frac{1}{2\cdot 12R\cdot M}(CX + S) +\frac{S}{X} + C \\
-# && \frac{\partial T}{\partial X} &= \frac{C}{24R\cdot M} - \frac{S}{X^2} \overset{!}{=} 0 \\
-# && X^* &= \sqrt{\frac{24R\cdot MS}{C}}\end{aligned}$$
-#
-# $X^*$ is called economic order quantity(EOQ).
-#
-# In sensitivity analysis, $X^*$ is denoted as $y$, the model output, and the model inputs are $M$, $C$ and $S$, denoted as $\mathbf{x}=(x_1,x_2,x_3)'$:
-#
-# $$y = \sqrt{\frac{24r\cdot x_1 x_3}{x_2}}$$
-#
-# We are interested in how $y$ changes depending on each $x_i$, in other words, the sensitivity of $y$ with regard to $x_i$.
+# +
+# function for constructing fig. 4:
 
-# ## EOQ Function
 
-# EOQ from [temfpy/uncertainty_quantification.py](https://github.com/OpenSourceEconomics/temfpy/blob/master/temfpy/uncertainty_quantification.py)
-
-def eoq_model(x, r=0.1):
-    r"""Economic order quantity model.
-    This function computes the optimal economic order quantity (EOQ) based on the model presented in
-    [H1990]_. The EOQ minimizes the holding costs as well as ordering costs. The core parameters of
-    the model are the units per months `x[0]`, the unit price of items in stock `x[1]`,
-    and the setup costs of an order `x[2]`. The annual interest rate `r` is treated as an
-    additional parameter.
-    Parameters
-    ----------
-    x : array_like
-        Core parameters of the model
-    r : float, optional
-        Annual interest rate
-    Returns
-    -------
-    float
-        Optimal order quantity
-    Notes
-    -----
-    A historical perspective on the model is provided by [E1990]_. A brief description with the core
-    equations is available in [W2020]_.
-    References
-    ----------
-    .. [H1990] Harris, F. W. (1990).
-        How many parts to make at once.
-        Operations Research, 38(6), 947–950.
-    .. [E1990] Erlenkotter, D. (1990).
-        Ford Whitman Harris and the economic order quantity model.
-        Operations Research, 38(6), 937–946.
-    .. [W2020] Economic order quantity. (2020, April 3). In Wikipedia.
-        Retrieved from
-        `https://en.wikipedia.org/w/index.php\
-        ?title=Economic_order_quantity&oldid=948881557 <https://en.wikipedia.org/w/index.php
-        ?title=Economic_order_quantity&oldid=948881557>`_
-    Examples
-    --------
-    >>> x = [1, 2, 3]
-    >>> y = eoq_model(x, r=0.1)
-    >>> np.testing.assert_almost_equal(y, 18.973665961010276)
+def eoq_model_partial(x, r=0.1, fix_num=0):
+    """
+    Calculate the value of eoq_harris,
+    fixing one x.
+    
+    Args: 
+        params (np.array): 1d numpy array,
+                           cuurrently only need the first param,
+                           which is interest & depreciation rate, r=10.
+        x (np.array or list): 2d numpy array with the independent variables,
+                              currently only need the first 3 columns.
+        fix_num (int): take value of 0~n-1.
+    Output:
+        y (np.array): 2d numpy array with the dependent variables,
+                      keeping the fix_num-th x fixed.
     """
 
-    m, c, s = x
-    y = np.sqrt((24 * m * s) / (r * c))
+    x_np = np.array(x)
 
+    y = np.zeros(shape=(x_np.T.shape[0], x_np.T.shape[0]))
+
+    if fix_num == 0:
+        for i, x_i in enumerate(x_np[fix_num]):
+            y[i] = np.sqrt((24 * r * x_i * x_np[2]) / x_np[1])
+    elif fix_num == 1:
+        for i, x_i in enumerate(x_np[fix_num]):
+            y[i] = np.sqrt((24 * r * x_np[0] * x_np[2]) / x_i)
+    elif fix_num == 2:
+        for i, x_i in enumerate(x_np[fix_num]):
+            y[i] = np.sqrt((24 * r * x_np[0] * x_i) / x_np[1])
     return y
 
+
+# -
 
 # ## Data Generation
 
 # +
 # Set flags
 
-seed = 123
+seed = 1234
 n = 10000
 
 x_min_multiplier = 0.9
 x_max_multiplier = 1.1
+
 m_0 = 1230
 c_0 = 0.0135
 s_0 = 2.15
 # -
 
+params = np.zeros(shape=(1, 1))
+params[0, 0] = 10
+
+x_min_multiplier * m_0, x_max_multiplier * m_0
+
 # ### No Monte Carlo
 
+# +
 np.random.seed(seed)
-m = np.random.uniform(low=x_min_multiplier*m_0,
-                      high=x_max_multiplier*m_0,
-                      size=n)
-c = np.random.uniform(low=x_min_multiplier*c_0,
-                      high=x_max_multiplier*c_0,
-                      size=n)
-s = np.random.uniform(low=x_min_multiplier*s_0,
-                      high=x_max_multiplier*s_0,
-                      size=n)
+
+m = np.random.uniform(low=x_min_multiplier * m_0, high=x_max_multiplier * m_0, size=n)
+c = np.random.uniform(low=x_min_multiplier * c_0, high=x_max_multiplier * c_0, size=n)
+s = np.random.uniform(low=x_min_multiplier * s_0, high=x_max_multiplier * s_0, size=n)
+
+y = eoq_model([m, c, s])
+
 plt.clf()
 sns.distplot(m)
+# -
 
 # ### Monte Carlo with `rvs`
 
+# +
 np.random.seed(seed)
-m = stats.uniform(x_min_multiplier*m_0,
-                    x_max_multiplier*m_0).rvs(10000)
-c = stats.uniform(x_min_multiplier*c_0,
-                    x_max_multiplier*c_0).rvs(10000)
-s = stats.uniform(x_min_multiplier*s_0,
-                    x_max_multiplier*s_0).rvs(10000)
+
+m = stats.uniform(x_min_multiplier * m_0, x_max_multiplier * m_0).rvs(10000)
+c = stats.uniform(x_min_multiplier * c_0, x_max_multiplier * c_0).rvs(10000)
+s = stats.uniform(x_min_multiplier * s_0, x_max_multiplier * s_0).rvs(10000)
+
+y = eoq_model([m, c, s])
+# -
 
 plt.clf()
 sns.distplot(m)
 
-# ### Monte Carlo with Chaospy (Closer numbers to Borgonovoa & Plischkeb (2016))
+plt.clf()
+sns.distplot(y, hist_kws=dict(cumulative=True))
+
+plt.clf()
+sns.distplot(y)
+
+# ### Monte Carlo with Chaospy (Closer to Borgonovoa & Plischkeb (2016))
 
 sample_rule = "random"
 
+# +
 np.random.seed(seed)
-m = cp.Uniform(x_min_multiplier*m_0,
-               x_max_multiplier*m_0).sample(n, rule=sample_rule)
-c = cp.Uniform(x_min_multiplier*c_0,
-               x_max_multiplier*c_0).sample(n, rule=sample_rule)
-s = cp.Uniform(x_min_multiplier*s_0,
-               x_max_multiplier*s_0).sample(n, rule=sample_rule)
+
+m = cp.Uniform(x_min_multiplier * m_0, x_max_multiplier * m_0).sample(
+    n, rule=sample_rule
+)
+c = cp.Uniform(x_min_multiplier * c_0, x_max_multiplier * c_0).sample(
+    n, rule=sample_rule
+)
+s = cp.Uniform(x_min_multiplier * s_0, x_max_multiplier * s_0).sample(
+    n, rule=sample_rule
+)
+
+y = eoq_model([m, c, s])
+# -
+
+df_monte_carlo = pd.DataFrame(data=[y, m, c, s])
+
+# ## Graphs
+
+# +
+df_monte_carlo = pd.DataFrame(data=[y, m, c, s])
 
 plt.clf()
-sns.distplot(m)
+fig, ax = plt.subplots(figsize=(6, 5))
+ax = sns.heatmap(
+    df_monte_carlo.T.corr(),
+    vmin=-1,
+    vmax=1,
+    center=0,
+    cmap="RdBu_r",
+    annot=True,
+    fmt=".2f",
+)
+ax.set_xticklabels(["y", "m", "c", "s"])
+ax.set_yticklabels(["y", "m", "c", "s"])
+plt.show()
+# -
 
-x = np.array([m, c, s])
-x
+# ### Fig. 4
 
-y = eoq_model(x)
+y_fix_m = eoq_model_partial([m, c, s], fix_num=0)
+
+y_fix_m.shape
+
+# +
+# don't try at home:
+# -
 
 plt.clf()
-sns.jointplot(x=x[0], y=x[1], kind="hex")
+# sns.set_palette(cubehelix)
+for item in y_fix_m:
+    sns.kdeplot(item)
 
-plt.clf()
-sns.jointplot(x=x[0], y=y, kind="hex")
-
-# # Correlated Sampling with Harris Model
+# # Harris: Correlated Sampling: Copula
 
 # ## Generation
 
 # - `.Nataf(dist, R, ordering=None)`
 # - `.TCopula(dist, df, R)`
+# - `.AliMikhailHaq(dist, theta=0.5, eps=1e-06)`
 
-m_dist = cp.Uniform(x_min_multiplier*m_0, x_max_multiplier*m_0)
-c_dist = cp.Uniform(x_min_multiplier*c_0, x_max_multiplier*c_0)
-s_dist = cp.Uniform(x_min_multiplier*s_0, x_max_multiplier*s_0)
+# +
+m_uniform = cp.Uniform(x_min_multiplier * m_0, x_max_multiplier * m_0)
+c_uniform = cp.Uniform(x_min_multiplier * c_0, x_max_multiplier * c_0)
+s_uniform = cp.Uniform(x_min_multiplier * s_0, x_max_multiplier * s_0)
 
-R = [
-     [1, 0.5, 0.4],
-     [0.5, 1, 0.7],
-     [0.4, 0.7, 1]
-    ]
+x_uniform = cp.J(m_uniform, c_uniform, s_uniform)
+# -
 
-x_dist = cp.J(m_dist, c_dist, s_dist)
-x_copula = cp.Nataf(x_dist, R)
+R = [[1, 0.5, 0.4], [0.5, 1, 0.7], [0.4, 0.7, 1]]
+
+x_copula = cp.Nataf(x_uniform, R)
 
 np.random.seed(seed)
 x_copula_sample = x_copula.sample(n)
 
 y_copula = eoq_model(x_copula_sample)
 
-# ## X's
+# ## Graphs
+
+df_chaospy_copula = pd.DataFrame(
+    data=[y_copula, x_copula_sample[0], x_copula_sample[1], x_copula_sample[2]]
+)
 
 plt.clf()
-sns.distplot(x_copula_sample[0])
-
-plt.clf()
-sns.jointplot(x=x_copula_sample[0],
-              y=x_copula_sample[1],
-              kind="hex")
-
-sns.jointplot(x=x_copula_sample[0],
-              y=x_copula_sample[2],
-              kind="hex")
-
-sns.jointplot(x=x_copula_sample[1],
-              y=x_copula_sample[2],
-              kind="hex")
+fig, ax = plt.subplots(figsize=(6, 5))
+ax = sns.heatmap(
+    df_chaospy_copula.T.corr(),
+    vmin=-1,
+    vmax=1,
+    center=0,
+    cmap="RdBu_r",
+    annot=True,
+    fmt=".2f",
+)
+ax.set_xticklabels(["y", "m", "c", "s"])
+ax.set_yticklabels(["y", "m", "c", "s"])
+plt.show()
 
 # ## X & y
 
 plt.clf()
-sns.jointplot(x=x_copula_sample[0],
-              y=y_copula,
-              kind="hex")
+sns.jointplot(x=x_copula_sample[0], y=y_copula, kind="hex")
 
 plt.clf()
-sns.jointplot(x=x_copula_sample[1],
-              y=y_copula,
-              kind="hex")
+sns.jointplot(x=x_copula_sample[1], y=y_copula, kind="hex")
 
 plt.clf()
-sns.jointplot(x=x_copula_sample[2],
-              y=y_copula,
-              kind="hex")
+sns.jointplot(x=x_copula_sample[2], y=y_copula, kind="hex")
 
-# # Replicating: [Introducing Copula in Monte Carlo Simulation](https://towardsdatascience.com/introducing-copula-in-monte-carlo-simulation-9ed1fe9f905)
+# # Harris: Correlated Sampling: Rosenblatt: stats
 
-# ## Random Variable Transformation
+# According to [Introducing Copula in Monte Carlo Simulation - Towards Data Science](https://towardsdatascience.com/introducing-copula-in-monte-carlo-simulation-9ed1fe9f905).
 
 # +
-# Generate Monte Carlo sample
+x_normal = stats.multivariate_normal(mean=[m_0, s_0, c_0], cov=R)
 
-x = stats.uniform(0, 1).rvs(10000)
+np.random.seed(seed)
+x_normal_sample = x_normal.rvs(n)
+# -
+
+x_uniform = stats.norm(loc=[m_0, s_0, c_0])
+x_uniform_sample = x_uniform.cdf(x_normal_sample)
+
+m_uniform = stats.uniform.ppf(
+    x_uniform_sample[:, 0],
+    loc=x_min_multiplier * m_0,
+    scale=(x_max_multiplier - x_min_multiplier) * m_0,
+)
+
+s_uniform = stats.uniform.ppf(
+    x_uniform_sample[:, 1],
+    loc=x_min_multiplier * s_0,
+    scale=(x_max_multiplier - x_min_multiplier) * s_0,
+)
+
+c_uniform = stats.uniform.ppf(
+    x_uniform_sample[:, 2],
+    loc=x_min_multiplier * c_0,
+    scale=(x_max_multiplier - x_min_multiplier) * c_0,
+)
+
+y_rosenblatt = eoq_model([m_uniform, s_uniform, c_uniform])
+
+# ## Graphs
+
+# +
+df_stats_rosenblatt = pd.DataFrame(data=[y_rosenblatt, m_uniform, s_uniform, c_uniform])
+
+plt.clf()
+fig, ax = plt.subplots(figsize=(6, 5))
+ax = sns.heatmap(
+    df_stats_rosenblatt.T.corr(),
+    vmin=-1,
+    vmax=1,
+    center=0,
+    cmap="RdBu_r",
+    annot=True,
+    fmt=".2f",
+)
+ax.set_xticklabels(["y", "m", "c", "s"])
+ax.set_yticklabels(["y", "m", "c", "s"])
+plt.show()
 # -
 
 plt.clf()
-sns.distplot(x)
-
-norm = stats.distributions.norm()
-x_trans = norm.ppf(x)
+sns.jointplot(x=m_uniform, y=y_rosenblatt, kind="hex")
 
 plt.clf()
-sns.distplot(x_trans)
+sns.jointplot(x=s_uniform, y=y_rosenblatt, kind="hex")
 
 plt.clf()
-sns.jointplot(x=x, y=x_trans)
+sns.jointplot(x=c_uniform, y=y_rosenblatt, kind="hex")
 
-# ## Gaussian Copula — Adding Variable Correlations
+# # Harris: Correlated Sampling: Rosenblatt: chaospy
 
-mvnorm = stats.multivariate_normal([0, 0], [[1., 0.5], [0.5, 1.]])
-x = mvnorm.rvs((10000,))
+x_normal = cp.MvNormal(loc=[m_0, s_0, c_0], scale=R)
 
-sns.jointplot(x=x[:,0], y=x[:,1], kind="kde")
-
-norm = stats.norm([0],[1])
-x_unif = norm.cdf(x)
-
-plt.clf()
-sns.jointplot(x=x_unif[:,0], y=x_unif[:,1], kind="hex")
-
-x1_tri  = stats.triang.ppf(x_unif[:, 0],  c=0.158 , loc=36, scale=21)
-x2_norm =stats.norm(525, 112).ppf(x_unif[:, 1])
-
-plt.clf()
-sns.distplot(x1_tri)
-
-plt.clf()
-sns.distplot(x2_norm)
-
-plt.clf()
-sns.jointplot(x=x1_tri, y=x2_norm, kind="hex")
-
-# ## Probabilistic Estimation of HCIIP
-
-# ### No Variable Correlation Case
+cp.Cov(x_normal)
 
 # +
-# HCIIP = GRV*NTG*POR*SHC/FVF
+m_uniform = cp.Uniform(x_min_multiplier * m_0, x_max_multiplier * m_0)
+c_uniform = cp.Uniform(x_min_multiplier * c_0, x_max_multiplier * c_0)
+s_uniform = cp.Uniform(x_min_multiplier * s_0, x_max_multiplier * s_0)
 
-means = [0.]*5
-cov = [[1., 0., 0., 0., 0.],
-[0., 1., 0., 0., 0.],
-[0., 0., 1., 0., 0.],
-[0., 0., 0., 1., 0.],
-[0., 0., 0., 0., 1.]]
-
-mvnorm_std = stats.multivariate_normal(means,cov)
-x = mvnorm_std.rvs(10000,random_state=42)
-norm_std = stats.norm()
-x_unif = norm_std.cdf(x)
-
-#create individual distr.
-grv = stats.triang(c=0.1 , loc=10000, scale=300).ppf(x_unif[:, 0])
-ntg = stats.triang(c=0.2 , loc=0.5, scale=0.5).ppf(x_unif[:, 1])
-phi = stats.truncnorm(-2*1.96,1.96,0.2,0.05).ppf(x_unif[:, 2])
-shc = stats.norm(0.6,0.05).ppf(x_unif[:, 3])
-fvf= stats.truncnorm(-1.96,2*1.96,1.3,0.1).ppf(x_unif[:, 4])
-
-stoiip = 7758*grv*ntg*phi*shc/fvf/1e6
+x_uniform = cp.J(m_uniform, c_uniform, s_uniform)
 # -
 
-plt.clf()
-sns.distplot(stoiip, kde=False)
+cp.Cov(x_uniform)
+
+np.random.seed(seed)
+x_normal_sample = x_normal.sample(n, rule="hammersley")
+
+x_rosenblatt = x_uniform.inv(x_normal.fwd(x_normal_sample))
+x_rosenblatt
+
+y_rosenblatt = eoq_model(x_rosenblatt)
 
 plt.clf()
-sns.distplot(stoiip, hist_kws=dict(cumulative=True))
+sns.jointplot(x=x_normal_sample[0], y=x_normal_sample[1], kind="hex")
 
-# ### Variable Correlation Case
+# ## Graphs
+
+# What's wrong with this????
 
 # +
-means = [0.]*5
+df_chaospy_rosenblatt = pd.DataFrame(
+    data=[y_rosenblatt, x_rosenblatt[0], x_rosenblatt[1], x_rosenblatt[2]]
+)
 
-cov = [[1., 0., 0., 0., 0.],
-[0., 1., 0.7, 0.6, 0.],
-[0., 0.7, 1., 0.8, 0.],
-[0., 0.6, 0.8, 1., 0.],
-[0., 0., 0., 0., 1.]]
+plt.clf()
+fig, ax = plt.subplots(figsize=(6, 5))
+ax = sns.heatmap(
+    df_chaospy_rosenblatt.T.corr(),
+    vmin=-1,
+    vmax=1,
+    center=0,
+    cmap="RdBu_r",
+    annot=True,
+    fmt=".2f",
+)
+ax.set_xticklabels(["y", "m", "c", "s"])
+ax.set_yticklabels(["y", "m", "c", "s"])
 
-mvnorm_std = stats.multivariate_normal(means,cov)
-x = mvnorm_std.rvs(10000,random_state=42)
-norm_std = stats.norm()
-x_unif = norm_std.cdf(x)
-
-#create individual distr.
-grv = stats.triang(c=0.1 , loc=10000, scale=300).ppf(x_unif[:, 0])
-ntg = stats.triang(c=0.2 , loc=0.5, scale=0.5).ppf(x_unif[:, 1])
-phi = stats.truncnorm(-2*1.96,1.96,0.2,0.05).ppf(x_unif[:, 2])
-shc = stats.norm(0.6,0.05).ppf(x_unif[:, 3])
-fvf= stats.truncnorm(-1.96,2*1.96,1.3,0.1).ppf(x_unif[:, 4])
-
-stoiip = 7758*grv*ntg*phi*shc/fvf/1e6
+plt.show()
 # -
-
-plt.clf()
-sns.distplot(stoiip, kde=False)
-
-plt.clf()
-sns.distplot(stoiip, hist_kws=dict(cumulative=True))
 
 # # Testing ChaosPy: [Distributions — ChaosPy documentation](https://chaospy.readthedocs.io/en/master/distributions/index.html)
 
@@ -378,7 +386,7 @@ distribution.sample(size=6, rule="halton", antithetic=True).round(4)
 # ## Moments: [Descriptive Statistics — ChaosPy documentation](https://chaospy.readthedocs.io/en/master/descriptives.html#descriptives)
 
 # the variance is defined as follows:
-distribution.mom(2) - distribution.mom(1)**2
+distribution.mom(2) - distribution.mom(1) ** 2
 
 # or:
 cp.Var(distribution)
@@ -396,8 +404,6 @@ np.random.seed(1234)
 dist = cp.Iid(cp.Uniform(), 2)
 copula = cp.Gumbel(dist, theta=1.5)
 
-dist
-
 copula
 
 np.random.seed(1234)
@@ -407,5 +413,3 @@ plt.clf()
 sns.jointplot(x=sample[0], y=sample[1], kind="hex")
 
 # ok, what now…
-
-
