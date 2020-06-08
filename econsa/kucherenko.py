@@ -10,6 +10,11 @@ explainatory.
 
 TODO:
     - Add possibility that input data is a pandas data frame
+    - Evaluate function calls outside
+    - Add bounds
+    - Check why sometimes errors and sometimes NaN when bounds violated
+    - Pass sampler and make defualt sampler accept uniform and normal
+
 """
 import warnings
 from collections import namedtuple
@@ -224,11 +229,6 @@ def _general_sobol_indices(func, shifted_samples, k=0):
 def _kucherenko_samples(mean, cov, n_draws, sampling_scheme, seed, skip):
     """Draw samples from independent and conditional distribution.
 
-    TODO:
-        - FIND OUT IF THIS IS IMPORTANT: cov_new = np.cov(x)
-        - Explain better what I'm doing here
-        - Name, kuchereno_samples or conditional_gaussian_sampling?
-
     Draw samples as formulated in the second algorithm of [Section 6]. Steps of the
     algorithm [a) - i)] are marked as comments in the code. Variable names should
     coincide with symbols used in Kucherenko et al. 2012.
@@ -238,7 +238,7 @@ def _kucherenko_samples(mean, cov, n_draws, sampling_scheme, seed, skip):
             distribution of which we want to sample.
         cov (np.ndarray): Array of shape d x d, representing the covariance of
             the distribution of which we want to sample.
-        n_draws (int):
+        n_draws (int): Number of samples to draw.
         sampling_scheme (str): One of ["sobol", "random"].
         seed (int): Random number generator seed.
         skip (int): How many values to skip of the Sobol sequence.
