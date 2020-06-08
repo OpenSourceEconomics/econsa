@@ -9,4 +9,4 @@ We provide several tutorials that showcase the use case for ``econsa``.
 
    eoq-model
    qualitative_analysis
-   quantiative_analysis
+   quantitative_analysis
