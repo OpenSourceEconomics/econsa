@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.4.2
+#       jupytext_version: 1.5.0
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -22,10 +22,10 @@ import chaospy as cp
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# import numba as nb
+# import openturns as ot
 
+# import numba as nb
 # from pathlib import Path
-# from multiprocessing import Pool
 # -
 
 from temfpy.uncertainty_quantification import eoq_model
@@ -40,7 +40,7 @@ def eoq_model_partial(x, r=0.1, fix_num=0):
     """
     Calculate the value of eoq_harris,
     fixing one x.
-    
+
     Args: 
         params (np.array): 1d numpy array,
                            cuurrently only need the first param,
@@ -48,6 +48,7 @@ def eoq_model_partial(x, r=0.1, fix_num=0):
         x (np.array or list): 2d numpy array with the independent variables,
                               currently only need the first 3 columns.
         fix_num (int): take value of 0~n-1.
+
     Output:
         y (np.array): 2d numpy array with the dependent variables,
                       keeping the fix_num-th x fixed.
@@ -66,6 +67,7 @@ def eoq_model_partial(x, r=0.1, fix_num=0):
     elif fix_num == 2:
         for i, x_i in enumerate(x_np[fix_num]):
             y[i] = np.sqrt((24 * r * x_np[0] * x_i) / x_np[1])
+
     return y
 
 
@@ -87,9 +89,6 @@ c_0 = 0.0135
 s_0 = 2.15
 # -
 
-params = np.zeros(shape=(1, 1))
-params[0, 0] = 10
-
 x_min_multiplier * m_0, x_max_multiplier * m_0
 
 # ### No Monte Carlo
@@ -109,6 +108,8 @@ sns.distplot(m)
 
 # ### Monte Carlo with `rvs`
 
+# Notice that compared to above, the range and count are much more spread.
+
 # +
 np.random.seed(seed)
 
@@ -117,10 +118,10 @@ c = stats.uniform(x_min_multiplier * c_0, x_max_multiplier * c_0).rvs(10000)
 s = stats.uniform(x_min_multiplier * s_0, x_max_multiplier * s_0).rvs(10000)
 
 y = eoq_model([m, c, s])
-# -
 
 plt.clf()
 sns.distplot(m)
+# -
 
 plt.clf()
 sns.distplot(y, hist_kws=dict(cumulative=True))
@@ -136,19 +137,17 @@ sample_rule = "random"
 np.random.seed(seed)
 
 m = cp.Uniform(x_min_multiplier * m_0, x_max_multiplier * m_0).sample(
-    n, rule=sample_rule
+    n, rule=sample_rule,
 )
 c = cp.Uniform(x_min_multiplier * c_0, x_max_multiplier * c_0).sample(
-    n, rule=sample_rule
+    n, rule=sample_rule,
 )
 s = cp.Uniform(x_min_multiplier * s_0, x_max_multiplier * s_0).sample(
-    n, rule=sample_rule
+    n, rule=sample_rule,
 )
 
 y = eoq_model([m, c, s])
 # -
-
-df_monte_carlo = pd.DataFrame(data=[y, m, c, s])
 
 # ## Graphs
 
@@ -179,12 +178,13 @@ y_fix_m.shape
 
 # +
 # don't try at home:
-# -
 
+# +
 plt.clf()
-# sns.set_palette(cubehelix)
+
 for item in y_fix_m:
     sns.kdeplot(item)
+# -
 
 # # Harris: Correlated Sampling: Copula
 
@@ -195,26 +195,33 @@ for item in y_fix_m:
 # - `.AliMikhailHaq(dist, theta=0.5, eps=1e-06)`
 
 # +
-m_uniform = cp.Uniform(x_min_multiplier * m_0, x_max_multiplier * m_0)
-c_uniform = cp.Uniform(x_min_multiplier * c_0, x_max_multiplier * c_0)
-s_uniform = cp.Uniform(x_min_multiplier * s_0, x_max_multiplier * s_0)
+m_chaospy_uniform = cp.Uniform(x_min_multiplier * m_0, x_max_multiplier * m_0)
+c_chaospy_uniform = cp.Uniform(x_min_multiplier * c_0, x_max_multiplier * c_0)
+s_chaospy_uniform = cp.Uniform(x_min_multiplier * s_0, x_max_multiplier * s_0)
 
-x_uniform = cp.J(m_uniform, c_uniform, s_uniform)
+x_chaospy_uniform = cp.J(m_chaospy_uniform, c_chaospy_uniform, s_chaospy_uniform)
 # -
 
 R = [[1, 0.5, 0.4], [0.5, 1, 0.7], [0.4, 0.7, 1]]
 
-x_copula = cp.Nataf(x_uniform, R)
+# +
+x_chaospy_copula = cp.Nataf(x_chaospy_uniform, R)
 
 np.random.seed(seed)
-x_copula_sample = x_copula.sample(n)
+x_chaospy_copula_sample = x_chaospy_copula.sample(n, rule=sample_rule)
+# -
 
-y_copula = eoq_model(x_copula_sample)
+y_chaospy_copula = eoq_model(x_chaospy_copula_sample)
 
 # ## Graphs
 
 df_chaospy_copula = pd.DataFrame(
-    data=[y_copula, x_copula_sample[0], x_copula_sample[1], x_copula_sample[2]]
+    data=[
+        y_chaospy_copula,
+        x_chaospy_copula_sample[0],
+        x_chaospy_copula_sample[1],
+        x_chaospy_copula_sample[2],
+    ]
 )
 
 plt.clf()
@@ -235,52 +242,66 @@ plt.show()
 # ## X & y
 
 plt.clf()
-sns.jointplot(x=x_copula_sample[0], y=y_copula, kind="hex")
+sns.jointplot(x=x_chaospy_copula_sample[0], y=y_chaospy_copula, kind="hex")
 
 plt.clf()
-sns.jointplot(x=x_copula_sample[1], y=y_copula, kind="hex")
+sns.jointplot(x=x_chaospy_copula_sample[1], y=y_chaospy_copula, kind="hex")
 
 plt.clf()
-sns.jointplot(x=x_copula_sample[2], y=y_copula, kind="hex")
+sns.jointplot(x=x_chaospy_copula_sample[2], y=y_chaospy_copula, kind="hex")
 
 # # Harris: Correlated Sampling: Rosenblatt: stats
 
 # According to [Introducing Copula in Monte Carlo Simulation - Towards Data Science](https://towardsdatascience.com/introducing-copula-in-monte-carlo-simulation-9ed1fe9f905).
 
 # +
-x_normal = stats.multivariate_normal(mean=[m_0, s_0, c_0], cov=R)
+x_stats_normal = stats.multivariate_normal(mean=[m_0, s_0, c_0], cov=R)
 
 np.random.seed(seed)
-x_normal_sample = x_normal.rvs(n)
+x_stats_normal_sample = x_stats_normal.rvs(n)
 # -
 
-x_uniform = stats.norm(loc=[m_0, s_0, c_0])
-x_uniform_sample = x_uniform.cdf(x_normal_sample)
+plt.clf()
+sns.jointplot(x=x_stats_normal_sample[:, 0], y=x_stats_normal_sample[:, 1], kind="hex")
 
-m_uniform = stats.uniform.ppf(
-    x_uniform_sample[:, 0],
+# +
+x_stats_uniform = stats.norm(loc=[m_0, s_0, c_0])
+
+np.random.seed(seed)
+x_stats_uniform_sample = x_stats_uniform.cdf(x_stats_normal_sample)
+# -
+
+plt.clf()
+sns.jointplot(
+    x=x_stats_uniform_sample[:, 0], y=x_stats_uniform_sample[:, 1], kind="hex"
+)
+
+m_stats_uniform = stats.uniform.ppf(
+    x_stats_uniform_sample[:, 0],
     loc=x_min_multiplier * m_0,
     scale=(x_max_multiplier - x_min_multiplier) * m_0,
 )
 
-s_uniform = stats.uniform.ppf(
-    x_uniform_sample[:, 1],
+s_stats_uniform = stats.uniform.ppf(
+    x_stats_uniform_sample[:, 1],
     loc=x_min_multiplier * s_0,
     scale=(x_max_multiplier - x_min_multiplier) * s_0,
 )
 
-c_uniform = stats.uniform.ppf(
-    x_uniform_sample[:, 2],
+c_stats_uniform = stats.uniform.ppf(
+    x_stats_uniform_sample[:, 2],
     loc=x_min_multiplier * c_0,
     scale=(x_max_multiplier - x_min_multiplier) * c_0,
 )
 
-y_rosenblatt = eoq_model([m_uniform, s_uniform, c_uniform])
+y_stats_rosenblatt = eoq_model([m_stats_uniform, s_stats_uniform, c_stats_uniform])
 
 # ## Graphs
 
 # +
-df_stats_rosenblatt = pd.DataFrame(data=[y_rosenblatt, m_uniform, s_uniform, c_uniform])
+df_stats_rosenblatt = pd.DataFrame(
+    data=[y_stats_rosenblatt, m_stats_uniform, s_stats_uniform, c_stats_uniform]
+)
 
 plt.clf()
 fig, ax = plt.subplots(figsize=(6, 5))
@@ -299,48 +320,65 @@ plt.show()
 # -
 
 plt.clf()
-sns.jointplot(x=m_uniform, y=y_rosenblatt, kind="hex")
+sns.jointplot(x=m_stats_uniform, y=y_stats_rosenblatt, kind="hex")
 
 plt.clf()
-sns.jointplot(x=s_uniform, y=y_rosenblatt, kind="hex")
+sns.jointplot(x=s_stats_uniform, y=y_stats_rosenblatt, kind="hex")
 
 plt.clf()
-sns.jointplot(x=c_uniform, y=y_rosenblatt, kind="hex")
+sns.jointplot(x=c_stats_uniform, y=y_stats_rosenblatt, kind="hex")
 
 # # Harris: Correlated Sampling: Rosenblatt: chaospy
 
-x_normal = cp.MvNormal(loc=[m_0, s_0, c_0], scale=R)
-
-cp.Cov(x_normal)
-
 # +
-m_uniform = cp.Uniform(x_min_multiplier * m_0, x_max_multiplier * m_0)
-c_uniform = cp.Uniform(x_min_multiplier * c_0, x_max_multiplier * c_0)
-s_uniform = cp.Uniform(x_min_multiplier * s_0, x_max_multiplier * s_0)
+x_chaospy_normal = cp.MvNormal(loc=[m_0, s_0, c_0], scale=R)
 
-x_uniform = cp.J(m_uniform, c_uniform, s_uniform)
+cp.Cov(x_chaospy_normal)
 # -
 
-cp.Cov(x_uniform)
-
 np.random.seed(seed)
-x_normal_sample = x_normal.sample(n, rule="hammersley")
-
-x_rosenblatt = x_uniform.inv(x_normal.fwd(x_normal_sample))
-x_rosenblatt
-
-y_rosenblatt = eoq_model(x_rosenblatt)
+x_chaospy_normal_sample = x_chaospy_normal.sample(n, rule=sample_rule)
 
 plt.clf()
-sns.jointplot(x=x_normal_sample[0], y=x_normal_sample[1], kind="hex")
+sns.jointplot(x=x_chaospy_normal_sample[0], y=x_chaospy_normal_sample[1], kind="hex")
+
+x_chaospy_rosenblatt_middle = x_chaospy_normal.fwd(x_chaospy_normal_sample)
+
+# +
+plt.clf()
+sns.jointplot(
+    x=x_chaospy_rosenblatt_middle[0], y=x_chaospy_rosenblatt_middle[1], kind="hex"
+)
+
+# Why? WHY????
+# I suspect ``chaospy`` is not very good at handeling ≥3 dim distributions.
+
+# +
+x_chaospy_uniform = cp.J(m_chaospy_uniform, c_chaospy_uniform, s_chaospy_uniform)
+
+cp.Cov(x_chaospy_uniform)
+# -
+
+x_chaospy_uniform
+
+x_chaospy_rosenblatt = x_chaospy_uniform.inv(x_chaospy_rosenblatt_middle)
+x_chaospy_rosenblatt
+
+plt.clf()
+sns.jointplot(x=x_chaospy_rosenblatt[0], y=x_chaospy_rosenblatt[1], kind="hex")
+
+y_chaospy_rosenblatt = eoq_model(x_chaospy_rosenblatt)
 
 # ## Graphs
 
-# What's wrong with this????
-
 # +
 df_chaospy_rosenblatt = pd.DataFrame(
-    data=[y_rosenblatt, x_rosenblatt[0], x_rosenblatt[1], x_rosenblatt[2]]
+    data=[
+        y_chaospy_rosenblatt,
+        x_chaospy_rosenblatt[0],
+        x_chaospy_rosenblatt[1],
+        x_chaospy_rosenblatt[2],
+    ]
 )
 
 plt.clf()
@@ -359,6 +397,10 @@ ax.set_yticklabels(["y", "m", "c", "s"])
 
 plt.show()
 # -
+
+# # Test openTURNS
+
+# Import failed. See [Error when importing · Issue #1518 · openturns/openturns](https://github.com/openturns/openturns/issues/1518).
 
 # # Testing ChaosPy: [Distributions — ChaosPy documentation](https://chaospy.readthedocs.io/en/master/distributions/index.html)
 
@@ -411,5 +453,3 @@ sample = copula.sample(10000)
 
 plt.clf()
 sns.jointplot(x=sample[0], y=sample[1], kind="hex")
-
-# ok, what now…
