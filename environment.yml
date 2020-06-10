@@ -36,4 +36,4 @@ dependencies:
     - pre-commit==1.18.3
     - sphinxcontrib-bibtex
     - numpydoc
-    - git+https://github.com/OpenSourceEconomics/temfpy.git
+      # - git+https://github.com/OpenSourceEconomics/temfpy.git
