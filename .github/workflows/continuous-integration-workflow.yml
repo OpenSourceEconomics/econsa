@@ -28,9 +28,9 @@ jobs:
       run: |
         # Set-up conda
         if [ "${{ matrix.os }}" == "macos-latest" ]; then
-          export PATH="/opt/miniconda3/bin:$PATH"
+          export PATH="$PATH:/usr/local/miniconda/bin"
         elif [ "${{ matrix.os }}" == "windows-latest" ]; then
-          set PATH=%PATH%;C:\Miniconda\condabin
+          export PATH=$PATH:"/C/Miniconda/condabin"
         else
           export PATH="$PATH:/usr/share/miniconda/bin"
         fi
