@@ -43,7 +43,12 @@ def test_shift_sample_3d():
 def test_shift_cov():
     np.random.seed(1234)
     true_cov = np.array(
-        [[1, 0.1, 0.2, 0.3], [0.1, 2, 0.4, 0.5], [0.2, 0.4, 3, 0.6], [0.3, 0.5, 0.6, 4]],
+        [
+            [1, 0.1, 0.2, 0.3],
+            [0.1, 2, 0.4, 0.5],
+            [0.2, 0.4, 3, 0.6],
+            [0.3, 0.5, 0.6, 4],
+        ],
     )
     data = np.random.multivariate_normal(mean=np.zeros(4), cov=true_cov, size=20)
     df = pd.DataFrame(data=data)
