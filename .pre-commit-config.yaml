@@ -5,6 +5,12 @@ repos:
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
     -   id: mixed-line-ending
+-   repo: https://github.com/psf/black
+    rev: stable
+    hooks:
+    -   id: black
+        files: '(\.pyi?|wscript)$'
+        language_version: python3.7
 -   repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.3
     hooks:

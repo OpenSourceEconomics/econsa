@@ -26,15 +26,6 @@ jobs:
     - name: Run test suite.
       shell: bash -l {0}
       run: |
-        # Set-up conda
-        if [ "${{ matrix.os }}" == "macos-latest" ]; then
-          export PATH="$PATH:/usr/local/miniconda/bin"
-        elif [ "${{ matrix.os }}" == "windows-latest" ]; then
-          export PATH=$PATH:"/C/Miniconda/condabin"
-        else
-          export PATH="$PATH:/usr/share/miniconda/bin"
-        fi
-
         source .envrc
         pytest --cov=econsa --cov-report=xml
 
@@ -55,7 +46,6 @@ jobs:
       if: runner.os == 'Linux' && matrix.python-version == '3.7'
       shell: bash -l {0}
       run: |
-        export PATH="$PATH:/usr/share/miniconda/bin"
         source .envrc
         cd docs
         make html
@@ -63,7 +53,6 @@ jobs:
     - name: Run figures.
       shell: bash -l {0}
       run: |
-        export PATH="$PATH:/usr/share/miniconda/bin"
         source .envrc
         run-figures
 
