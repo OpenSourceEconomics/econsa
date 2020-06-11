@@ -26,7 +26,7 @@ jobs:
     - name: Run test suite.
       shell: bash -l {0}
       run: |
-        source .envrc
+        source .envrc-ci
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
@@ -38,6 +38,7 @@ jobs:
         git submodule update --init --recursive
 
     - name: Upload coverage to Codecov,
+      if: runner.os == 'Linux' && matrix.python-version == '3.7'
       uses: codecov/codecov-action@v1
       with:
         file: coverage.xml
@@ -46,14 +47,14 @@ jobs:
       if: runner.os == 'Linux' && matrix.python-version == '3.7'
       shell: bash -l {0}
       run: |
-        source .envrc
+        source .envrc-ci
         cd docs
         make html
 
     - name: Run figures.
       shell: bash -l {0}
       run: |
-        source .envrc
+        source .envrc-ci
         run-figures
 
     - name: Run pre-commits.
