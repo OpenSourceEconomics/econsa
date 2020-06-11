@@ -5,9 +5,9 @@ This script supports our CI setup as it simply runs all files that create figure
 documentation.
 
 """
-import subprocess as sp
 import glob
 import os
+import subprocess as sp
 
 if __name__ == "__main__":
 

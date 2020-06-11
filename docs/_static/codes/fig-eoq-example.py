@@ -7,14 +7,11 @@ interest & depreciation cost.
 .. [H1990] Harris, F. W. (1990). How Many Parts to Make at Once. Operations Research, 38(6),
 947–950.
 """
-
-
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import seaborn as sns
 import chaospy as cp
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 import numpy as np
-
+import seaborn as sns
 from temfpy.uncertainty_quantification import eoq_model
 
 
