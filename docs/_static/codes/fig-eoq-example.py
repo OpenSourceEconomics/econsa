@@ -47,7 +47,6 @@ def eoq_model_total_cost(x, y, r=10):
     .. [H1990] Harris, F. W. (1990). How Many Parts to Make at Once. Operations Research, 38(6),
     947–950.
     """
-
     m, s, c = x
 
     y_np = np.array(y)
