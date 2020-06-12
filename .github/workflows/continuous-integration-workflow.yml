@@ -56,6 +56,7 @@ jobs:
         run-figures
 
     - name: Run pre-commits.
+      if: runner.os != 'Windows'
       shell: bash -l {0}
       run: |
         pre-commit install -f --install-hooks
