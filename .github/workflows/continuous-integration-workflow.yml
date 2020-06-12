@@ -43,20 +43,22 @@ jobs:
         file: coverage.xml
 
     - name: Build docs.
-      if: runner.os == 'Linux' && matrix.python-version == '3.7'
+      if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
         cd docs
         make html
 
     - name: Run figures.
-      if: runner.os == 'Linux' && matrix.python-version == '3.7'
+      if: runner.os != 'Windows'
       shell: bash -l {0}
       run: |
+        # We need access to auxiliary scripts for our workflow.
+        export PATH=$PWD/bin:$PATH
         run-figures
 
     - name: Run pre-commits.
-      if: runner.os == 'Linux' && matrix.python-version == '3.7'
+      if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
         pre-commit install -f --install-hooks
