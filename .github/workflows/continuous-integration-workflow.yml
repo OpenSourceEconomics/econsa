@@ -26,7 +26,6 @@ jobs:
     - name: Run test suite.
       shell: bash -l {0}
       run: |
-        source .envrc
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
@@ -47,7 +46,6 @@ jobs:
       if: runner.os == 'Linux' && matrix.python-version == '3.7'
       shell: bash -l {0}
       run: |
-        source .envrc
         cd docs
         make html
 
@@ -55,7 +53,6 @@ jobs:
       if: runner.os == 'Linux' && matrix.python-version == '3.7'
       shell: bash -l {0}
       run: |
-        source .envrc
         run-figures
 
     - name: Run pre-commits.
