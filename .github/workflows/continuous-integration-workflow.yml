@@ -52,9 +52,7 @@ jobs:
       if: runner.os != 'Windows'
       shell: bash -l {0}
       run: |
-        export PROJECT_ROOT=$PWD
-        # We need access to auxiliary scripts for our workflow.
-        export PATH=$PWD/bin:$PATH
+        source .envrc-ci
         run-figures
 
     - name: Run pre-commits.
