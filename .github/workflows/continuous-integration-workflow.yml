@@ -43,7 +43,6 @@ jobs:
         file: coverage.xml
 
     - name: Build docs.
-      if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
         cd docs
@@ -53,12 +52,12 @@ jobs:
       if: runner.os != 'Windows'
       shell: bash -l {0}
       run: |
+        export PROJECT_ROOT=$PWD
         # We need access to auxiliary scripts for our workflow.
         export PATH=$PWD/bin:$PATH
         run-figures
 
     - name: Run pre-commits.
-      if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
         pre-commit install -f --install-hooks
