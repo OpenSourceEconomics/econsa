@@ -27,6 +27,4 @@ We are drawing on related work throughout.
 
 **Popular science**
 
-* King, M., and Kay, J. (2020).  `Radical uncertainty: decision-making for an unknowable future <http://tiny.cc/Radical_Uncertainty>`_. London, UK: The Bridge Street Press. 
-
-
+* King, M., and Kay, J. (2020).  `Radical uncertainty: decision-making for an unknowable future <http://tiny.cc/Radical_Uncertainty>`_. London, UK: The Bridge Street Press.

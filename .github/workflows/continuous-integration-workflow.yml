@@ -3,23 +3,29 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  run-tests:
+    name: Run tests for ${{ matrix.os }} on ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
 
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        python-version: ['3.7']
 
     steps:
     - uses: actions/checkout@v2
+
     - uses: goanpeca/setup-miniconda@v1.0.2
       with:
-           activate-environment: econsa
-           environment-file: environment.yml
-           python-version: 3.7
+          auto-update-conda: true
+          activate-environment: econsa
+          environment-file: environment.yml
+          python-version: ${{ matrix.python-version }}
 
-    - name: run tests
+    - name: Run test suite.
       shell: bash -l {0}
       run: |
-        export PATH="$PATH:/usr/share/miniconda/bin"
-        source .envrc
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
@@ -30,18 +36,28 @@ jobs:
         # This can be removed once temfpy is live on conda.
         git submodule update --init --recursive
 
-        # We want to local build of the documentation to succeed. This can be
-        # removed once readthedocs.org is part of PR testing setup.
-        cd docs; make html; cd $PROJECT_ROOT
-
-    - name: upload coverage to Codecov
+    - name: Upload coverage to Codecov,
+      if: runner.os == 'Linux' && matrix.python-version == '3.7'
       uses: codecov/codecov-action@v1
       with:
         file: coverage.xml
 
-    - name: run figures
+    - name: Build docs.
       shell: bash -l {0}
       run: |
-        export PATH="$PATH:/usr/share/miniconda/bin"
-        source .envrc
+        cd docs
+        make html
+
+    - name: Run figures.
+      if: runner.os != 'Windows'
+      shell: bash -l {0}
+      run: |
+        source .envrc-ci
         run-figures
+
+    - name: Run pre-commits.
+      if: runner.os != 'Windows'
+      shell: bash -l {0}
+      run: |
+        pre-commit install -f --install-hooks
+        pre-commit run --all-files

@@ -28,8 +28,19 @@ requirements:
     - bokeh >=2.0
     - seaborn >=0.10.0
 
+test:
+  commands:
+    - pytest
+  source_files:
+    # Copy the tox.ini with its pytest configuration.
+    - tox.ini
+    # Copy over the test files. You can use folders and files.
+    - econsa/tests
+
 about:
   home: https://github.com/OpenSourceEconomics/econsa
+  dev_url: https://github.com/OpenSourceEconomics/econsa
   license: MIT
   license_file: LICENSE
   summary: Conda installable package comprising of a python toolbox for uncertainty quantification and sensitivity analysis tailored to economic models.
+  doc_url: https://econsa.readthedocs.io/en/latest/index.html
