@@ -4,10 +4,10 @@ This module contains all tests for the sampling setup.
 
 """
 import numpy as np
+import rpy2.robjects.packages as rpackages
 from numpy.random import RandomState
 from rpy2 import robjects
 from rpy2.robjects import numpy2ri
-from rpy2.robjects.packages import importr
 
 from econsa.sampling import condMVN
 
@@ -15,9 +15,12 @@ from econsa.sampling import condMVN
 
 
 # Import R modules
-base = importr("base")
-stats = importr("stats")
-condMVNorm = importr("condMVNorm")
+base = rpackages.importr("base")
+stats = rpackages.importr("stats")
+utils = rpackages.importr("utils")
+utils.chooseCRANmirror(ind=1)
+utils.install_packages("condMVNorm")
+condMVNorm = rpackages.importr("condMVNorm")
 
 # Import numpy.random generator
 # Since NumPy v1.17: rng = default_rng()
