@@ -33,7 +33,7 @@ def test_sampling():
 
 def get_strategies(name):
     if name == "condMVN":
-        n = rs.randint(low=3, high=20)
+        n = rs.randint(low=4, high=20)
         mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n))
         sigma = sigma @ sigma.T
