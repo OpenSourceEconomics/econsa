@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: r-lib/actions/setup-r@v1
+    - uses: r-lib/actions/setup-r@master
       with:
           r-version: '4.0.1'
 
@@ -27,11 +27,29 @@ jobs:
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
 
-    - name: Run test suite.
+    - name: Run test suite on non-Windows.
+      if: runner.os != 'Windows'
       shell: bash -l {0}
-      env:
-        LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}:/usr/lib/R/lib
       run: |
+        python -m rpy2.situation
+        export LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}
+
+        pytest --cov=econsa --cov-report=xml
+
+        # We want to make sure proper formatting of the notebooks.
+        flake8-nb; [ $? -eq 0 ] || exit 1
+        black-nb .; [ $? -eq 0 ] || exit 1
+
+        # We want to pull the submodules.
+        # This can be removed once temfpy is live on conda.
+        git submodule update --init --recursive
+
+    - name: Run test suite on Windows.
+      if: runner.os == 'Windows'
+      shell: bash -l {0}
+      run: |
+        python -m rpy2.situation
+
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
