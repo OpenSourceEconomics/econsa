@@ -27,7 +27,7 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
            The mean vector of the multivariate normal distribution.
 
     sigma : array_like
-            Symmetric and positive-definte covariance matrix of
+            Symmetric and positive-definite covariance matrix of
             the multivariate normal distribution.
 
     dependent_ind : array_like
@@ -35,7 +35,7 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
 
     given_ind : array_like, optional
                 The indices of independent variables (default value is ``None``).
-                If not speficied or all values are zero, return unconditional values.
+                If not specified or all values are zero, return unconditional values.
 
     x_given : array_like, optional
               The conditioning values (default value is ``None``).
@@ -84,7 +84,7 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
         condVar = np.array(sigma_np[dependent_ind, :][:, dependent_ind])
         return (condMean, condVar)
 
-    # Make sure that x_given is not empty & aligns with given_len:
+    # Make sure that x_given is not empty and aligns with given_len:
     x_given_np = np.array(x_given).squeeze()
     try:
         if len(x_given_np) != len(given_ind_np):

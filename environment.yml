@@ -38,3 +38,4 @@ dependencies:
     - flake8-nb
     - numpydoc
     - pre-commit
+    - rpy2
