@@ -20,6 +20,11 @@ jobs:
       with:
         r-version: '4.0.1'
 
+    - name: Install R dependencies.
+      shell: bash -l {0}
+      run: |
+        Rscript -e 'install.packages("condMVNorm")'
+
     - uses: goanpeca/setup-miniconda@v1.0.2
       with:
           auto-update-conda: true
@@ -30,6 +35,7 @@ jobs:
     - name: Run test suite.
       shell: bash -l {0}
       run: |
+        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/lib/R/lib
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
