@@ -100,14 +100,14 @@ def test_condMVN_exception():
     if n % 2 == 0:
         with pytest.raises(ValueError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
-        assert str(e.value) == "lengths of x_given and given_ind must be the same"
+        assert "lengths of x_given and given_ind must be the same" in str(e.value)
     elif n % 3 == 0:
         with pytest.raises(TypeError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
-        assert str(e.value) == "len() of unsized object"
+        assert "len() of unsized object" in str(e.value)
     elif n % 5 == 0:
         with pytest.raises(ValueError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
-        assert str(e.value) == "sigma is not a symmetric matrix"
+        assert "sigma is not a symmetric matrix" in str(e.value)
     else:
         condMVN(mean, sigma, dependent_ind, given_ind, x_given)
