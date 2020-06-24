@@ -47,7 +47,7 @@ def get_strategies(name):
         n = rs.randint(low=4, high=20)
         mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n))
-        sigma = sigma @ sigma.T
+        sigma = sigma @ sigma.T if n % 5 != 0 else sigma
         dependent_n = rs.randint(low=1, high=n - 2)
         dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
         given_ind = [x for x in range(0, n) if x not in dependent] if n % 2 == 0 else []
@@ -97,14 +97,17 @@ def test_condMVN_exception():
     n, mean, sigma, dependent_ind, given_ind, x_given = get_strategies(
         "condMVN_exception",
     )
-    if n % 2 == 0 and n % 3 == 0:
-        with pytest.raises(ValueError):
+    if n % 2 == 0:
+        with pytest.raises(ValueError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
-    elif n % 2 == 0:
-        with pytest.raises(ValueError):
-            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+        assert str(e.value) == "lengths of x_given and given_ind must be the same"
     elif n % 3 == 0:
-        with pytest.raises(TypeError):
+        with pytest.raises(TypeError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+        assert str(e.value) == "len() of unsized object"
+    elif n % 5 == 0:
+        with pytest.raises(ValueError) as e:
+            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+        assert str(e.value) == "sigma is not a symmetric matrix"
     else:
         condMVN(mean, sigma, dependent_ind, given_ind, x_given)
