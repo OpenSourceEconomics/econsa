@@ -34,7 +34,7 @@ def test_sampling():
 
 def get_strategies(name):
     if name == "condMVN":
-        n = rs.randint(low=4, high=20)
+        n = rs.randint(low=4, high=21)
         mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n))
         sigma = sigma @ sigma.T
@@ -44,13 +44,15 @@ def get_strategies(name):
         x_given = rs.randint(low=-2, high=2, size=len(given_ind))
         strategy = (n, mean, sigma, dependent, given_ind, x_given)
     elif name == "condMVN_exception":
-        n = rs.randint(low=4, high=20)
+        n = rs.randint(low=4, high=31)
         mean = rs.randint(low=-2, high=2, size=n)
-        sigma = rs.standard_normal(size=(n, n))
-        sigma = sigma @ sigma.T if n % 5 != 0 else sigma
+        sigma = rs.standard_normal(size=(n, n)) if n % 5 != 0 else np.ones(shape=(n, n))
+        sigma = sigma @ sigma.T if n % 7 != 0 else sigma
         dependent_n = rs.randint(low=1, high=n - 2)
         dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
-        given_ind = [x for x in range(0, n) if x not in dependent] if n % 2 == 0 else []
+        given_ind = (
+            [x for x in range(0, n) if x not in dependent] if n % 2 == 0 else None
+        )
         x_given = (
             rs.randint(low=-2, high=2, size=len(given_ind) + 1) if n % 3 == 0 else []
         )
@@ -106,6 +108,10 @@ def test_condMVN_exception():
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
         assert "len() of unsized object" in str(e.value)
     elif n % 5 == 0:
+        with pytest.raises(ValueError) as e:
+            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+        assert "sigma is not positive-definite" in str(e.value)
+    elif n % 7 == 0:
         with pytest.raises(ValueError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
         assert "sigma is not a symmetric matrix" in str(e.value)
