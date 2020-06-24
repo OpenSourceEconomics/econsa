@@ -131,11 +131,14 @@ nbsphinx_execute = "auto"
 
 nbsphinx_prolog = r"""
 {% set docname = 'docs/source/' + env.doc2path(env.docname, base=None) %}
+.. |binder| image:: https://mybinder.org/badge_logo.svg
+     :target: https://mybinder.org/v2/gh/OpenSourceEconomics/econsa/master?filepath={{ docname|e }}
 
 .. only:: html
 
     .. nbinfo::
         Download the notebook :download:`here <https://nbviewer.jupyter.org/github/OpenSourceEconomics/econsa/blob/master/{{ docname }}>`!
+        Interactive online version: |binder|
 """
 
 
