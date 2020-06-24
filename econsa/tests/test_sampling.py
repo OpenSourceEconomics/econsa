@@ -46,7 +46,7 @@ def get_strategies(name):
     elif name == "condMVN_exception":
         n = rs.randint(low=4, high=31)
         mean = rs.randint(low=-2, high=2, size=n)
-        sigma = rs.standard_normal(size=(n, n)) if n % 5 != 0 else np.ones(shape=(n, n))
+        sigma = rs.standard_normal(size=(n, n)) if n % 5 != 0 else np.diagflat([-1] * n)
         sigma = sigma @ sigma.T if n % 7 != 0 else sigma
         dependent_n = rs.randint(low=1, high=n - 2)
         dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
@@ -54,7 +54,7 @@ def get_strategies(name):
             [x for x in range(0, n) if x not in dependent] if n % 2 == 0 else None
         )
         x_given = (
-            rs.randint(low=-2, high=2, size=len(given_ind) + 1) if n % 3 == 0 else []
+            rs.randint(low=-2, high=2, size=n - dependent_n + 2) if n % 3 == 0 else []
         )
         strategy = (n, mean, sigma, dependent, given_ind, x_given)
     else:
@@ -106,7 +106,7 @@ def test_condMVN_exception():
     elif n % 3 == 0:
         with pytest.raises(TypeError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
-        assert "len() of unsized object" in str(e.value)
+        assert "len()" in str(e.value)
     elif n % 5 == 0:
         with pytest.raises(ValueError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
