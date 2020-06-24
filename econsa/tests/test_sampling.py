@@ -4,6 +4,7 @@ This module contains all tests for the sampling setup.
 
 """
 import numpy as np
+import pytest
 import rpy2.robjects.packages as rpackages
 from numpy.random import RandomState
 from rpy2 import robjects
@@ -42,6 +43,18 @@ def get_strategies(name):
         given_ind = [x for x in range(0, n) if x not in dependent]
         x_given = rs.randint(low=-2, high=2, size=len(given_ind))
         strategy = (n, mean, sigma, dependent, given_ind, x_given)
+    elif name == "condMVN_exception":
+        n = rs.randint(low=4, high=20)
+        mean = rs.randint(low=-2, high=2, size=n)
+        sigma = rs.standard_normal(size=(n, n))
+        sigma = sigma @ sigma.T
+        dependent_n = rs.randint(low=1, high=n - 2)
+        dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
+        given_ind = [x for x in range(0, n) if x not in dependent] if n % 2 == 0 else []
+        x_given = (
+            rs.randint(low=-2, high=2, size=len(given_ind) + 1) if n % 3 == 0 else []
+        )
+        strategy = (n, mean, sigma, dependent, given_ind, x_given)
     else:
         raise NotImplementedError
     return strategy
@@ -76,3 +89,22 @@ def test_condMVN():
     # Comparison
     np.testing.assert_allclose(cond_mean, condMean_r)
     np.testing.assert_allclose(cond_var, condVar_r)
+
+
+def test_condMVN_exception():
+    """Test condMVN raises exceptions when invalid variables are passed.
+    """
+    n, mean, sigma, dependent_ind, given_ind, x_given = get_strategies(
+        "condMVN_exception",
+    )
+    if n % 2 == 0 and n % 3 == 0:
+        with pytest.raises(ValueError):
+            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+    elif n % 2 == 0:
+        with pytest.raises(ValueError):
+            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+    elif n % 3 == 0:
+        with pytest.raises(TypeError):
+            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+    else:
+        condMVN(mean, sigma, dependent_ind, given_ind, x_given)
