@@ -96,7 +96,7 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
     if check_sigma:
         if not np.allclose(sigma_np, sigma_np.T):
             raise ValueError("sigma is not a symmetric matrix")
-        elif not np.all(np.linalg.eigvals(sigma) > 0):
+        elif np.all(np.linalg.eigvals(sigma_np) > 0) == 0:
             raise ValueError("sigma is not positive-definite")
 
     b = sigma_np[dependent_ind, :][:, dependent_ind]
