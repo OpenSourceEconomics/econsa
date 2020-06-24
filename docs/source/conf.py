@@ -217,3 +217,6 @@ epub_exclude_files = ["search.html"]
 
 # Use new CDN path of MathJax
 mathjax_path = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+
+# Skip import packages
+autodoc_mock_imports = ["rpy2"]
