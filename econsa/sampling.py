@@ -59,7 +59,7 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
     >>> sigma = np.array([[4.0677098, -0.9620331, 0.9897267],
     ...                   [-0.9620331, 2.2775449, 0.7475968],
     ...                   [0.9897267, 0.7475968, 0.7336631]])
-    >>> dependent_ind = [0,]
+    >>> dependent_ind = [0, ]
     >>> given_ind = [1, 2]
     >>> x_given = [1, -1]
     >>> cond_mean, cond_var = condMVN(mean, sigma, dependent_ind, given_ind, x_given)
