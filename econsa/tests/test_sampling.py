@@ -54,14 +54,14 @@ def get_strategies(name):
             [x for x in range(0, n) if x not in dependent] if n % 3 == 0 else None
         )
         x_given = (
-            rs.randint(low=-2, high=2, size=n - dependent_n + 1) if n % 5 == 0 else None
+            rs.randint(low=-2, high=2, size=n - dependent_n + 1) if n % 2 == 0 else None
         )
         strategy = (n, mean, sigma, dependent, given_ind, x_given)
     elif name == "test_condMVN_exception_sigma":
-        n = rs.randint(low=4, high=21)
+        n = rs.randint(low=4, high=31)
         mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
-        sigma = sigma @ sigma.T if n % 5 == 0 else sigma
+        sigma = sigma @ sigma.T if n % 2 == 0 else sigma
         dependent_n = rs.randint(low=1, high=n - 2)
         dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
         given_ind = [x for x in range(0, n) if x not in dependent]
@@ -110,13 +110,13 @@ def test_condMVN_exception_given():
         "condMVN_exception_given",
     )
 
-    if n % 3 != 0 and n % 5 != 0:
+    if n % 3 != 0 and n % 2 != 0:
         # Valid case: both `given_ind` and `x_given` are empty
         condMVN(mean, sigma, dependent_ind, given_ind, x_given)
     elif n % 3 != 0:
         # Valid case: only `given_ind` is empty
         condMVN(mean, sigma, dependent_ind, given_ind, x_given)
-    elif n % 5 != 0:
+    elif n % 2 != 0:
         # Only `x_given` is empty
         with pytest.raises(TypeError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
@@ -135,7 +135,7 @@ def test_condMVN_exception_sigma():
         "test_condMVN_exception_sigma",
     )
 
-    if n % 3 != 0 and n % 5 != 0:
+    if n % 3 != 0 and n % 2 != 0:
         # `sigma` is negative definite matrix
         with pytest.raises(ValueError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
@@ -143,7 +143,7 @@ def test_condMVN_exception_sigma():
     elif n % 3 != 0:
         # Valid case
         condMVN(mean, sigma, dependent_ind, given_ind, x_given)
-    elif n % 5 != 0:
+    elif n % 2 != 0:
         # `sigma` is not symmetric
         with pytest.raises(ValueError) as e:
             condMVN(mean, sigma, dependent_ind, given_ind, x_given)
