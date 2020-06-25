@@ -69,6 +69,15 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
     #
     mean_np = np.array(mean).squeeze()
     sigma_np = np.array(sigma).squeeze()
+    given_ind_np = np.array(given_ind).squeeze()
+    x_given_np = np.array(x_given).squeeze()
+
+    # Check sigma is symmetric & positive-definite:
+    if check_sigma:
+        if not np.allclose(sigma_np, sigma_np.T):
+            raise ValueError("sigma is not a symmetric matrix")
+        elif np.all(np.linalg.eigvals(sigma_np) > 0) == 0:
+            raise ValueError("sigma is not positive-definite")
 
     if given_ind is None and x_given is None:
         condMean = np.array(mean_np[dependent_ind])
@@ -76,7 +85,6 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
         return (condMean, condVar)
 
     # Make sure that given_len is not empty:
-    given_ind_np = np.array(given_ind).squeeze()
     try:
         len(given_ind_np)
     except TypeError:
@@ -85,19 +93,11 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
         return (condMean, condVar)
 
     # Make sure that x_given is not empty and aligns with given_len:
-    x_given_np = np.array(x_given).squeeze()
     try:
         if len(x_given_np) != len(given_ind_np):
             raise ValueError("lengths of x_given and given_ind must be the same")
     except TypeError:
         raise
-
-    # Check sigma is symmetric & positive-definite:
-    if check_sigma:
-        if not np.allclose(sigma_np, sigma_np.T):
-            raise ValueError("sigma is not a symmetric matrix")
-        elif np.all(np.linalg.eigvals(sigma_np) > 0) == 0:
-            raise ValueError("sigma is not positive-definite")
 
     b = sigma_np[dependent_ind, :][:, dependent_ind]
     c = sigma_np[dependent_ind, :][:, given_ind]
