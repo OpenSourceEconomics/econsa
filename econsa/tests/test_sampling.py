@@ -109,7 +109,6 @@ def test_condMVN_exception_given():
     n, mean, sigma, dependent_ind, given_ind, x_given = get_strategies(
         "condMVN_exception_given",
     )
-    print("n = ", n)
 
     if n % 3 != 0 and n % 5 != 0:
         # Valid case: both `given_ind` and `x_given` are empty
@@ -135,7 +134,6 @@ def test_condMVN_exception_sigma():
     n, mean, sigma, dependent_ind, given_ind, x_given = get_strategies(
         "test_condMVN_exception_sigma",
     )
-    print("n = ", n)
 
     if n % 3 != 0 and n % 5 != 0:
         # `sigma` is negative definite matrix
