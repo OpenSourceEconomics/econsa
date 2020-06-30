@@ -34,5 +34,5 @@ Supported by
 ------------
 
 .. image:: docs/_static/images/OSE_sb_web.svg
-    :width: 18 %
+    :width: 22 %
     :target: https://github.com/OpenSourceEconomics
