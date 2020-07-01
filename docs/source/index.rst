@@ -41,7 +41,8 @@ With ``conda`` available on your path, installing and testing ``econsa`` is as s
 Supported by
 ------------
 
-.. image:: ../_static/images/ose-logo.jpg
+.. image:: ../_static/images/OSE_sb_web.svg
+          :width: 30 %
 	  :target: https://github.com/OpenSourceEconomics
 
 .. toctree::
