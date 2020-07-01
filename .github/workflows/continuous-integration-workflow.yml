@@ -43,7 +43,7 @@ jobs:
         file: coverage.xml
 
     - name: Build docs.
-      if: runner.os = 'Ubuntu'
+      if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
         pip install cairosvg
