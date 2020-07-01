@@ -10,7 +10,9 @@ def get_sample(*args, **kwargs):
     return
 
 
-def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigma=True):
+def cond_mvn(
+    mean, sigma, dependent_ind, given_ind=None, given_value=None, check_sigma=True,
+):
     r"""Conditional mean and variance function.
 
     Returns conditional mean and variance of dependent variables,
@@ -37,7 +39,7 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
                 The indices of independent variables (default value is ``None``).
                 If not specified or all values are zero, return unconditional values.
 
-    x_given : array_like, optional
+    given_value : array_like, optional
               The conditioning values (default value is ``None``).
               Should be the same length as `given_ind`, otherwise throw an error.
 
@@ -61,50 +63,41 @@ def condMVN(mean, sigma, dependent_ind, given_ind=None, x_given=None, check_sigm
     ...                   [0.9897267, 0.7475968, 0.7336631]])
     >>> dependent_ind = [0, ]
     >>> given_ind = [1, 2]
-    >>> x_given = [1, -1]
-    >>> cond_mean, cond_var = condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+    >>> given_value = [1, -1]
+    >>> cond_mean, cond_var = cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
     >>> np.testing.assert_almost_equal(cond_mean, -4.347531, decimal=6)
     >>> np.testing.assert_almost_equal(cond_var, 0.170718, decimal=6)
     """
     #
-    mean_np = np.array(mean).squeeze()
-    sigma_np = np.array(sigma).squeeze()
-    given_ind_np = np.array(given_ind).squeeze()
-    x_given_np = np.array(x_given).squeeze()
+    mean_np = np.array(mean)
+    sigma_np = np.array(sigma)
+    given_ind_np = np.array(given_ind, ndmin=1)
+    given_value_np = np.array(given_value, ndmin=1)
 
-    # Check sigma is symmetric & positive-definite:
+    # Check `sigma` is symmetric & positive-definite:
     if check_sigma:
         if not np.allclose(sigma_np, sigma_np.T):
             raise ValueError("sigma is not a symmetric matrix")
         elif np.all(np.linalg.eigvals(sigma_np) > 0) == 0:
             raise ValueError("sigma is not positive-definite")
 
-    if given_ind is None and x_given is None:
+    # When `given_ind` is empty, return mean and variances of dependent values:
+    if np.all(np.array(None, ndmin=1) == given_ind):
         condMean = np.array(mean_np[dependent_ind])
         condVar = np.array(sigma_np[dependent_ind, :][:, dependent_ind])
         return (condMean, condVar)
 
-    # Make sure that given_len is not empty:
-    try:
-        len(given_ind_np)
-    except TypeError:
-        condMean = np.array(mean_np[dependent_ind])
-        condVar = np.array(sigma_np[dependent_ind, :][:, dependent_ind])
-        return (condMean, condVar)
-
-    # Make sure that x_given is not empty and aligns with given_len:
-    try:
-        if len(x_given_np) != len(given_ind_np):
-            raise ValueError("lengths of x_given and given_ind must be the same")
-    except TypeError:
-        raise
+    # Make sure that `given_value` aligns with `given_len`:
+    # This includes the case that `given_value` is empty.
+    if len(given_value_np) != len(given_ind_np):
+        raise ValueError("lengths of given_value and given_ind must be the same")
 
     b = sigma_np[dependent_ind, :][:, dependent_ind]
     c = sigma_np[dependent_ind, :][:, given_ind]
     d = sigma_np[given_ind, :][:, given_ind]
     c_dinv = c @ np.linalg.inv(d)
 
-    cond_mean = mean_np[dependent_ind] + c_dinv @ (x_given - mean_np[given_ind])
+    cond_mean = mean_np[dependent_ind] + c_dinv @ (given_value - mean_np[given_ind])
     cond_var = b - c_dinv @ (c.T)
 
     return (cond_mean, cond_var)

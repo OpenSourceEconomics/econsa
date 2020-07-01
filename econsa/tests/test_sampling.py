@@ -10,18 +10,18 @@ from numpy.random import RandomState
 from rpy2 import robjects
 from rpy2.robjects import numpy2ri
 
-from econsa.sampling import condMVN
+from econsa.sampling import cond_mvn
 
 # Since NumPy v1.17: from numpy.random import default_rng
 
 
 # Import R modules
-base = rpackages.importr("base")
-stats = rpackages.importr("stats")
-utils = rpackages.importr("utils")
-utils.chooseCRANmirror(ind=1)
-utils.install_packages("condMVNorm")
-condMVNorm = rpackages.importr("condMVNorm")
+r_base = rpackages.importr("base")
+r_stats = rpackages.importr("stats")
+r_utils = rpackages.importr("utils")
+r_utils.chooseCRANmirror(ind=1)
+r_utils.install_packages("condMVNorm")
+r_cond_mvnorm = rpackages.importr("condMVNorm")
 
 # Import numpy.random generator
 # Since NumPy v1.17: rng = default_rng()
@@ -33,7 +33,7 @@ def test_sampling():
 
 
 def get_strategies(name):
-    if name == "condMVN":
+    if name == "cond_mvn":
         n = rs.randint(low=4, high=21)
         mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n))
@@ -41,9 +41,9 @@ def get_strategies(name):
         dependent_n = rs.randint(low=1, high=n - 2)
         dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
         given_ind = [x for x in range(0, n) if x not in dependent]
-        x_given = rs.randint(low=-2, high=2, size=len(given_ind))
-        strategy = (n, mean, sigma, dependent, given_ind, x_given)
-    elif name == "condMVN_exception_given":
+        given_value = rs.randint(low=-2, high=2, size=len(given_ind))
+        strategy = (n, mean, sigma, dependent, given_ind, given_value)
+    elif name == "cond_mvn_exception_given":
         n = rs.randint(low=4, high=31)
         mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n))
@@ -53,11 +53,11 @@ def get_strategies(name):
         given_ind = (
             [x for x in range(0, n) if x not in dependent] if n % 3 == 0 else None
         )
-        x_given = (
+        given_value = (
             rs.randint(low=-2, high=2, size=n - dependent_n + 1) if n % 2 == 0 else None
         )
-        strategy = (n, mean, sigma, dependent, given_ind, x_given)
-    elif name == "test_condMVN_exception_sigma":
+        strategy = (n, mean, sigma, dependent, given_ind, given_value)
+    elif name == "test_cond_mvn_exception_sigma":
         n = rs.randint(low=4, high=31)
         mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
@@ -65,88 +65,89 @@ def get_strategies(name):
         dependent_n = rs.randint(low=1, high=n - 2)
         dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
         given_ind = [x for x in range(0, n) if x not in dependent]
-        x_given = rs.randint(low=-2, high=2, size=len(given_ind))
-        strategy = (n, mean, sigma, dependent, given_ind, x_given)
+        given_value = rs.randint(low=-2, high=2, size=len(given_ind))
+        strategy = (n, mean, sigma, dependent, given_ind, given_value)
     else:
         raise NotImplementedError
     return strategy
 
 
-def test_condMVN():
-    """Test condMVN against the original from R package condMVNorm.
+def test_cond_mvn():
+    """Test cond_mvn against the original from R package cond_mvnorm.
     """
     # Evaluate Python code
-    n, mean, sigma, dependent_ind, given_ind, x_given = get_strategies("condMVN")
-    cond_mean, cond_var = condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+    n, mean, sigma, dependent_ind, given_ind, given_value = get_strategies("cond_mvn")
+    cond_mean, cond_var = cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
 
     # Evaluate R code
     numpy2ri.activate()
-    mean_r = robjects.FloatVector(mean)
-    sigma_r = base.matrix(sigma, n, n)
-    dependent_ind_r = robjects.IntVector([x + 1 for x in dependent_ind])
-    given_ind_r = robjects.IntVector([x + 1 for x in given_ind])
-    x_given_r = robjects.IntVector(x_given)
-    condMean_r, condVar_r = condMVNorm.condMVN(
-        mean=mean_r,
-        sigma=sigma_r,
-        dependent=dependent_ind_r,
-        given=given_ind_r,
-        X=x_given_r,
+    r_mean = robjects.FloatVector(mean)
+    r_sigma = r_base.matrix(sigma, n, n)
+    r_dependent_ind = robjects.IntVector([x + 1 for x in dependent_ind])
+    r_given_ind = robjects.IntVector([x + 1 for x in given_ind])
+    r_given_value = robjects.IntVector(given_value)
+    r_cond_mean, r_cond_var = r_cond_mvnorm.condMVN(
+        mean=r_mean,
+        sigma=r_sigma,
+        dependent=r_dependent_ind,
+        given=r_given_ind,
+        X=r_given_value,
     )
+
+    r_cond_mean = np.array(r_cond_mean)
+    r_cond_var = np.array(r_cond_var)
+
     numpy2ri.deactivate()
 
-    condMean_r = np.array(condMean_r)
-    condVar_r = np.array(condVar_r)
-
     # Comparison
-    np.testing.assert_allclose(cond_mean, condMean_r)
-    np.testing.assert_allclose(cond_var, condVar_r)
+    np.testing.assert_allclose(cond_mean, r_cond_mean)
+    np.testing.assert_allclose(cond_var, r_cond_var)
 
 
-def test_condMVN_exception_given():
-    """Test condMVN raises exceptions when invalid `given_ind` or `x_given` is passed.
+def test_cond_mvn_exception_given():
+    """Test cond_mvn raises exceptions when invalid `given_ind` or `given_value` is passed.
     """
-    n, mean, sigma, dependent_ind, given_ind, x_given = get_strategies(
-        "condMVN_exception_given",
+    n, mean, sigma, dependent_ind, given_ind, given_value = get_strategies(
+        "cond_mvn_exception_given",
     )
 
     if n % 3 != 0 and n % 2 != 0:
-        # Valid case: both `given_ind` and `x_given` are empty
-        condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+        # Valid case: both `given_ind` and `given_value` are empty
+        cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
     elif n % 3 != 0:
         # Valid case: only `given_ind` is empty
-        condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+        cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
     elif n % 2 != 0:
-        # Only `x_given` is empty
+        # Only `given_value` is empty
         with pytest.raises(TypeError) as e:
-            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+            cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
         assert "len() of unsized object" in str(e.value)
     else:
-        # `x_given` is not empty, and does not align with `given_ind`
+        # `given_value` is not empty, and does not align with `given_ind`
         with pytest.raises(ValueError) as e:
-            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
-        assert "lengths of x_given and given_ind must be the same" in str(e.value)
+            cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
+        assert "lengths of given_value and given_ind must be the same" in str(e.value)
 
 
-def test_condMVN_exception_sigma():
-    """Test condMVN raises exceptions when invalid `sigma` is passed.
+def test_cond_mvn_exception_sigma():
+    """Test cond_mvn raises exceptions when invalid `sigma` is passed.
     """
-    n, mean, sigma, dependent_ind, given_ind, x_given = get_strategies(
-        "test_condMVN_exception_sigma",
+    n, mean, sigma, dependent_ind, given_ind, given_value = get_strategies(
+        "test_cond_mvn_exception_sigma",
     )
 
     if n % 3 != 0 and n % 2 != 0:
         # `sigma` is negative definite matrix
         with pytest.raises(ValueError) as e:
-            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+            cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
         assert "sigma is not positive-definite" in str(e.value)
     elif n % 3 != 0:
         # Valid case
-        condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+        cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
     elif n % 2 != 0:
         # `sigma` is not symmetric
         with pytest.raises(ValueError) as e:
-            condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+            cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
         assert "sigma is not a symmetric matrix" in str(e.value)
     else:
-        condMVN(mean, sigma, dependent_ind, given_ind, x_given)
+        cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
