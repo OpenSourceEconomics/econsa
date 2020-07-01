@@ -28,28 +28,21 @@ r_cond_mvnorm = rpackages.importr("condMVNorm")
 rs = RandomState()
 
 
-def test_sampling():
-    pass
-
-
 def get_strategies(name):
+    n = rs.randint(low=4, high=21)
+    mean = rs.randint(low=-2, high=2, size=n)
+    dependent_n = rs.randint(low=1, high=n - 2)
+    dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
+
     if name == "cond_mvn":
-        n = rs.randint(low=4, high=21)
-        mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n))
         sigma = sigma @ sigma.T
-        dependent_n = rs.randint(low=1, high=n - 2)
-        dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
         given_ind = [x for x in range(0, n) if x not in dependent]
         given_value = rs.randint(low=-2, high=2, size=len(given_ind))
         strategy = (n, mean, sigma, dependent, given_ind, given_value)
     elif name == "cond_mvn_exception_given":
-        n = rs.randint(low=4, high=31)
-        mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n))
         sigma = sigma @ sigma.T
-        dependent_n = rs.randint(low=1, high=n - 2)
-        dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
         given_ind = (
             [x for x in range(0, n) if x not in dependent] if n % 3 == 0 else None
         )
@@ -58,12 +51,8 @@ def get_strategies(name):
         )
         strategy = (n, mean, sigma, dependent, given_ind, given_value)
     elif name == "test_cond_mvn_exception_sigma":
-        n = rs.randint(low=4, high=31)
-        mean = rs.randint(low=-2, high=2, size=n)
         sigma = rs.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
         sigma = sigma @ sigma.T if n % 2 == 0 else sigma
-        dependent_n = rs.randint(low=1, high=n - 2)
-        dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
         given_ind = [x for x in range(0, n) if x not in dependent]
         given_value = rs.randint(low=-2, high=2, size=len(given_ind))
         strategy = (n, mean, sigma, dependent, given_ind, given_value)

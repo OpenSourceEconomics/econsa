@@ -6,10 +6,6 @@ This module contains all we need to sample random input parameters.
 import numpy as np
 
 
-def get_sample(*args, **kwargs):
-    return
-
-
 def cond_mvn(
     mean, sigma, dependent_ind, given_ind=None, given_value=None, check_sigma=True,
 ):
