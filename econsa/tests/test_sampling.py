@@ -101,19 +101,12 @@ def test_cond_mvn_exception_given():
         "cond_mvn_exception_given",
     )
 
-    if n % 3 != 0 and n % 2 != 0:
-        # Valid case: both `given_ind` and `given_value` are empty
-        cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
-    elif n % 3 != 0:
+    if n % 3 != 0:
         # Valid case: only `given_ind` is empty
+        # or both `given_ind` and `given_value` are empty
         cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
-    elif n % 2 != 0:
-        # Only `given_value` is empty
-        with pytest.raises(TypeError) as e:
-            cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
-        assert "len() of unsized object" in str(e.value)
     else:
-        # `given_value` is not empty, and does not align with `given_ind`
+        # `given_value` is empty or does not align with `given_ind`
         with pytest.raises(ValueError) as e:
             cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
         assert "lengths of given_value and given_ind must be the same" in str(e.value)
@@ -131,9 +124,6 @@ def test_cond_mvn_exception_sigma():
         with pytest.raises(ValueError) as e:
             cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
         assert "sigma is not positive-definite" in str(e.value)
-    elif n % 3 != 0:
-        # Valid case
-        cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
     elif n % 2 != 0:
         # `sigma` is not symmetric
         with pytest.raises(ValueError) as e:
