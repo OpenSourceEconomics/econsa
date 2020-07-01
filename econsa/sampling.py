@@ -14,7 +14,9 @@ def cond_mvn(
     Returns conditional mean and variance of dependent variables,
     given multivariate normal distribution and indices of independent variables.
 
-    This is a translation of the main function of R package "condMVNorm".
+    This is a translation of the main function of R package condMVNorm_.
+
+    .. _condMVNorm: https://cran.r-project.org/web/packages/condMVNorm/index.html
 
     .. math::
         X = (X_{\text{ind}}, X_{\text{dep}}) \sim \mathcal{N}
@@ -46,10 +48,10 @@ def cond_mvn(
     Returns
     -------
     cond_mean : array_like
-               The conditional mean of dependent variables.
+                The conditional mean of dependent variables.
 
     cond_var : arrray_like
-              The conditional covariance matrix of dependent variables.
+               The conditional covariance matrix of dependent variables.
 
     Examples
     --------

@@ -6,13 +6,11 @@ This module contains all tests for the sampling setup.
 import numpy as np
 import pytest
 import rpy2.robjects.packages as rpackages
-from numpy.random import RandomState
+from numpy.random import default_rng
 from rpy2 import robjects
 from rpy2.robjects import numpy2ri
 
 from econsa.sampling import cond_mvn
-
-# Since NumPy v1.17: from numpy.random import default_rng
 
 
 # Import R modules
@@ -24,37 +22,40 @@ r_utils.install_packages("condMVNorm")
 r_cond_mvnorm = rpackages.importr("condMVNorm")
 
 # Import numpy.random generator
-# Since NumPy v1.17: rng = default_rng()
-rs = RandomState()
+rng = default_rng()
 
 
 def get_strategies(name):
-    n = rs.randint(low=4, high=21)
-    mean = rs.randint(low=-2, high=2, size=n)
-    dependent_n = rs.randint(low=1, high=n - 2)
-    dependent = rs.choice(range(0, n), replace=False, size=dependent_n)
+    n = rng.integers(low=4, high=21)
+    mean = rng.integers(low=-2, high=2, size=n)
+    dependent_n = rng.integers(low=1, high=n - 2)
+    dependent = rng.choice(range(0, n), replace=False, size=dependent_n)
 
     if name == "cond_mvn":
-        sigma = rs.standard_normal(size=(n, n))
+        sigma = rng.standard_normal(size=(n, n))
         sigma = sigma @ sigma.T
         given_ind = [x for x in range(0, n) if x not in dependent]
-        given_value = rs.randint(low=-2, high=2, size=len(given_ind))
+        given_value = rng.integers(low=-2, high=2, size=len(given_ind))
         strategy = (n, mean, sigma, dependent, given_ind, given_value)
     elif name == "cond_mvn_exception_given":
-        sigma = rs.standard_normal(size=(n, n))
+        sigma = rng.standard_normal(size=(n, n))
         sigma = sigma @ sigma.T
         given_ind = (
             [x for x in range(0, n) if x not in dependent] if n % 3 == 0 else None
         )
         given_value = (
-            rs.randint(low=-2, high=2, size=n - dependent_n + 1) if n % 2 == 0 else None
+            rng.integers(low=-2, high=2, size=n - dependent_n + 1)
+            if n % 2 == 0
+            else None
         )
         strategy = (n, mean, sigma, dependent, given_ind, given_value)
     elif name == "test_cond_mvn_exception_sigma":
-        sigma = rs.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
+        sigma = (
+            rng.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
+        )
         sigma = sigma @ sigma.T if n % 2 == 0 else sigma
         given_ind = [x for x in range(0, n) if x not in dependent]
-        given_value = rs.randint(low=-2, high=2, size=len(given_ind))
+        given_value = rng.integers(low=-2, high=2, size=len(given_ind))
         strategy = (n, mean, sigma, dependent, given_ind, given_value)
     else:
         raise NotImplementedError
