@@ -38,5 +38,3 @@ dependencies:
     - flake8-nb
     - numpydoc
     - pre-commit
-    - cairosvg
-    - sphinxcontrib-svg2pdfconverter[CairoSVG]

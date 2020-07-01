@@ -43,8 +43,11 @@ jobs:
         file: coverage.xml
 
     - name: Build docs.
+      if: runner.os = 'Ubuntu'
       shell: bash -l {0}
       run: |
+        pip install cairosvg
+        pip install sphinxcontrib-svg2pdfconverter[CairoSVG]
         cd docs
         make html
 
