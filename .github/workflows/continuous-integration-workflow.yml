@@ -16,10 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: r-lib/actions/setup-r@master
-      with:
-          r-version: '3.6'
-
     - uses: goanpeca/setup-miniconda@v1.0.2
       with:
           auto-update-conda: true
@@ -31,7 +27,6 @@ jobs:
       if: runner.os != 'Windows'
       shell: bash -l {0}
       run: |
-        export LD_LIBRARY_PATH=$(python -m rpy2.situation LD_LIBRARY_PATH):${LD_LIBRARY_PATH}
 
         pytest --cov=econsa --cov-report=xml
 
@@ -48,7 +43,6 @@ jobs:
       shell: bash -l {0}
       run: |
         python -m rpy2.situation
-
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
