@@ -1,6 +1,6 @@
 """Capabilities for sampling of random input parameters.
 
-This module contains all we need to sample random input parameters.
+This module contains functions to sample random input parameters.
 
 """
 import numpy as np
@@ -16,7 +16,7 @@ def cond_mvn(
 
     This is a translation of the main function of R package condMVNorm_.
 
-    .. _condMVNorm: https://cran.r-project.org/web/packages/condMVNorm/index.html
+    .. _condMVNorm: https://cran.r-project.org/package=condMVNorm
 
     .. math::
         X = (X_{\text{ind}}, X_{\text{dep}}) \sim \mathcal{N}
@@ -41,7 +41,7 @@ def cond_mvn(
               The conditioning values (default value is ``None``).
               Should be the same length as `given_ind`, otherwise throw an error.
 
-    check_sigma : boolean, optional
+    check_sigma : bool, optional
                   Check that `sigma` is symmetric,
                   and no eigenvalue is zero (default value is ``True``).
 
@@ -83,7 +83,7 @@ def cond_mvn(
     if np.all(np.array(None, ndmin=1) == given_ind):
         condMean = np.array(mean_np[dependent_ind])
         condVar = np.array(sigma_np[dependent_ind, :][:, dependent_ind])
-        return (condMean, condVar)
+        return condMean, condVar
 
     # Make sure that `given_value` aligns with `given_len`:
     # This includes the case that `given_value` is empty.
@@ -98,4 +98,4 @@ def cond_mvn(
     cond_mean = mean_np[dependent_ind] + c_dinv @ (given_value - mean_np[given_ind])
     cond_var = b - c_dinv @ (c.T)
 
-    return (cond_mean, cond_var)
+    return cond_mean, cond_var
