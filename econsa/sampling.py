@@ -19,7 +19,9 @@ def cond_mvn(
     .. _condMVNorm: https://cran.r-project.org/package=condMVNorm
 
     .. math::
-        X = (X_{\text{ind}}, X_{\text{dep}}) \sim \mathcal{N}
+        X = (X_{\text{given}}, X_{\text{dep}}) \sim \mathcal{N}
+
+    where the average of :math:`X` is `mean` and the covariance matrix of :math:`X` is `sigma`.
 
     Parameters
     ----------
