@@ -10,14 +10,13 @@ from rpy2.robjects import numpy2ri
 from rpy2 import robjects
 
 r_package_cond_mvnorm = rpackages.importr("condMVNorm")
-r_package_base = rpackages.importr("base")
 
 
 def r_cond_mvn(mean, sigma, dependent_ind, given_ind, given_value):
     numpy2ri.activate()
     r_mean = robjects.FloatVector(mean)
     n = sigma.shape[0]
-    r_sigma = r_package_base.matrix(sigma, n, n)
+    r_sigma = robjects.r.matrix(sigma, n, n)
     r_dependent_ind = robjects.IntVector([x + 1 for x in dependent_ind])
     r_given_ind = robjects.IntVector([x + 1 for x in given_ind])
     r_given_value = robjects.IntVector(given_value)
