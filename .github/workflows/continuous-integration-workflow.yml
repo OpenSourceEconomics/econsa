@@ -42,9 +42,6 @@ jobs:
       if: runner.os == 'Windows'
       shell: bash -l {0}
       run: |
-        # Set R_HOME for rpy2
-        set R_HOME=C:\Miniconda\envs\econsa\lib\R
-        setx R_HOME "C:\Miniconda\envs\econsa\lib\R"
         python -m rpy2.situation
         pytest --cov=econsa --cov-report=xml
 
