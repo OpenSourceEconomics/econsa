@@ -42,6 +42,8 @@ jobs:
       if: runner.os == 'Windows'
       shell: bash -l {0}
       run: |
+        R RHOME
+        which R
         python -m rpy2.situation
         pytest --cov=econsa --cov-report=xml
 
