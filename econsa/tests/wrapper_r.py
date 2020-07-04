@@ -3,13 +3,7 @@
 This module contains all functionality related to the use of functions from R for testing purposes.
 
 """
-import os
-
 import numpy as np
-
-if os.name == "nt":
-    os.environ["R_HOME"] = "C:/Miniconda/envs/econsa/lib/R"
-
 import rpy2.robjects.packages as rpackages
 from rpy2 import robjects
 from rpy2.robjects import numpy2ri
