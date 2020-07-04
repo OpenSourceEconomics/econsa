@@ -58,7 +58,7 @@ extensions = [
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
-    "numpydoc",
+    "sphinx.ext.napoleon",
     "nbsphinx",
     "sphinx.ext.mathjax",
     "sphinxcontrib.bibtex",
@@ -93,9 +93,18 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
-# Configuration for numpydoc
-numpydoc_xref_param_type = True
-numpydoc_xref_ignore = {"type", "optional", "default"}
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = True
+napoleon_use_param = True
+napoleon_use_rtype = True
 
 # -- Options for HTML output -------------------------------------------------
 
