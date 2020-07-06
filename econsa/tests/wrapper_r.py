@@ -1,4 +1,4 @@
-"""Wrapping R
+"""Wrapping R.
 
 This module contains all functionality related to the use of functions from R for testing purposes.
 
@@ -8,6 +8,9 @@ import rpy2.robjects.packages as rpackages
 from rpy2 import robjects
 from rpy2.robjects import numpy2ri
 
+r_package_utils = rpackages.importr("utils")
+r_package_utils.chooseCRANmirror(ind=1)
+r_package_utils.install_packages("condMVNorm")
 r_package_cond_mvnorm = rpackages.importr("condMVNorm")
 
 
