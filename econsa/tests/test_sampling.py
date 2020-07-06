@@ -3,12 +3,12 @@
 This module contains all tests for the sampling setup.
 
 """
-from numpy.random import default_rng
 import numpy as np
 import pytest
+from numpy.random import default_rng
 
-from econsa.tests.wrapper_r import r_cond_mvn
 from econsa.sampling import cond_mvn
+from econsa.tests.wrapper_r import r_cond_mvn
 
 rng = default_rng()
 

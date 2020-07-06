@@ -4,10 +4,9 @@ This module contains all functionality related to the use of functions from R fo
 
 """
 import numpy as np
-
 import rpy2.robjects.packages as rpackages
-from rpy2.robjects import numpy2ri
 from rpy2 import robjects
+from rpy2.robjects import numpy2ri
 
 r_package_cond_mvnorm = rpackages.importr("condMVNorm")
 
