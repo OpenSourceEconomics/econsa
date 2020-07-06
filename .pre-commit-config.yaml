@@ -1,3 +1,4 @@
+exclude: (bin/run-figures)|(docs/_static/images)
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.1.0
