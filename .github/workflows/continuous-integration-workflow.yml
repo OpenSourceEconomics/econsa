@@ -43,18 +43,10 @@ jobs:
       shell: bash -l {0}
       run: |
 
-        export PATH=/c/Miniconda/envs/econsa/Library/mingw-w64/bin:/c/Miniconda/envs/econsa/Library/mingw-w64/lib:$PATH
-        which R
-        python -m rpy2.situation
+        #export PATH=/c/Miniconda/envs/econsa/Library/mingw-w64/bin:/c/Miniconda/envs/econsa/Library/mingw-w64/lib:$PATH
+        #which R
+        #python -m rpy2.situation
         pytest --cov=econsa --cov-report=xml
-
-        # We want to make sure proper formatting of the notebooks.
-        flake8-nb; [ $? -eq 0 ] || exit 1
-        black-nb .; [ $? -eq 0 ] || exit 1
-
-        # We want to pull the submodules.
-        # This can be removed once temfpy is live on conda.
-        git submodule update --init --recursive
 
     - name: Upload coverage to Codecov,
       if: runner.os == 'Linux' && matrix.python-version == '3.7'
