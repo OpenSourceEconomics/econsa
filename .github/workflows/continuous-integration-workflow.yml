@@ -44,6 +44,7 @@ jobs:
       run: |
 
         export PATH=/c/Miniconda/envs/econsa/Library/mingw-w64/bin:/c/Miniconda/envs/econsa/Library/mingw-w64/lib:$PATH
+        which R
         python -m rpy2.situation
         pytest --cov=econsa --cov-report=xml
 
