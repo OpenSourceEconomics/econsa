@@ -43,11 +43,7 @@ jobs:
       shell: bash -l {0}
       run: |
 
-        which python
-
-        echo $PATH
-
-        export PATH=/c/Miniconda/envs/econsa/R:$PATH
+        export PATH=/c/Miniconda/envs/econsa/Library/mingw-w64/bin:/c/Miniconda/envs/econsa/Library/mingw-w64/lib:$PATH
         python -m rpy2.situation
         pytest --cov=econsa --cov-report=xml
 
