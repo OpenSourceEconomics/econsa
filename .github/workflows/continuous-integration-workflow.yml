@@ -42,6 +42,10 @@ jobs:
       if: runner.os == 'Windows'
       shell: bash -l {0}
       run: |
+
+        which python
+        source activate econsa
+
         python -m rpy2.situation
         pytest --cov=econsa --cov-report=xml
 
