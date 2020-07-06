@@ -20,11 +20,18 @@ def r_cond_mvn(mean, sigma, dependent_ind, given_ind, given_value):
     r_dependent_ind = robjects.IntVector([x + 1 for x in dependent_ind])
     r_given_ind = robjects.IntVector([x + 1 for x in given_ind])
     r_given_value = robjects.IntVector(given_value)
-    numpy2ri.deactivate()
 
-    args = (r_mean, r_sigma, r_dependent_ind, r_given_ind, r_given_value)
-    r_cond_mean, r_cond_cov = r_package_cond_mvnorm.condMVN(*args)
+    # args = (r_mean, r_sigma, r_dependent_ind, r_given_ind, r_given_value)
+    r_cond_mean, r_cond_cov = r_package_cond_mvnorm.condMVN(
+        mean=r_mean,
+        sigma=r_sigma,
+        dependent=r_dependent_ind,
+        given=r_given_ind,
+        X=r_given_value,
+    )
 
     r_cond_mean, r_cond_cov = np.array(r_cond_mean), np.array(r_cond_cov)
+
+    numpy2ri.deactivate()
 
     return r_cond_mean, r_cond_cov
