@@ -27,7 +27,6 @@ dependencies:
   - nbsphinx
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex
-  - r-base
   - r-r.utils
   - r-condmvnorm
   - rpy2
