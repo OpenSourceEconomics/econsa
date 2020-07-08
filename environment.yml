@@ -27,8 +27,6 @@ dependencies:
   - nbsphinx
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex
-  - r-r.utils
-  - r-condmvnorm
   - rpy2
   - pip:
     - salib==1.3.8
