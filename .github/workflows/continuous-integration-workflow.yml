@@ -16,17 +16,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: install baseline
+      run: |
+        sudo apt-get update
+        sudo apt-get install r-base r-base-dev
+
     - uses: goanpeca/setup-miniconda@v1.0.2
       with:
           auto-update-conda: true
           activate-environment: econsa
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
-
-    - name: install baseline
-      run: |
-        sudo apt-get update
-        sudo apt-get install r-base r-base-dev
 
     - name: Run test suite.
       shell: bash -l {0}
