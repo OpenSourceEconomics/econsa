@@ -20,13 +20,13 @@ def get_strategies(name):
     dependent_ind = rng.choice(range(0, n), replace=False, size=dependent_n)
 
     if name == "cond_mvn":
-        sigma = rng.standard_normal(size=(n, n))
-        sigma = sigma @ sigma.T
+        cov = rng.standard_normal(size=(n, n))
+        cov = cov @ cov.T
         given_ind = [x for x in range(0, n) if x not in dependent_ind]
         given_value = rng.integers(low=-2, high=2, size=len(given_ind))
     elif name == "cond_mvn_exception_given":
-        sigma = rng.standard_normal(size=(n, n))
-        sigma = sigma @ sigma.T
+        cov = rng.standard_normal(size=(n, n))
+        cov = cov @ cov.T
         given_ind = (
             [x for x in range(0, n) if x not in dependent_ind] if n % 3 == 0 else None
         )
@@ -35,17 +35,15 @@ def get_strategies(name):
             if n % 2 == 0
             else None
         )
-    elif name == "test_cond_mvn_exception_sigma":
-        sigma = (
-            rng.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
-        )
-        sigma = sigma @ sigma.T if n % 2 == 0 else sigma
+    elif name == "test_cond_mvn_exception_cov":
+        cov = rng.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
+        cov = cov @ cov.T if n % 2 == 0 else cov
         given_ind = [x for x in range(0, n) if x not in dependent_ind]
         given_value = rng.integers(low=-2, high=2, size=len(given_ind))
     else:
         raise NotImplementedError
 
-    strategy = (mean, sigma, dependent_ind, given_ind, given_value)
+    strategy = (mean, cov, dependent_ind, given_ind, given_value)
 
     return strategy
 
@@ -65,39 +63,39 @@ def test_cond_mvn():
 def test_cond_mvn_exception_given():
     """Test cond_mvn raises exceptions when invalid `given_ind` or `given_value` is passed.
     """
-    mean, sigma, dependent_ind, given_ind, given_value = get_strategies(
+    mean, cov, dependent_ind, given_ind, given_value = get_strategies(
         "cond_mvn_exception_given",
     )
 
-    n = sigma.shape[0]
+    n = cov.shape[0]
     if n % 3 != 0:
         # Valid case: only `given_ind` is empty or both `given_ind` and `given_value` are empty
-        cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
+        cond_mvn(mean, cov, dependent_ind, given_ind, given_value)
     else:
         # `given_value` is empty or does not align with `given_ind`
         with pytest.raises(ValueError) as e:
-            cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
+            cond_mvn(mean, cov, dependent_ind, given_ind, given_value)
         assert "lengths of given_value and given_ind must be the same" in str(e.value)
 
 
-def test_cond_mvn_exception_sigma():
-    """Test cond_mvn raises exceptions when invalid `sigma` is passed.
+def test_cond_mvn_exception_cov():
+    """Test cond_mvn raises exceptions when invalid `cov` is passed.
     """
-    mean, sigma, dependent_ind, given_ind, given_value = get_strategies(
-        "test_cond_mvn_exception_sigma",
+    mean, cov, dependent_ind, given_ind, given_value = get_strategies(
+        "test_cond_mvn_exception_cov",
     )
 
-    n = sigma.shape[0]
+    n = cov.shape[0]
 
     if n % 3 != 0 and n % 2 != 0:
-        # `sigma` is negative definite matrix
+        # `cov` is negative definite matrix
         with pytest.raises(ValueError) as e:
-            cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
-        assert "sigma is not positive-definite" in str(e.value)
+            cond_mvn(mean, cov, dependent_ind, given_ind, given_value)
+        assert "cov is not positive-definite" in str(e.value)
     elif n % 2 != 0:
-        # `sigma` is not symmetric
+        # `cov` is not symmetric
         with pytest.raises(ValueError) as e:
-            cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
-        assert "sigma is not a symmetric matrix" in str(e.value)
+            cond_mvn(mean, cov, dependent_ind, given_ind, given_value)
+        assert "cov is not a symmetric matrix" in str(e.value)
     else:
-        cond_mvn(mean, sigma, dependent_ind, given_ind, given_value)
+        cond_mvn(mean, cov, dependent_ind, given_ind, given_value)
