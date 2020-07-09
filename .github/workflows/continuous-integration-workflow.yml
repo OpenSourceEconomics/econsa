@@ -42,23 +42,6 @@ jobs:
       with:
         file: coverage.xml
 
-    - name: Build docs.
-      if: runner.os == 'Linux'
-      shell: bash -l {0}
-      run: |
-        pip install cairosvg
-        pip install sphinxcontrib-svg2pdfconverter[CairoSVG]
-        cd docs
-        make html
-
-    - name: Run figures.
-      if: runner.os != 'Windows'
-      shell: bash -l {0}
-      run: |
-        # The export command in .envrc does not work on Windows.
-        source .envrc-ci
-        run-figures
-
     - name: Run pre-commits.
       shell: bash -l {0}
       run: |
