@@ -42,6 +42,13 @@ jobs:
       with:
         file: coverage.xml
 
+    - name: Run figures.
+      if: runner.os == 'Linux'
+      shell: bash -l {0}
+      run: |
+        source .envrc
+        run-figures
+
     - name: Run pre-commits.
       shell: bash -l {0}
       run: |
