@@ -23,7 +23,7 @@ def get_strategies(name):
         cov = rng.standard_normal(size=(n, n))
         cov = cov @ cov.T
         given_ind = [x for x in range(0, n) if x not in dependent_ind]
-        given_value = rng.integers(low=-2, high=2, size=len(given_ind))
+        given_value = rng.uniform(low=-2, high=2, size=len(given_ind))
     elif name == "cond_mvn_exception_given":
         cov = rng.standard_normal(size=(n, n))
         cov = cov @ cov.T
@@ -31,7 +31,7 @@ def get_strategies(name):
             [x for x in range(0, n) if x not in dependent_ind] if n % 3 == 0 else None
         )
         given_value = (
-            rng.integers(low=-2, high=2, size=n - dependent_n + 1)
+            rng.uniform(low=-2, high=2, size=n - dependent_n + 1)
             if n % 2 == 0
             else None
         )
@@ -39,7 +39,7 @@ def get_strategies(name):
         cov = rng.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
         cov = cov @ cov.T if n % 2 == 0 else cov
         given_ind = [x for x in range(0, n) if x not in dependent_ind]
-        given_value = rng.integers(low=-2, high=2, size=len(given_ind))
+        given_value = rng.uniform(low=-2, high=2, size=len(given_ind))
     else:
         raise NotImplementedError
 
