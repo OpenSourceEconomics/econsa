@@ -17,18 +17,18 @@ def get_strategies(name):
     n = rng.integers(low=4, high=21)
     mean = rng.integers(low=-2, high=2, size=n)
     dependent_n = rng.integers(low=1, high=n - 2)
-    dependent = rng.choice(range(0, n), replace=False, size=dependent_n)
+    dependent_ind = rng.choice(range(0, n), replace=False, size=dependent_n)
 
     if name == "cond_mvn":
         sigma = rng.standard_normal(size=(n, n))
         sigma = sigma @ sigma.T
-        given_ind = [x for x in range(0, n) if x not in dependent]
+        given_ind = [x for x in range(0, n) if x not in dependent_ind]
         given_value = rng.integers(low=-2, high=2, size=len(given_ind))
     elif name == "cond_mvn_exception_given":
         sigma = rng.standard_normal(size=(n, n))
         sigma = sigma @ sigma.T
         given_ind = (
-            [x for x in range(0, n) if x not in dependent] if n % 3 == 0 else None
+            [x for x in range(0, n) if x not in dependent_ind] if n % 3 == 0 else None
         )
         given_value = (
             rng.integers(low=-2, high=2, size=n - dependent_n + 1)
@@ -40,12 +40,12 @@ def get_strategies(name):
             rng.standard_normal(size=(n, n)) if n % 3 == 0 else np.diagflat([-1] * n)
         )
         sigma = sigma @ sigma.T if n % 2 == 0 else sigma
-        given_ind = [x for x in range(0, n) if x not in dependent]
+        given_ind = [x for x in range(0, n) if x not in dependent_ind]
         given_value = rng.integers(low=-2, high=2, size=len(given_ind))
     else:
         raise NotImplementedError
 
-    strategy = (mean, sigma, dependent, given_ind, given_value)
+    strategy = (mean, sigma, dependent_ind, given_ind, given_value)
 
     return strategy
 

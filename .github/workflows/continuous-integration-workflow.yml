@@ -23,11 +23,9 @@ jobs:
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
 
-    - name: Run test suite on non-Windows.
-      if: runner.os != 'Windows'
+    - name: Run test suite.
       shell: bash -l {0}
       run: |
-
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
@@ -38,45 +36,28 @@ jobs:
         # This can be removed once temfpy is live on conda.
         git submodule update --init --recursive
 
-    - name: Run test suite on Windows.
-      if: runner.os == 'Windows'
-      shell: bash -l {0}
-      run: |
-        python -m rpy2.situation
-        pytest --cov=econsa --cov-report=xml
-
-        # We want to make sure proper formatting of the notebooks.
-        flake8-nb; [ $? -eq 0 ] || exit 1
-        black-nb .; [ $? -eq 0 ] || exit 1
-
-        # We want to pull the submodules.
-        # This can be removed once temfpy is live on conda.
-        git submodule update --init --recursive
-
-    - name: Upload coverage to Codecov,
+    - name: Upload coverage to Codecov.
       if: runner.os == 'Linux' && matrix.python-version == '3.7'
       uses: codecov/codecov-action@v1
       with:
         file: coverage.xml
 
-    - name: Build docs.
+    - name: Run figures.
       if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
-        pip install cairosvg
-        pip install sphinxcontrib-svg2pdfconverter[CairoSVG]
-        cd docs
-        make html
+        # .envrc
+        export PROJECT_ROOT=$PWD
+        export PATH=$PWD/bin:$PATH
+        export PYTHONPATH=$PROJECT_ROOT:$PYTHONPATH
+        export PYTHONPATH=$PROJECT_ROOT/submodules/temfpy:$PYTHONPATH
+        export MATPLOTLIBRC=$PWD/configurations
+        export JUPYTER_CONFIG_DIR=$PWD/configurations/jupyter
+        export IPYTHONDIR=$PWD/configurations/ipython
 
-    - name: Run figures.
-      if: runner.os != 'Windows'
-      shell: bash -l {0}
-      run: |
-        source .envrc-ci
         run-figures
 
     - name: Run pre-commits.
-      if: runner.os != 'Windows'
       shell: bash -l {0}
       run: |
         pre-commit install -f --install-hooks
