@@ -19,7 +19,7 @@ def r_cond_mvn(mean, cov, dependent_ind, given_ind, given_value):
     r_cov = robjects.r.matrix(cov, n, n)
     r_dependent_ind = robjects.IntVector([x + 1 for x in dependent_ind])
     r_given_ind = robjects.IntVector([x + 1 for x in given_ind])
-    r_given_value = robjects.IntVector(given_value)
+    r_given_value = robjects.FloatVector(given_value)
 
     args = (r_mean, r_cov, r_dependent_ind, r_given_ind, r_given_value)
     r_cond_mean, r_cond_cov = r_package_cond_mvnorm.condMVN(*args)
