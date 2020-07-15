@@ -1,9 +1,11 @@
+============
 Related work
 ============
 
 We are drawing on related work throughout.
 
-**Software**
+Software
+--------
 
 * Feinberg, J., and Langtangen, H. P. (2015). `Chaospy: an open source tool for designing methods of uncertainty quantification`. *Journal of Computational Science, 11*, 46-57.
 
@@ -12,7 +14,8 @@ We are drawing on related work throughout.
 * Tennoe S., Halnes G., and Einevoll G.T. (2018). `Uncertainpy: a Python toolbox for uncertainty quantification and sensitivity analysis in computational neuroscience`. *Frontiers in Neuroinformatics, 12*, 49.
 
 
-**Books**
+Books
+-----
 
 * Ghanem, R., Higdon, D., and Owhadi, H. (2017). `Handbook of uncertainty quantification`. Cham, Switzerland: Springer International Publishing.
 
@@ -25,6 +28,7 @@ We are drawing on related work throughout.
 * Sullivan, T.J. (2015). `Introduction to uncertainty quantification`. Cham, Switzerland: Springer International Publishing.
 
 
-**Popular science**
+Popular science
+---------------
 
 * King, M., and Kay, J. (2020).  `Radical uncertainty: decision-making for an unknowable future`. London, UK: The Bridge Street Press.
