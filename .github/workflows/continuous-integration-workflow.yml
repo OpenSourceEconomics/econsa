@@ -50,7 +50,6 @@ jobs:
         export PROJECT_ROOT=$PWD
         export PATH=$PWD/bin:$PATH
         export PYTHONPATH=$PROJECT_ROOT:$PYTHONPATH
-        export PYTHONPATH=$PROJECT_ROOT/submodules/temfpy:$PYTHONPATH
         export MATPLOTLIBRC=$PWD/configurations
         export JUPYTER_CONFIG_DIR=$PWD/configurations/jupyter
         export IPYTHONDIR=$PWD/configurations/ipython

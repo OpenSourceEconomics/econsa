@@ -17,6 +17,7 @@ dependencies:
   - seaborn
   - numba
   - pdbpp
+  - temfpy>=1.1
   - chaospy
   - pytest
   - pytest-black
