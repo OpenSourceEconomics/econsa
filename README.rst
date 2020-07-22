@@ -1,3 +1,9 @@
+.. image:: logos/econsa_logo_no_type_RGB.svg
+   :width: 100%
+   :height: 100px
+   :align: center
+
+
 econsa
 ======
 
