@@ -10,12 +10,16 @@ from econsa.sampling import cond_mvn
 
 
 def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
-    """Correlation for Gaussian copula.
+    r"""Conditional sampling from Gaussian copula.
+
+    This function provides the probability distribution of conditional sample
+    drawn from a Gaussian copula, given covariance matrix and a uniform random vector,
+    as described in Section 4.2 of [K2012]_.
 
     Parameters
     ----------
     cov : array_like
-        Description
+        Covariance matrix of the desired sample.
 
     dependent_ind : int or array_like
         The indices of dependent variables.
@@ -23,13 +27,20 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     given_ind : array_like
         The indices of independent variables.
 
-    given_value_u : TYPE
-        Description
+    given_value_u : array_like
+        The given random vector (:math:`u`) that is uniformly distributed between 0 and 1.
 
     Returns
     -------
     cond_quan : array_like
-        Description
+        The conditional sample (:math:`\xi`) that is between 0 and 1,
+        and has the same length as ``dependent_ind``.
+
+    References
+    ----------
+    .. [K2012] Kucherenko, S., Tarantola, S., & Annoni, P. (2012).
+        Estimation of global sensitivity indices for models with
+        dependent variables. Computer Physics Communications, 183(4), 937–946.
 
     Examples
     --------
@@ -62,6 +73,11 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     if not np.all((given_value_u >= 0) & (given_value_u <= 1)):
         raise ValueError("sanitize your inputs!")
 
+    # Make sure that covariance is well-conditioned
+    if np.linalg.cond(cov) > 100:
+        raise ValueError("covariance matrix is ill-conditioned")
+
+    # Transform u into a standard normal vector y
     given_value_y = norm().ppf(given_value_u)
 
     means = np.zeros(cov.shape[0])
@@ -71,9 +87,9 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
 
     cond_dist = multivariate_norm(cond_mean, cond_cov)
     cond_draw = np.atleast_1d(cond_dist.rvs())
-    cond_quan = norm.cdf(cond_draw)
+    cond_quan = np.atleast_1d(norm.cdf(cond_draw))
 
-    return np.atleast_1d(cond_quan)
+    return cond_quan
 
 
 def _cov2corr(cov, return_std=False):
@@ -89,8 +105,7 @@ def _cov2corr(cov, return_std=False):
          Covariance matrix with dimensions :math:`N\times N`.
 
     return_std: bool, optional
-         If True then the standard deviation is also returned.
-         By default only the correlation matrix is returned.
+         If True then the standard deviation is also returned. (default value is `False`)
 
     Returns
     -------
