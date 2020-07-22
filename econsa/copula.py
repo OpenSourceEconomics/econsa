@@ -14,7 +14,7 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
 
     This function provides the probability distribution of conditional sample
     drawn from a Gaussian copula, given covariance matrix and a uniform random vector,
-    as described in Section 4.2 of [K2012]_.
+    as described in Section 4.1 of [K2012]_.
 
     Parameters
     ----------
@@ -69,7 +69,8 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     """
     given_value_u = np.atleast_1d(given_value_u)
 
-    # Check `given_value_u` are between 0 and 1:
+    # Check `given_value_u` are between 0 and 1
+    # TODO: more sensible error message
     if not np.all((given_value_u >= 0) & (given_value_u <= 1)):
         raise ValueError("sanitize your inputs!")
 
