@@ -119,6 +119,9 @@ html_theme = "sphinx_rtd_theme"
 #
 # html_theme_options = {}
 
+# Add a logo at the the top of sidebar
+html_logo = "../../logos/econsa_logo_no_type_RGB.svg"
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
