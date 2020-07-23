@@ -9,23 +9,6 @@ from scipy.stats import norm
 from econsa.sampling import cond_mvn
 
 
-# def cond_gaussian_copula_sample(cov, dependent_ind, given_ind, given_value_u, distribution):
-#     """Summary.
-
-#     .. todo::
-#         The code now only takes one given value.
-
-#     Returns
-#     -------
-#     TYPE
-#         Description.
-#     """
-#     condi_value_u = cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u)
-
-#     gc_value = distribution[int(dependent_ind[0])].inv(condi_value_u)
-#     return gc_value
-
-
 def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     r"""Conditional sampling from Gaussian copula.
 
@@ -108,7 +91,6 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     # C(u, Sigma)
     cond_dist = multivariate_norm(cond_mean, cond_cov)
     cond_draw = np.atleast_1d(cond_dist.rvs())
-    # Conditional F^{-1}(u)
     cond_quan = np.atleast_1d(norm.cdf(cond_draw))
 
     return cond_quan
