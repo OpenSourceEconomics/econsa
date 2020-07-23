@@ -90,7 +90,7 @@ def test_cond_gaussian_copula():
         cond_mean, cond_cov = cond_mvn(*args_cn)
         cond_dist = multivariate_norm(cond_mean, cond_cov)
         cn_value = np.atleast_1d(cond_dist.rvs())
-        print(type(gc_value))
+
         np.testing.assert_almost_equal(cn_value, gc_value)
 
 
