@@ -1,5 +1,5 @@
 .. |logo| image:: logos/econsa_logo_no_type_RGB.svg
-   :height: 25px
+   :height: 23px
 
 |logo| econsa
 =============
