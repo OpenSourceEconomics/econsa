@@ -28,7 +28,7 @@ Welcome to econsa's documentation!
 
 	| -- Friedrich von Hayek, Nobel Prize Lecture
 
-.. image:: ../../logos/econsa_logo_no_type_RGB.svg
+.. image:: ../../logos/econsa_logo_vertical_RGB.svg
     :alt: econsa logo
     :width: 15%
     :align: center
