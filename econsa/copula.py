@@ -9,12 +9,32 @@ from scipy.stats import norm
 from econsa.sampling import cond_mvn
 
 
+# def cond_gaussian_copula_sample(cov, dependent_ind, given_ind, given_value_u, distribution):
+#     """Summary.
+
+#     .. todo::
+#         The code now only takes one given value.
+
+#     Returns
+#     -------
+#     TYPE
+#         Description.
+#     """
+#     condi_value_u = cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u)
+
+#     gc_value = distribution[int(dependent_ind[0])].inv(condi_value_u)
+#     return gc_value
+
+
 def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     r"""Conditional sampling from Gaussian copula.
 
     This function provides the probability distribution of conditional sample
     drawn from a Gaussian copula, given covariance matrix and a uniform random vector,
     as described in Section 4.1 of [K2012]_.
+
+    .. todo::
+        Make this the backend of ``gc_value``.
 
     Parameters
     ----------
@@ -33,7 +53,7 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     Returns
     -------
     cond_quan : array_like
-        The conditional sample (:math:`\xi`) that is between 0 and 1,
+        The conditional sample (:math:`G(u)`) that is between 0 and 1,
         and has the same length as ``dependent_ind``.
 
     References
@@ -77,7 +97,7 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     if np.linalg.cond(cov) > 100:
         raise ValueError("covariance matrix is ill-conditioned")
 
-    # Transform u into a standard normal vector y
+    # F^{−1}(u)
     given_value_y = norm().ppf(given_value_u)
 
     means = np.zeros(cov.shape[0])
@@ -85,8 +105,10 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
         means, _cov2corr(cov), dependent_ind, given_ind, given_value_y,
     )
 
+    # C(u, Sigma)
     cond_dist = multivariate_norm(cond_mean, cond_cov)
     cond_draw = np.atleast_1d(cond_dist.rvs())
+    # Conditional F^{-1}(u)
     cond_quan = np.atleast_1d(norm.cdf(cond_draw))
 
     return cond_quan

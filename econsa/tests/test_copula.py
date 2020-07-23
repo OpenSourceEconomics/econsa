@@ -13,12 +13,16 @@ from econsa.sampling import cond_mvn
 
 
 def get_strategies(name):
-    dim = np.random.randint(2, 10)
+    dim = np.random.randint(3, 10)
 
     full = list(range(0, dim))
     given_ind = full[:]
-    dependent_ind = [np.random.choice(full)]
-    given_ind.remove(dependent_ind[0])
+
+    dependent_n = np.random.randint(low=1, high=dim - 1)
+    dependent_ind = np.random.choice(full, replace=False, size=dependent_n)
+
+    for i in dependent_ind:
+        given_ind.remove(i)
 
     means = np.random.uniform(-100, 100, dim)
     sigma = np.random.normal(size=(dim, dim))
@@ -76,7 +80,10 @@ def test_cond_gaussian_copula():
         condi_value_u = cond_gaussian_copula(
             cov, dependent_ind, given_ind, given_value_u,
         )
-        gc_value = distribution[int(dependent_ind[0])].inv(condi_value_u)
+        gc_value = (
+            distribution[int(dependent_ind[i])].inv(condi_value_u)
+            for i, index in enumerate(dependent_ind)
+        )
 
         np.random.seed(123)
         cond_mean, cond_cov = cond_mvn(*args_cn)
