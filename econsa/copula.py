@@ -15,9 +15,6 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     This function provides the probability distribution of conditional sample
     drawn from a Gaussian copula, given covariance matrix and a uniform random vector.
 
-    .. todo::
-        Make this the backend of ``gc_value``.
-
     Parameters
     ----------
     cov : array_like
@@ -34,7 +31,7 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
 
     Returns
     -------
-    cond_quan : ndarray
+    cond_quan : numpy.ndarray
         The conditional sample (:math:`G(u)`) that is between 0 and 1,
         and has the same length as ``dependent_ind``.
 

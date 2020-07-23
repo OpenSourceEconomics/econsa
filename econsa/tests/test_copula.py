@@ -69,17 +69,19 @@ def test_cond_gaussian_copula():
     """
     args_gc, args_cn = get_strategies("test_cond_gaussian_copula")
     cov, dependent_ind, given_ind, given_value_u, distribution = args_gc
-    dim = len(dependent_ind)
 
     np.random.seed(123)
     condi_value_u = cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u)
-    gc_value = [distribution[int(ind)].inv(condi_value_u) for ind in dependent_ind]
-    gc_value = np.squeeze(np.array(gc_value).reshape(dim, dim))
+    dist_subset = list()
+    for ind in dependent_ind:
+        dist_subset.append(distribution[int(ind)])
+    dist_subset = cp.J(*dist_subset)
+    gc_value = dist_subset.inv(condi_value_u)
 
     np.random.seed(123)
     cond_mean, cond_cov = cond_mvn(*args_cn)
     cond_dist = multivariate_norm(cond_mean, cond_cov)
-    cn_value = np.atleast_1d(cond_dist.rvs(size=dim).T)
+    cn_value = np.atleast_1d(cond_dist.rvs())
 
     np.testing.assert_almost_equal(cn_value, gc_value)
 
