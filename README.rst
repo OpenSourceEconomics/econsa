@@ -1,4 +1,4 @@
-.. |logo| image:: econsa_logo_no_type_RGB.svg
+.. |logo| image:: logos/econsa_logo_no_type_RGB.svg
    :height: 27px
    
 |logo| econsa
