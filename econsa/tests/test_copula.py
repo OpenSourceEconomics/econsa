@@ -13,25 +13,25 @@ from econsa.sampling import cond_mvn
 
 
 def get_strategies(name):
-    dim = np.random.randint(3, 10)
+    dim = np.random.randint(2, 10)
 
     full = list(range(0, dim))
     given_ind = full[:]
 
-    dependent_n = np.random.randint(low=1, high=dim - 1)
+    dependent_n = np.random.randint(low=1, high=dim)
     dependent_ind = np.random.choice(full, replace=False, size=dependent_n)
 
     for i in dependent_ind:
         given_ind.remove(i)
 
     means = np.random.uniform(-100, 100, dim)
-    sigma = np.random.normal(size=(dim, dim))
 
-    exception_cov = False
-
-    cov = sigma @ sigma.T
-    if np.linalg.cond(cov) > 100:
-        exception_cov = True
+    # Draw new sigma until cov is well-conditioned
+    while True:
+        sigma = np.random.normal(size=(dim, dim))
+        cov = sigma @ sigma.T
+        if np.linalg.cond(cov) < 100:
+            break
 
     marginals = list()
     for i in range(dim):
@@ -51,7 +51,7 @@ def get_strategies(name):
 
         strategy_gc = (cov, dependent_ind, given_ind, given_value_u, distribution)
         strategy_cn = (means, cov, dependent_ind, given_ind, given_value)
-        strategy = (strategy_gc, strategy_cn, exception_cov)
+        strategy = (strategy_gc, strategy_cn)
     elif name == "test_cond_gaussian_copula_exception_u":
         given_value_u = given_value
         strategy = (cov, dependent_ind, given_ind, given_value_u)
@@ -67,30 +67,20 @@ def test_cond_gaussian_copula():
     should be identical to the direct use of a multivariate normal
     distribution.
     """
-    args_gc, args_cn, exception_cov = get_strategies("test_cond_gaussian_copula")
+    args_gc, args_cn = get_strategies("test_cond_gaussian_copula")
     cov, dependent_ind, given_ind, given_value_u, distribution = args_gc
+    dim = len(dependent_ind)
 
-    if exception_cov is True:
-        # Test error when ``cov`` has large conditional number
-        with pytest.raises(ValueError) as e:
-            cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u)
-        assert "covariance matrix is ill-conditioned" in str(e.value)
-    else:
-        # Test valid case
-        condi_value_u = cond_gaussian_copula(
-            cov, dependent_ind, given_ind, given_value_u,
-        )
-        gc_value = (
-            distribution[int(dependent_ind[i])].inv(condi_value_u)
-            for i, index in enumerate(dependent_ind)
-        )
+    condi_value_u = cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u)
+    gc_value = [distribution[int(ind)].inv(condi_value_u) for ind in dependent_ind]
+    gc_value = np.atleast_1d(gc_value).reshape(dim, dim)
 
-        np.random.seed(123)
-        cond_mean, cond_cov = cond_mvn(*args_cn)
-        cond_dist = multivariate_norm(cond_mean, cond_cov)
-        cn_value = np.atleast_1d(cond_dist.rvs())
+    np.random.seed(123)
+    cond_mean, cond_cov = cond_mvn(*args_cn)
+    cond_dist = multivariate_norm(cond_mean, cond_cov)
+    cn_value = np.atleast_1d(cond_dist.rvs(size=dim).T)
 
-        np.testing.assert_almost_equal(cn_value, gc_value)
+    np.testing.assert_almost_equal(cn_value, gc_value)
 
 
 def test_cond_gaussian_copula_exception_u():

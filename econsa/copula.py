@@ -13,8 +13,7 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     r"""Conditional sampling from Gaussian copula.
 
     This function provides the probability distribution of conditional sample
-    drawn from a Gaussian copula, given covariance matrix and a uniform random vector,
-    as described in Section 4.1 of [K2012]_.
+    drawn from a Gaussian copula, given covariance matrix and a uniform random vector.
 
     .. todo::
         Make this the backend of ``gc_value``.
@@ -35,40 +34,31 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
 
     Returns
     -------
-    cond_quan : array_like
+    cond_quan : ndarray
         The conditional sample (:math:`G(u)`) that is between 0 and 1,
         and has the same length as ``dependent_ind``.
 
-    References
-    ----------
-    .. [K2012] Kucherenko, S., Tarantola, S., & Annoni, P. (2012).
-        Estimation of global sensitivity indices for models with
-        dependent variables. Computer Physics Communications, 183(4), 937–946.
-
     Examples
     --------
+    .. TODO::
+        This is too long but very suitable for a tutorial notebook,
+        let's just have a hard-coded direct use of the function.
+
     >>> import chaospy as cp
     >>> np.random.seed(123)
-    >>> dim = 3
-    >>> means = np.random.uniform(-100, 100, dim)
-    >>> sigma = np.random.normal(size=(dim, dim))
-    >>> cov = sigma @ sigma.T
-    >>> marginals = list()
-    >>> for i in range(dim):
-    ...     mean, sigma = means[i], np.sqrt(cov[i, i])
-    ...     marginals.append(cp.Normal(mu=mean, sigma=sigma))
+    >>> mean = [0, 0, 0]
+    >>> sigma = [0.4, 1.2, 1.7]
+    >>> marginals = [cp.Normal(mu=mu, sigma=np.sqrt(si)) for (mu, si) in zip(mean, sigma)]
     >>> distribution = cp.J(*marginals)
     >>> sample = distribution.sample(1).T[0]
-    >>> full = list(range(0, dim))
-    >>> dependent_ind = [np.random.choice(full)]
-    >>> given_ind = full[:]
-    >>> given_ind.remove(dependent_ind[0])
+    >>> dependent_ind = 1
+    >>> given_ind = [0, 2]
     >>> given_value = sample[given_ind]
     >>> given_value_u = [
     ...     distribution[ind].cdf(given_value[i]) for i, ind in enumerate(given_ind)
     ... ]
     >>> condi_value_u = cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u)
-    >>> np.testing.assert_almost_equal(condi_value_u[0], 0.170718, decimal=6)
+    >>> np.testing.assert_almost_equal(condi_value_u[0], 0.877255, decimal=6)
     """
     given_value_u = np.atleast_1d(given_value_u)
 
@@ -76,16 +66,12 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     if not np.all((given_value_u >= 0) & (given_value_u <= 1)):
         raise ValueError("given_value_u must be between 0 and 1")
 
-    # Make sure that covariance is well-conditioned
-    if np.linalg.cond(cov) > 100:
-        raise ValueError("covariance matrix is ill-conditioned")
-
     # F^{−1}(u)
     given_value_y = norm().ppf(given_value_u)
 
-    means = np.zeros(cov.shape[0])
+    mean = np.zeros(cov.shape[0])
     cond_mean, cond_cov = cond_mvn(
-        means, _cov2corr(cov), dependent_ind, given_ind, given_value_y,
+        mean, _cov2corr(cov), dependent_ind, given_ind, given_value_y,
     )
 
     # C(u, Sigma)
