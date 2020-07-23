@@ -70,9 +70,8 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     given_value_u = np.atleast_1d(given_value_u)
 
     # Check `given_value_u` are between 0 and 1
-    # TODO: more sensible error message
     if not np.all((given_value_u >= 0) & (given_value_u <= 1)):
-        raise ValueError("sanitize your inputs!")
+        raise ValueError("given_value_u must be between 0 and 1")
 
     # Make sure that covariance is well-conditioned
     if np.linalg.cond(cov) > 100:
