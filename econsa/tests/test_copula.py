@@ -25,13 +25,14 @@ def get_strategies(name):
         given_ind.remove(i)
 
     means = np.random.uniform(-100, 100, dim)
-    sigma = np.random.normal(size=(dim, dim))
 
+    # TODO: Let's not maintain this explicit check, just remove this test feature please.
     exception_cov = False
-
-    cov = sigma @ sigma.T
-    if np.linalg.cond(cov) > 100:
-        exception_cov = True
+    while True:
+        sigma = np.random.normal(size=(dim, dim))
+        cov = sigma @ sigma.T
+        if np.linalg.cond(cov) < 100:
+            break
 
     marginals = list()
     for i in range(dim):
@@ -89,7 +90,7 @@ def test_cond_gaussian_copula():
         cond_mean, cond_cov = cond_mvn(*args_cn)
         cond_dist = multivariate_norm(cond_mean, cond_cov)
         cn_value = np.atleast_1d(cond_dist.rvs())
-
+        print(type(gc_value))
         np.testing.assert_almost_equal(cn_value, gc_value)
 
 

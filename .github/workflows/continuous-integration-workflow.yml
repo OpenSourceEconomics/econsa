@@ -30,11 +30,7 @@ jobs:
 
         # We want to make sure proper formatting of the notebooks.
         flake8-nb; [ $? -eq 0 ] || exit 1
-        black-nb .; [ $? -eq 0 ] || exit 1
-
-        # We want to pull the submodules.
-        # This can be removed once temfpy is live on conda.
-        git submodule update --init --recursive
+        black-nb . --check; [ $? -eq 0 ] || exit 1
 
     - name: Upload coverage to Codecov.
       if: runner.os == 'Linux' && matrix.python-version == '3.7'
@@ -46,14 +42,7 @@ jobs:
       if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
-        # .envrc
-        export PROJECT_ROOT=$PWD
-        export PATH=$PWD/bin:$PATH
-        export PYTHONPATH=$PROJECT_ROOT:$PYTHONPATH
-        export MATPLOTLIBRC=$PWD/configurations
-        export JUPYTER_CONFIG_DIR=$PWD/configurations/jupyter
-        export IPYTHONDIR=$PWD/configurations/ipython
-
+        source .envrc
         run-figures
 
     - name: Run pre-commits.

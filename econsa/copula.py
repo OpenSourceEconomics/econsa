@@ -35,6 +35,7 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
 
     Returns
     -------
+    # TODO: This is always a numpy array, right?
     cond_quan : array_like
         The conditional sample (:math:`G(u)`) that is between 0 and 1,
         and has the same length as ``dependent_ind``.
@@ -47,6 +48,10 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
 
     Examples
     --------
+
+    .. todo::
+        This is too long but very suitable for a tutorial notebook, let's just have a hard-coded
+        direct use of the function.
     >>> import chaospy as cp
     >>> np.random.seed(123)
     >>> dim = 3
@@ -76,16 +81,12 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
     if not np.all((given_value_u >= 0) & (given_value_u <= 1)):
         raise ValueError("given_value_u must be between 0 and 1")
 
-    # Make sure that covariance is well-conditioned
-    if np.linalg.cond(cov) > 100:
-        raise ValueError("covariance matrix is ill-conditioned")
-
     # F^{−1}(u)
     given_value_y = norm().ppf(given_value_u)
 
-    means = np.zeros(cov.shape[0])
+    mean = np.zeros(cov.shape[0])
     cond_mean, cond_cov = cond_mvn(
-        means, _cov2corr(cov), dependent_ind, given_ind, given_value_y,
+        mean, _cov2corr(cov), dependent_ind, given_ind, given_value_y,
     )
 
     # C(u, Sigma)
