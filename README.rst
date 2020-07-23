@@ -1,11 +1,8 @@
-.. image:: logos/econsa_logo_no_type_RGB.svg
-   :width: 100%
-   :height: 100px
-   :align: center
-
-
-econsa
-======
+.. |logo| image:: econsa_logo_no_type_RGB.svg
+   :height: 27px
+   
+|logo| econsa
+=============
 
 
     I prefer true but imperfect knowledge, even if it leaves much undetermined and unpredictable, to a pretence of exact knowledge that is likely to be false.
