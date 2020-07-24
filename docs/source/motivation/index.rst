@@ -17,8 +17,9 @@ Any computational economic model :math:`\boldsymbol{M}` provides a mapping betwe
 We follow :cite:`Borgonovo.2016` and use the **Economic Order Quantity (EOQ)** model (:cite:`Harris.1990`) as a running example throughout our documentation. We thus start by explaining its basic setup first and then discuss uncertainty propagation and sensitivity analysis.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 0
 
    eoq-model
    uncertainty-propagation
-   sensitivity-analysis
+   sensitivity-analysis-qualitative
+   sensitivity-analysis-quantitative

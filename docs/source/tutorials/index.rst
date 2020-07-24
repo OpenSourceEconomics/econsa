@@ -7,5 +7,7 @@ We provide several tutorials that showcase the use case for ``econsa``.
 .. toctree::
    :maxdepth: 0
 
-   eoq_model
-   qualitative_analysis
+   sampling
+   uncertainty-propagation
+   sensitivity-analysis-qualitative
+   sensitivity-analysis-quantitative
