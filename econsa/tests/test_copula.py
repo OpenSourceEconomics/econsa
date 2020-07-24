@@ -49,7 +49,10 @@ def get_strategies(name):
         strategy_cn = (means, cov, dependent_ind, given_ind, given_value)
         strategy = (strategy_gc, strategy_cn)
     elif name == "test_cond_gaussian_copula_exception_u":
-        given_value_u = given_value
+        given_value_u = [
+            distribution[ind].cdf(given_value[i]) * 100
+            for i, ind in enumerate(given_ind)
+        ]
         strategy = (cov, dependent_ind, given_ind, given_value_u)
     else:
         raise NotImplementedError
