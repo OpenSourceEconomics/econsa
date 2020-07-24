@@ -2,6 +2,8 @@
 
 This module contains tests for the copula sampling functions.
 
+Note that we are using simple covariance matrix here since calculating sigma then covariance matrix
+causes numerical instability on higher dimension.
 """
 import chaospy as cp
 import numpy as np
@@ -27,10 +29,9 @@ def get_strategies(name):
 
     means = np.random.uniform(-100, 100, dim)
 
-    # Draw new sigma until cov is well-conditioned
+    # Draw new cov until is well-conditioned
     while True:
-        sigma = np.random.normal(size=(dim, dim))
-        cov = sigma @ sigma.T
+        cov = np.identity(dim) * np.random.uniform(0.05, 10)
         if np.linalg.cond(cov) < 100:
             break
 

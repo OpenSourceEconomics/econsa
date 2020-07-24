@@ -41,21 +41,15 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
         This is too long but very suitable for a tutorial notebook,
         let's just have a hard-coded direct use of the function.
 
-    >>> import chaospy as cp
     >>> np.random.seed(123)
-    >>> mean = [0, 0, 0]
-    >>> sigma = [0.4, 1.2, 1.7]
-    >>> marginals = [cp.Normal(mu=mu, sigma=np.sqrt(si)) for (mu, si) in zip(mean, sigma)]
-    >>> distribution = cp.J(*marginals)
-    >>> sample = distribution.sample(1).T[0]
-    >>> dependent_ind = 1
-    >>> given_ind = [0, 2]
-    >>> given_value = sample[given_ind]
-    >>> given_value_u = [
-    ...     distribution[ind].cdf(given_value[i]) for i, ind in enumerate(given_ind)
-    ... ]
+    >>> cov = np.array([[ 3.290887,  0.465004, -3.411841],
+    ...                 [ 0.465004,  3.962172, -0.574745],
+    ...                 [-3.411841, -0.574745,  4.063252]])
+    >>> dependent_ind = 2
+    >>> given_ind = [0, 1]
+    >>> given_value_u = [0.0596779, 0.39804426]
     >>> condi_value_u = cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u)
-    >>> np.testing.assert_almost_equal(condi_value_u[0], 0.877255, decimal=6)
+    >>> np.testing.assert_almost_equal(condi_value_u[0], 0.856504, decimal=6)
     """
     given_value_u = np.atleast_1d(given_value_u)
 
