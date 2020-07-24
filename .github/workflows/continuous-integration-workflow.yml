@@ -32,10 +32,6 @@ jobs:
         flake8-nb; [ $? -eq 0 ] || exit 1
         black-nb --check .; [ $? -eq 0 ] || exit 1
 
-        # We want to pull the submodules.
-        # This can be removed once temfpy is live on conda.
-        git submodule update --init --recursive
-
     - name: Run figures.
       if: runner.os == 'Linux'
       shell: bash -l {0}
