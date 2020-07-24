@@ -2,11 +2,11 @@
 
 This module contains functions to sample random input parameters from a Gaussian copula.
 """
+from econsa.sampling import cond_mvn
+
 import numpy as np
 from scipy.stats import multivariate_normal as multivariate_norm
 from scipy.stats import norm
-
-from econsa.sampling import cond_mvn
 
 
 def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u, size=1):

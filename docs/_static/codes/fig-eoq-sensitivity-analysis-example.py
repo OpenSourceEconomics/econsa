@@ -1,7 +1,6 @@
-import matplotlib.pyplot as plt  # noqa: F401
-import numpy as np  # noqa: F401
-
-from temfpy.uncertainty_quantification import eoq_model  # noqa: F401
+import matplotlib.pyplot as plt
+import numpy as np
+from temfpy.uncertainty_quantification import eoq_model
 
 # TODO: This code will be reactivated once we have Tim's PR merged.
 # from econsa.kucherenko import kucherenko_indices
