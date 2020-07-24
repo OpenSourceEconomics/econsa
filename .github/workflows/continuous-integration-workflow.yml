@@ -37,7 +37,7 @@ jobs:
         git submodule update --init --recursive
 
     - name: Run figures.
-      if: runner.os != 'Windows'
+      if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
