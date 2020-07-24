@@ -9,7 +9,7 @@ from scipy.stats import norm
 from econsa.sampling import cond_mvn
 
 
-def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
+def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u, size=1):
     r"""Conditional sampling from Gaussian copula.
 
     This function provides the probability distribution of conditional sample
@@ -28,6 +28,9 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
 
     given_value_u : array_like
         The given random vector (:math:`u`) that is uniformly distributed between 0 and 1.
+
+    size : int
+        Number of draws from the conditional distribution. (default value is `1`)
 
     Returns
     -------
@@ -67,7 +70,7 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u):
 
     # C(u, Sigma)
     cond_dist = multivariate_norm(cond_mean, cond_cov)
-    cond_draw = np.atleast_1d(cond_dist.rvs())
+    cond_draw = np.atleast_1d(cond_dist.rvs(size=size))
     cond_quan = np.atleast_1d(norm.cdf(cond_draw))
 
     return cond_quan

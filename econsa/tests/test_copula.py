@@ -28,12 +28,7 @@ def get_strategies(name):
         given_ind.remove(i)
 
     means = np.random.uniform(-100, 100, dim)
-
-    # Draw new cov until is well-conditioned
-    while True:
-        cov = np.identity(dim) * np.random.uniform(0.05, 10)
-        if np.linalg.cond(cov) < 100:
-            break
+    cov = np.identity(dim) * np.random.uniform(0.05, 10)
 
     marginals = list()
     for i in range(dim):
