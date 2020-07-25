@@ -10,20 +10,39 @@ from econsa.correlation import gc_correlation
 
 
 def get_strategies(name):
-    dim = np.random.randint(2, 5)
+    dim = np.random.randint(2, 10)
     means = np.random.uniform(-100, 100, dim)
 
     if name == "test_gc_correlation_functioning":
         # List of distributions to draw from.
+        # Repeated distributions are for higher drawn frequency, not typo
         distributions = [
-            cp.Normal,
-            cp.Uniform,
-            cp.LogNormal,
+            cp.Cauchy,
             cp.Exponential,
-            cp.Rayleigh,
+            cp.Gilbrat,
+            cp.HyperbolicSecant,
+            cp.Laplace,
+            cp.LogNormal,
+            cp.LogNormal,
+            cp.LogNormal,
+            cp.LogUniform,
+            cp.LogUniform,
+            cp.LogUniform,
             cp.LogWeibull,
+            cp.Logistic,
+            cp.Maxwell,
+            cp.Normal,
+            cp.Normal,
+            cp.Normal,
+            cp.Rayleigh,
+            cp.TruncNormal,
+            cp.TruncExponential,
+            cp.Uniform,
+            cp.Uniform,
+            cp.Uniform,
+            cp.Wald,
+            cp.Wigner,
         ]
-
         marginals = list()
         for mean in means:
             dist = distributions[np.random.choice(len(distributions))](mean)
@@ -62,6 +81,10 @@ def test_gc_correlation_functioning():
     corr_transformed = gc_correlation(marginals, corr)
     cp.Nataf(cp.J(*marginals), corr_transformed)
     return "the function ended without error"
+
+
+def test_gc_correlation_2d():
+    pass
 
 
 def test_gc_correlation_exception_marginals():
