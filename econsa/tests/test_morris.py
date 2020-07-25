@@ -1,11 +1,11 @@
+import numpy as np
+import pandas as pd
+from numpy.testing import assert_array_almost_equal as aaae
+
 from econsa.morris import _shift_cov
 from econsa.morris import _shift_sample
 from econsa.morris import _uniform_to_standard_normal
 from econsa.morris import elementary_effects
-
-import numpy as np
-import pandas as pd
-from numpy.testing import assert_array_almost_equal as aaae
 
 
 def test_uniform_to_standard_normal():

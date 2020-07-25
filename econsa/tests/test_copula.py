@@ -5,13 +5,13 @@ This module contains tests for the copula sampling functions.
 Note that we are using simple covariance matrix here since calculating sigma then covariance matrix
 causes numerical instability on higher dimension.
 """
-from econsa.copula import cond_gaussian_copula
-from econsa.sampling import cond_mvn
-
 import chaospy as cp
 import numpy as np
 import pytest
 from scipy.stats import multivariate_normal as multivariate_norm
+
+from econsa.copula import cond_gaussian_copula
+from econsa.sampling import cond_mvn
 
 
 def get_strategies(name):
