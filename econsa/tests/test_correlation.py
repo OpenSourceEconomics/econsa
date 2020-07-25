@@ -3,7 +3,9 @@ import chaospy as cp
 import numpy as np
 import pytest
 from scipy.stats import norm
+from statsmodels.stats.correlation_tools import corr_nearest
 
+from econsa.copula import _cov2corr
 from econsa.correlation import gc_correlation
 
 
@@ -12,8 +14,7 @@ def get_strategies(name):
     means = np.random.uniform(-100, 100, dim)
 
     if name == "test_gc_correlation":
-        # list of distributions to draw from
-        # repeated distributions are for higher drawn frequency, not typo
+        # List of distributions to draw from.
         distributions = [
             cp.Normal,
             cp.Uniform,
@@ -27,18 +28,16 @@ def get_strategies(name):
 
         marginals = list()
         for mean in means:
-            dist_i = np.random.choice(len(distributions))
-            dist = distributions[dist_i]
-            marginals.append(dist(mean))
+            dist = distributions[np.random.choice(len(distributions))](mean)
+            marginals.append(dist)
 
-        # redraw corr until is positive definite
-        while True:
-            corr = np.random.uniform(-1, 1, size=(dim, dim))
-            corr = corr @ corr.T
-            for i in range(dim):
-                corr[i, i] = 1
-            if np.all(np.linalg.eigvals(corr) > 0) == 1:
-                break
+        cov = np.random.uniform(-1, 1, size=(dim, dim))
+        cov = cov @ cov.T
+        # If not positive definite, find the nearest one.
+        if np.all(np.linalg.eigvals(cov) > 0) == 0:
+            cov = corr_nearest(cov)
+
+        corr = _cov2corr(cov).round(8)
     elif name == "test_gc_correlation_exception_marginals":
         marginals = list()
         for i in range(dim):
@@ -49,9 +48,8 @@ def get_strategies(name):
         distributions = [cp.Normal, cp.Uniform, cp.LogNormal]
         marginals = list()
         for mean in means:
-            dist_i = np.random.choice(len(distributions))
-            dist = distributions[dist_i]
-            marginals.append(dist(mean))
+            dist = distributions[np.random.choice(len(distributions))](mean)
+            marginals.append(dist)
 
         corr = np.random.uniform(-1, 1, size=(dim, dim))
     else:
