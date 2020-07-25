@@ -7,6 +7,7 @@ import chaospy as cp
 import numpy as np
 from scipy import optimize
 from scipy.stats import multivariate_normal as multivariate_norm
+from statsmodels.stats.correlation_tools import corr_nearest
 
 
 def gc_correlation(marginals, corr, check_corr=True):
@@ -17,6 +18,10 @@ def gc_correlation(marginals, corr, check_corr=True):
     Gaussian copula.
     For special combination of distributions, use the values from Table 4. of
     [L1986]_.
+
+    Since chaospy's copula functions only accept positive definite correlation matrix,
+    this function also checks the output,
+    and transforms to nearest positive definite matrix if it is not already.
 
     Parameters
     ----------
@@ -87,11 +92,14 @@ def gc_correlation(marginals, corr, check_corr=True):
     # Align upper triangular with lower triangular.
     gc_corr = gc_corr + gc_corr.T - np.diag(np.diag(gc_corr))
 
+    # If gc_corr is not positive definite, find the nearest one.
+    if np.all(np.linalg.eigvals(gc_corr) > 0) == 0:
+        gc_corr = corr_nearest(gc_corr)
+
     return gc_corr
 
 
 def _gc_correlation_pairwise(distributions, rho, seed=123, num_draws=100000):
-
     assert len(distributions) == 2
 
     # Test whether [L1986]_ is applicable
@@ -105,8 +113,6 @@ def _gc_correlation_pairwise(distributions, rho, seed=123, num_draws=100000):
         dist_type.pop(dist_norm)
         dist_other = dist_type[0]
 
-        # TODO: the code here only includes table 4,
-        # we want to also also incorporate table 5.
         if "uniform" == dist_other:
             f = 1.023
         elif "exponential" == dist_other:
@@ -138,14 +144,10 @@ def _gc_correlation_pairwise(distributions, rho, seed=123, num_draws=100000):
 
 
 def _criterion(rho_c, arg, distributions, seed, num_draws):
-
     cov = np.identity(2)
     cov[1, 0] = cov[0, 1] = rho_c
 
     np.random.seed(seed)
-
-    # TODO: Here we need to use proper quadrature rules
-    # instead of Monte Carlo integration.
     x_1, x_2 = multivariate_norm([0, 0], cov).rvs(num_draws).T
 
     standard_norm_cdf = cp.Normal().cdf

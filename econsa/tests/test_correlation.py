@@ -63,13 +63,7 @@ def get_strategies(name):
 
 def test_gc_correlation():
     marginals, corr = get_strategies("test_gc_correlation")
-
-    # re-calc corr until is positive definite
-    while True:
-        corr_transformed = gc_correlation(marginals, corr)
-        if np.all(np.linalg.eigvals(corr_transformed) > 0) == 1:
-            break
-
+    corr_transformed = gc_correlation(marginals, corr)
     copula = cp.Nataf(cp.J(*marginals), corr_transformed)
     corr_copula = np.corrcoef(copula.sample(1000000))
 

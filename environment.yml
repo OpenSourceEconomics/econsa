@@ -12,6 +12,7 @@ dependencies:
   - numpy
   - pip
   - scipy
+  - statsmodels
   - jupyter
   - jupyterlab
   - seaborn
