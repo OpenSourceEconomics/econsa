@@ -1,6 +1,8 @@
 """Test for correlation transformation."""
 import chaospy as cp
 import numpy as np
+import pytest
+from scipy.stats import norm
 
 from econsa.correlation import gc_correlation
 
@@ -9,26 +11,26 @@ def get_strategies(name):
     dim = np.random.randint(2, 5)
     means = np.random.uniform(-100, 100, dim)
 
-    # list of distributions to draw from
-    # repeated distributions are for higher drawn frequency, not typo
-    distributions = [
-        cp.Normal,
-        cp.Uniform,
-        cp.Uniform,
-        cp.LogNormal,
-        cp.LogNormal,
-        cp.Exponential,
-        cp.Rayleigh,
-        cp.LogWeibull,
-    ]
-
-    marginals = list()
-    for mean in means:
-        dist_i = np.random.choice(len(distributions))
-        dist = distributions[dist_i]
-        marginals.append(dist(mean))
-
     if name == "test_gc_correlation":
+        # list of distributions to draw from
+        # repeated distributions are for higher drawn frequency, not typo
+        distributions = [
+            cp.Normal,
+            cp.Uniform,
+            cp.Uniform,
+            cp.LogNormal,
+            cp.LogNormal,
+            cp.Exponential,
+            cp.Rayleigh,
+            cp.LogWeibull,
+        ]
+
+        marginals = list()
+        for mean in means:
+            dist_i = np.random.choice(len(distributions))
+            dist = distributions[dist_i]
+            marginals.append(dist(mean))
+
         # redraw corr until is positive definite
         while True:
             corr = np.random.uniform(-1, 1, size=(dim, dim))
@@ -37,11 +39,25 @@ def get_strategies(name):
                 corr[i, i] = 1
             if np.all(np.linalg.eigvals(corr) > 0) == 1:
                 break
+    elif name == "test_gc_correlation_exception_marginals":
+        marginals = list()
+        for i in range(dim):
+            marginals.append(norm())
 
-        strategy = (marginals, corr)
+        corr = np.random.uniform(-1, 1, size=(dim, dim))
+    elif name == "test_gc_correlation_exception_corr_symmetric":
+        distributions = [cp.Normal, cp.Uniform, cp.LogNormal]
+        marginals = list()
+        for mean in means:
+            dist_i = np.random.choice(len(distributions))
+            dist = distributions[dist_i]
+            marginals.append(dist(mean))
+
+        corr = np.random.uniform(-1, 1, size=(dim, dim))
     else:
         raise NotImplementedError
 
+    strategy = (marginals, corr)
     return strategy
 
 
@@ -61,10 +77,16 @@ def test_gc_correlation():
 
 
 def test_gc_correlation_exception_marginals():
-    # TODO
-    pass
+    marginals, corr = get_strategies("test_gc_correlation_exception_marginals")
+
+    with pytest.raises(NotImplementedError) as e:
+        gc_correlation(marginals, corr)
+    assert "marginals must be chaospy distributions" in str(e.value)
 
 
-def test_gc_correlation_exception_corr():
-    # TODO
-    pass
+def test_gc_correlation_exception_corr_symmetric():
+    marginals, corr = get_strategies("test_gc_correlation_exception_corr_symmetric")
+
+    with pytest.raises(ValueError) as e:
+        gc_correlation(marginals, corr)
+    assert "corr is not a symmetric matrix" in str(e.value)
