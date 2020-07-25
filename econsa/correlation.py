@@ -10,7 +10,7 @@ from scipy.stats import multivariate_normal as multivariate_norm
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
-def gc_correlation(marginals, corr, check_corr=True):
+def gc_correlation(marginals, corr, check_corr=True, force_calc=False):
     """Correlation for Gaussian copula.
 
     This function implements the algorithm outlined in Section 4.2 of [K2012]_
@@ -33,9 +33,13 @@ def gc_correlation(marginals, corr, check_corr=True):
         The correlation matrix to be transformed.
 
     check_corr : bool, optional
-        Check that `corr` is symmetric, all elements are beteween 0 and 1,
+        Check that `corr` is symmetric, all elements are between 0 and 1,
         all diagonal elements are 1,
         and all eigenvalue is positive (default value is `True`).
+
+    force_calc : bool, optional
+        When `True`, calculate the covariances ignoring all special preset combinations of marginals
+        (default value is `False`).
 
     Returns
     -------
@@ -59,7 +63,7 @@ def gc_correlation(marginals, corr, check_corr=True):
     >>> corr_transformed = gc_correlation(marginals, corr)
     >>> copula = cp.Nataf(cp.J(*marginals), corr_transformed)
     >>> corr_copula = np.corrcoef(copula.sample(1000000))
-    >>> np.testing.assert_almost_equal(corr, corr_copula, decimal=1)
+    >>> np.testing.assert_almost_equal(corr, corr_copula, decimal=6)
     """
     corr = np.atleast_2d(corr)
 
@@ -87,7 +91,7 @@ def gc_correlation(marginals, corr, check_corr=True):
     for i, j in list(zip(*indices)):
         subset = [marginals[i], marginals[j]]
         distributions, rho = cp.J(*subset), corr[i, j]
-        gc_corr[i, j] = _gc_correlation_pairwise(distributions, rho)
+        gc_corr[i, j] = _gc_correlation_pairwise(distributions, rho, force_calc)
 
     # Align upper triangular with lower triangular.
     gc_corr = gc_corr + gc_corr.T - np.diag(np.diag(gc_corr))
@@ -99,7 +103,9 @@ def gc_correlation(marginals, corr, check_corr=True):
     return gc_corr
 
 
-def _gc_correlation_pairwise(distributions, rho, seed=123, num_draws=100000):
+def _gc_correlation_pairwise(
+    distributions, rho, force_calc, seed=123, num_draws=100000,
+):
     assert len(distributions) == 2
 
     # Test whether [L1986]_ is applicable
@@ -109,11 +115,16 @@ def _gc_correlation_pairwise(distributions, rho, seed=123, num_draws=100000):
         dist_type.append(str(dist).split(sep="(", maxsplit=1)[0].lower())
 
     try:
+        if force_calc is True:
+            raise ValueError("Do not use the set numbers.")
+
         dist_norm = dist_type.index("normal")
         dist_type.pop(dist_norm)
         dist_other = dist_type[0]
 
-        if "uniform" == dist_other:
+        if "normal" == dist_other:
+            f = 1
+        elif "uniform" == dist_other:
             f = 1.023
         elif "exponential" == dist_other:
             f = 1.107
