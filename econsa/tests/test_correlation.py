@@ -36,17 +36,36 @@ def get_strategies(name):
             cp.Normal,
             cp.Rayleigh,
             cp.TruncNormal,
-            cp.TruncExponential,
             cp.Uniform,
             cp.Uniform,
             cp.Uniform,
-            cp.Wald,
             cp.Wigner,
         ]
         marginals = list()
         for mean in means:
             dist = distributions[np.random.choice(len(distributions))](mean)
             marginals.append(dist)
+
+        cov = np.random.uniform(-1, 1, size=(dim, dim))
+        cov = cov @ cov.T
+        # If not positive definite, find the nearest one.
+        if np.all(np.linalg.eigvals(cov) > 0) == 0:
+            cov = corr_nearest(cov)
+
+        corr = _cov2corr(cov).round(8)
+    elif name == "test_gc_correlation_2d":
+        dim = 2
+        means = np.random.uniform(-100, 100, dim)
+        distributions = [
+            cp.Normal,
+            cp.Uniform,
+            cp.Exponential,
+            cp.Rayleigh,
+            cp.LogWeibull,
+        ]
+        marginals = [cp.Normal(means[0])]
+        dist2 = distributions[np.random.choice(len(distributions))](means[1])
+        marginals.append(dist2)
 
         cov = np.random.uniform(-1, 1, size=(dim, dim))
         cov = cov @ cov.T
@@ -84,7 +103,11 @@ def test_gc_correlation_functioning():
 
 
 def test_gc_correlation_2d():
-    pass
+    marginals, corr = get_strategies("test_gc_correlation_2d")
+    corr_transformed = gc_correlation(marginals, corr)
+    copula = cp.Nataf(cp.J(*marginals), corr_transformed)
+    corr_copula = np.corrcoef(copula.sample(1000000))
+    np.testing.assert_almost_equal(corr, corr_copula, decimal=3)
 
 
 def test_gc_correlation_exception_marginals():
