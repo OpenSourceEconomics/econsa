@@ -51,7 +51,7 @@ def test_gc_correlation():
             break
 
     copula = cp.Nataf(cp.J(*marginals), corr_transformed)
-    corr_copula = np.corrcoef(copula.sample(1000000)).round(3)
+    corr_copula = np.corrcoef(copula.sample(1000000))
 
     np.testing.assert_almost_equal(corr, corr_copula, decimal=1)
 
