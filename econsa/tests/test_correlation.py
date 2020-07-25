@@ -9,9 +9,13 @@ def get_strategies(name):
     dim = np.random.randint(2, 5)
     means = np.random.uniform(-100, 100, dim)
 
+    # list of distributions to draw from
+    # repeated distributions are for higher drawn frequency, not typo
     distributions = [
         cp.Normal,
         cp.Uniform,
+        cp.Uniform,
+        cp.LogNormal,
         cp.LogNormal,
         cp.Exponential,
         cp.Rayleigh,
@@ -56,6 +60,11 @@ def test_gc_correlation():
     np.testing.assert_almost_equal(corr, corr_copula, decimal=1)
 
 
-def test_gc_correlation_exception():
+def test_gc_correlation_exception_marginals():
+    # TODO
+    pass
+
+
+def test_gc_correlation_exception_corr():
     # TODO
     pass

@@ -20,44 +20,50 @@ def gc_correlation(marginals, corr, check_corr=True):
 
     Parameters
     ----------
-    marginals : TYPE
-        Description
+    marginals : chaospy.distributions
+        Marginal distributions of the correlated variables. All marginals must be chaospy
+        distributions, otherwise returns error.
 
-    corr : TYPE
-        Description
+    corr : array_like
+        The correlation matrix to be transformed.
 
     check_corr : bool, optional
-        Description. (default value is `True`)
+        Check that `corr` is symmetric, all elements are beteween 0 and 1,
+        all diagonal elements are 1,
+        and all eigenvalue is positive (default value is `True`).
 
     Returns
     -------
-    gc_corr : TYPE
-        Description
+    gc_corr : numpy.ndarray
+        The transformed correlation matrix that is ready to be fed into a Gaussian copula.
 
     References
     ----------
-    .. [L1986] Liu, P.-L., & Der Kiureghian, A. (1986).
-        Multivariate distribution models with prescribed marginals
-        and covariances. Probabilistic Engineering Mechanics, 1(2), 105–112.
-
     .. [K2012] Kucherenko, S., Tarantola, S., & Annoni, P. (2012).
         Estimation of global sensitivity indices for models with
         dependent variables. Computer Physics Communications, 183(4), 937–946.
+
+    .. [L1986] Liu, P.-L., & Der Kiureghian, A. (1986).
+        Multivariate distribution models with prescribed marginals
+        and covariances. Probabilistic Engineering Mechanics, 1(2), 105–112.
 
     Examples
     --------
     >>> corr = [[1.0, 0.6, 0.3], [0.6, 1.0, 0.0], [0.3, 0.0, 1.0]]
     >>> marginals = [cp.Normal(1.00), cp.Uniform(lower=-4.00), cp.Normal(4.20)]
-    >>> corr_g = gc_correlation(marginals, corr)
-    >>> np.testing.assert_almost_equal(
-    ...     corr_g,
-    ...     np.array([[1, 0.6138, 0.300312], [0.6138, 1, 0], [0.300312, 0, 1]),
-    ...     decimal=6,
-    ... )
+    >>> corr_transformed = gc_correlation(marginals, corr)
+    >>> copula = cp.Nataf(cp.J(*marginals), corr_transformed)
+    >>> corr_copula = np.corrcoef(copula.sample(1000000))
+    >>> np.testing.assert_almost_equal(corr, corr_copula, decimal=1)
     """
     corr = np.atleast_2d(corr)
 
-    # TODO: Test that marginals are all cp.distributions.
+    # Test that marginals are all cp.distributions.
+    for marginal in marginals:
+        if issubclass(type(marginal), cp.distributions.baseclass.Dist):
+            continue
+        else:
+            raise NotImplementedError("marginals must be chaospy distributions")
 
     if check_corr:
         if not np.allclose(corr, corr.T):
