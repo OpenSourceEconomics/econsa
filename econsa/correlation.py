@@ -76,7 +76,6 @@ def gc_correlation(marginals, corr, check_corr=True):
             raise ValueError("corr is not positive-definite")
 
     dim = len(corr)
-
     indices = np.tril_indices(dim, -1)
     gc_corr = np.identity(dim)
 
