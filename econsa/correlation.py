@@ -6,7 +6,6 @@ matrix into correlation matrix for Gaussian copulas.
 import chaospy as cp
 import numpy as np
 from scipy import optimize
-from scipy.stats import multivariate_normal as multivariate_norm
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
@@ -104,7 +103,7 @@ def gc_correlation(marginals, corr, check_corr=True, force_calc=False):
 
 
 def _gc_correlation_pairwise(
-    distributions, rho, force_calc, seed=123, num_draws=100000,
+    distributions, rho, force_calc, num_draws=100000,
 ):
     assert len(distributions) == 2
 
@@ -143,7 +142,7 @@ def _gc_correlation_pairwise(
         arg = rho * arg_2 + arg_1
 
         kwargs = dict()
-        kwargs["args"] = (arg, distributions, seed, num_draws)
+        kwargs["args"] = (arg, distributions, num_draws)
         kwargs["bounds"] = (-0.99, 0.99)
         kwargs["method"] = "bounded"
 
@@ -154,12 +153,13 @@ def _gc_correlation_pairwise(
     return result
 
 
-def _criterion(rho_c, arg, distributions, seed, num_draws):
+def _criterion(rho_c, arg, distributions, num_draws):
     cov = np.identity(2)
     cov[1, 0] = cov[0, 1] = rho_c
 
-    np.random.seed(seed)
-    x_1, x_2 = multivariate_norm([0, 0], cov).rvs(num_draws).T
+    distribution = cp.MvNormal(loc=np.zeros(2), scale=cov)
+    draws = distribution.sample(num_draws, rule="S").T.reshape(num_draws, 2)
+    x_1, x_2 = np.split(draws, 2, axis=1)
 
     standard_norm_cdf = cp.Normal().cdf
     arg_1 = distributions[0].inv(standard_norm_cdf(x_1))
