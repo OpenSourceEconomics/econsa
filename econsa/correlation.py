@@ -96,8 +96,14 @@ def gc_correlation(marginals, corr, check_corr=True, force_calc=False):
     gc_corr = gc_corr + gc_corr.T - np.diag(np.diag(gc_corr))
 
     # If gc_corr is not positive definite, find the nearest one.
+    # The corr_nearest function is for finding positive semi-definite matrix,
+    # so sometimes it fails to find one. Loop until success.
     if np.all(np.linalg.eigvals(gc_corr) > 0) == 0:
-        gc_corr = corr_nearest(gc_corr)
+        while True:
+            gc_corr_new = corr_nearest(gc_corr)
+            if np.all(np.linalg.eigvals(gc_corr_new) > 0) == 1:
+                gc_corr = gc_corr_new
+                break
 
     return gc_corr
 
@@ -158,7 +164,7 @@ def _criterion(rho_c, arg, distributions, num_draws):
     cov[1, 0] = cov[0, 1] = rho_c
 
     distribution = cp.MvNormal(loc=np.zeros(2), scale=cov)
-    draws = distribution.sample(num_draws, rule="S").T.reshape(num_draws, 2)
+    draws = distribution.sample(num_draws, rule="sobol").T.reshape(num_draws, 2)
     x_1, x_2 = np.split(draws, 2, axis=1)
 
     standard_norm_cdf = cp.Normal().cdf

@@ -112,13 +112,12 @@ def test_gc_correlation_2d():
     np.testing.assert_almost_equal(corr, corr_copula, decimal=3)
 
 
-@pytest.mark.xfail
 def test_gc_correlation_2d_force_calc():
     """Test the results from force_calc are close to that from the paper."""
     marginals, corr = get_strategies("test_gc_correlation_2d_force_calc")
     corr_ref_numbers = gc_correlation(marginals, corr)
     corr_force_calc = gc_correlation(marginals, corr, force_calc=True)
-    assert np.all(np.absolute(corr_ref_numbers - corr_force_calc) <= 0.3) == 1
+    assert np.all(np.absolute(corr_ref_numbers - corr_force_calc) <= 0.1) == 1
 
 
 def test_gc_correlation_exception_marginals():
