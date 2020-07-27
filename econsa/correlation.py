@@ -9,7 +9,7 @@ from scipy import optimize
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
-def gc_correlation(marginals, corr, check_corr=True, force_calc=False):
+def gc_correlation(marginals, corr, force_calc=False):
     """Correlation for Gaussian copula.
 
     This function implements the algorithm outlined in Section 4.2 of [K2012]_
@@ -31,13 +31,8 @@ def gc_correlation(marginals, corr, check_corr=True, force_calc=False):
     corr : array_like
         The correlation matrix to be transformed.
 
-    check_corr : bool, optional
-        Check that `corr` is symmetric, all elements are between 0 and 1,
-        all diagonal elements are 1,
-        and all eigenvalue is positive (default value is `True`).
-
     force_calc : bool, optional
-        When `True`, calculate the covariances ignoring all special preset combinations of marginals
+        When `True`, calculate the covariances ignoring all special combinations of marginals
         (default value is `False`).
 
     Returns
@@ -73,15 +68,15 @@ def gc_correlation(marginals, corr, check_corr=True, force_calc=False):
         else:
             raise NotImplementedError("marginals must be chaospy distributions")
 
-    if check_corr:
-        if not np.allclose(corr, corr.T):
-            raise ValueError("corr is not a symmetric matrix")
-        elif not np.all((corr >= -1) & (corr <= 1)):
-            raise ValueError("corr must be between 0 and 1")
-        elif not np.all(np.diagonal(corr) == 1):
-            raise ValueError("the diagonal of corr must all be 1")
-        elif np.all(np.linalg.eigvals(corr) > 0) == 0:
-            raise ValueError("corr is not positive-definite")
+    # check_corr
+    if not np.allclose(corr, corr.T):
+        raise ValueError("corr is not a symmetric matrix")
+    elif not np.all((corr >= -1) & (corr <= 1)):
+        raise ValueError("corr must be between 0 and 1")
+    elif not np.all(np.diagonal(corr) == 1):
+        raise ValueError("the diagonal of corr must all be 1")
+    elif np.all(np.linalg.eigvals(corr) > 0) == 0:
+        raise ValueError("corr is not positive-definite")
 
     dim = len(corr)
     indices = np.tril_indices(dim, -1)
@@ -113,36 +108,9 @@ def _gc_correlation_pairwise(
 ):
     assert len(distributions) == 2
 
-    # Test whether [L1986]_ is applicable
-    # Extract types of distributions
-    dist_type = list()
-    for dist in distributions:
-        dist_type.append(str(dist).split(sep="(", maxsplit=1)[0].lower())
-
-    try:
-        if force_calc is True:
-            raise ValueError("Do not use the set numbers.")
-
-        dist_norm = dist_type.index("normal")
-        dist_type.pop(dist_norm)
-        dist_other = dist_type[0]
-
-        if "normal" == dist_other:
-            f = 1
-        elif "uniform" == dist_other:
-            f = 1.023
-        elif "exponential" == dist_other:
-            f = 1.107
-        elif "rayleigh" == dist_other:
-            f = 1.014
-        elif "logweibull" == dist_other:
-            # Type-I extreme value, Gumbel
-            f = 1.031
-        else:
-            raise ValueError("This combination is not implemented.")
-
-        result = rho * f
-    except ValueError:
+    if force_calc and len(_special_dist(distributions)) == 2:
+        result = rho * _special_dist(distributions)[1]
+    else:
         arg_1 = np.prod(cp.E(distributions))
         arg_2 = np.sqrt(np.prod(cp.Var(distributions)))
         arg = rho * arg_2 + arg_1
@@ -157,6 +125,40 @@ def _gc_correlation_pairwise(
         result = out["x"]
 
     return result
+
+
+def _special_dist(distributions):
+    """Test whether [L1986]_ is applicable."""
+    dist_type = list()
+    for dist in distributions:
+        dist_type.append(str(dist).split(sep="(", maxsplit=1)[0].lower())
+
+    success = True
+
+    if any(dist_type) == "normal":
+        dist_norm = dist_type.index("normal")
+        dist_type.pop(dist_norm)
+        dist_other = dist_type[0]
+        if "normal" == dist_other:
+            f = 1
+        elif "uniform" == dist_other:
+            f = 1.023
+        elif "exponential" == dist_other:
+            f = 1.107
+        elif "rayleigh" == dist_other:
+            f = 1.014
+        elif "logweibull" == dist_other:
+            # Type-I extreme value, Gumbel
+            f = 1.031
+        else:
+            success = False
+    else:
+        success = False
+
+    if success:
+        return success, f
+    else:
+        return success
 
 
 def _criterion(rho_c, arg, distributions, num_draws):
