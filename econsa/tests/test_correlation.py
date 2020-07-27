@@ -15,27 +15,18 @@ def get_strategies(name):
 
     if name == "test_gc_correlation_functioning":
         # List of distributions to draw from.
-        # Repeated distributions are for higher drawn frequency, not typo
         distributions = [
             cp.Exponential,
             cp.Gilbrat,
             cp.HyperbolicSecant,
             cp.Laplace,
             cp.LogNormal,
-            cp.LogNormal,
-            cp.LogNormal,
-            cp.LogUniform,
-            cp.LogUniform,
             cp.LogUniform,
             cp.LogWeibull,
             cp.Logistic,
             cp.Maxwell,
             cp.Normal,
-            cp.Normal,
-            cp.Normal,
             cp.Rayleigh,
-            cp.Uniform,
-            cp.Uniform,
             cp.Uniform,
             cp.Wigner,
         ]
