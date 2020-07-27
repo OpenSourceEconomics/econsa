@@ -117,10 +117,10 @@ def _gc_correlation_pairwise(
 
         kwargs = dict()
         kwargs["args"] = (arg, distributions, num_draws)
-        kwargs["bounds"] = (-0.99, 0.99)
-        kwargs["method"] = "bounded"
+        # kwargs["bounds"] = (-0.99, 0.99)
+        kwargs["method"] = "Nelder-Mead"
 
-        out = optimize.minimize_scalar(_criterion, **kwargs)
+        out = optimize.minimize(_criterion, 0, **kwargs)
         assert out["success"]
         result = out["x"]
 
@@ -164,6 +164,9 @@ def _special_dist(distributions):
 def _criterion(rho_c, arg, distributions, num_draws):
     cov = np.identity(2)
     cov[1, 0] = cov[0, 1] = rho_c
+
+    if np.all(np.linalg.eigvals(cov) > 0) == 0:
+        cov = corr_nearest(cov)
 
     distribution = cp.MvNormal(loc=np.zeros(2), scale=cov)
     draws = distribution.sample(num_draws, rule="sobol").T.reshape(num_draws, 2)
