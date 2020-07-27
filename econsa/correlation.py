@@ -125,7 +125,7 @@ def _find_positive_definite(cov):
     if np.all(np.linalg.svd(cov)[1] > 0) == 0:
         while True:
             cov_new = corr_nearest(cov)
-            if np.all(np.linalg.eigvals(cov_new) > 0) == 1:
+            if np.all(np.linalg.svd(cov_new)[1] > 0) == 1:
                 cov = cov_new
                 break
     return cov
