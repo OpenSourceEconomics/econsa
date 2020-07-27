@@ -108,7 +108,7 @@ def _gc_correlation_pairwise(
 ):
     assert len(distributions) == 2
 
-    if force_calc and len(_special_dist(distributions)) == 2:
+    if force_calc and type(_special_dist(distributions)) is not bool:
         result = rho * _special_dist(distributions)[1]
     else:
         arg_1 = np.prod(cp.E(distributions))
