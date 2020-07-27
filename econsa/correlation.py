@@ -122,10 +122,10 @@ def _gc_correlation_pairwise(
 
 def _find_positive_definite(cov):
     """Find the nearest positive definite matrix."""
-    if np.all(np.linalg.svd(cov)[1] > 0) == 0:
+    if np.all(np.linalg.eigvalsh(cov) > 0) == 0:
         while True:
             cov_new = corr_nearest(cov)
-            if np.all(np.linalg.svd(cov_new)[1] > 0) == 1:
+            if np.all(np.linalg.eigvalsh(cov_new) > 0) == 1:
                 cov = cov_new
                 break
     return cov
