@@ -3,9 +3,9 @@ import chaospy as cp
 import numpy as np
 import pytest
 from scipy.stats import norm
-from statsmodels.stats.correlation_tools import corr_nearest
 
 from econsa.copula import _cov2corr
+from econsa.correlation import _find_positive_definite
 from econsa.correlation import gc_correlation
 
 
@@ -37,10 +37,8 @@ def get_strategies(name):
 
         cov = np.random.uniform(-1, 1, size=(dim, dim))
         cov = cov @ cov.T
-        # If not positive definite, find the nearest one.
-        if np.all(np.linalg.eigvals(cov) > 0) == 0:
-            cov = corr_nearest(cov)
-
+        cov = _find_positive_definite(cov)
+        # The rounding is necessary to prevent ValueError("corr must be between 0 and 1")
         corr = _cov2corr(cov).round(8)
     elif (
         name == "test_gc_correlation_2d" or name == "test_gc_correlation_2d_force_calc"
@@ -60,9 +58,6 @@ def get_strategies(name):
 
         cov = np.random.uniform(-1, 1, size=(dim, dim))
         cov = cov @ cov.T
-        # If not positive definite, find the nearest one.
-        if np.all(np.linalg.eigvals(cov) > 0) == 0:
-            cov = corr_nearest(cov)
 
         corr = _cov2corr(cov).round(8)
     elif name == "test_gc_correlation_exception_marginals":

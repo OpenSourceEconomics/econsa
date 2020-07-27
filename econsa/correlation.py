@@ -91,14 +91,7 @@ def gc_correlation(marginals, corr, force_calc=False):
     gc_corr = gc_corr + gc_corr.T - np.diag(np.diag(gc_corr))
 
     # If gc_corr is not positive definite, find the nearest one.
-    # The corr_nearest function is for finding positive semi-definite matrix,
-    # so sometimes it fails to find one. Loop until success.
-    if np.all(np.linalg.eigvals(gc_corr) > 0) == 0:
-        while True:
-            gc_corr_new = corr_nearest(gc_corr)
-            if np.all(np.linalg.eigvals(gc_corr_new) > 0) == 1:
-                gc_corr = gc_corr_new
-                break
+    gc_corr = _find_positive_definite(gc_corr)
 
     return gc_corr
 
@@ -125,6 +118,17 @@ def _gc_correlation_pairwise(
         result = out["x"]
 
     return result
+
+
+def _find_positive_definite(cov):
+    """Find the nearest positive definite matrix."""
+    if np.all(np.linalg.svd(cov)[1] > 0) == 0:
+        while True:
+            cov_new = corr_nearest(cov)
+            if np.all(np.linalg.eigvals(cov_new) > 0) == 1:
+                cov = cov_new
+                break
+    return cov
 
 
 def _special_dist(distributions):
@@ -164,7 +168,6 @@ def _special_dist(distributions):
 def _criterion(rho_c, arg, distributions, num_draws):
     cov = np.identity(2)
     cov[1, 0] = cov[0, 1] = rho_c
-
     distribution = cp.MvNormal(loc=np.zeros(2), scale=cov)
     draws = distribution.sample(num_draws, rule="sobol").T.reshape(num_draws, 2)
     x_1, x_2 = np.split(draws, 2, axis=1)
