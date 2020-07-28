@@ -3,9 +3,10 @@
 This module implements methods from two papers to map arbitrary correlation
 matrix into correlation matrix for Gaussian copulas.
 """
+from functools import partial
+
 import chaospy as cp
 import numpy as np
-from scipy import optimize
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
@@ -97,25 +98,26 @@ def gc_correlation(marginals, corr, force_calc=False):
 
 
 def _gc_correlation_pairwise(
-    distributions, rho, force_calc, num_draws=100000,
+    distributions, rho, force_calc, num_draws=10000,
 ):
     assert len(distributions) == 2
 
     if force_calc and type(_special_dist(distributions)) is not bool:
         result = rho * _special_dist(distributions)[1]
     else:
+
         arg_1 = np.prod(cp.E(distributions))
         arg_2 = np.sqrt(np.prod(cp.Var(distributions)))
         arg = rho * arg_2 + arg_1
 
         kwargs = dict()
-        kwargs["args"] = (arg, distributions, num_draws)
-        kwargs["bounds"] = (-0.99, 0.99)
-        kwargs["method"] = "bounded"
+        kwargs["distributions"] = distributions
+        kwargs["num_draws"] = num_draws
+        kwargs["arg"] = arg
 
-        out = optimize.minimize_scalar(_criterion, **kwargs)
-        assert out["success"]
-        result = out["x"]
+        grid = np.linspace(-0.99, 0.99, num=199, endpoint=True)
+        v_p_criterion = np.vectorize(partial(_criterion, **kwargs))
+        result = grid[np.argmin(v_p_criterion(grid))]
 
     return result
 
