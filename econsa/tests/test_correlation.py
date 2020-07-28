@@ -85,25 +85,26 @@ def test_gc_correlation_functioning():
     """Test the function runs successfully."""
     marginals, corr = get_strategies("test_gc_correlation_functioning")
     corr_transformed = gc_correlation(marginals, corr)
-    cp.Nataf(cp.J(*marginals), corr_transformed)
-    return "the function ended without error"
-
-
-def test_gc_correlation_2d():
-    """Test for special combinations the results are accurate."""
-    marginals, corr = get_strategies("test_gc_correlation_2d")
-    corr_transformed = gc_correlation(marginals, corr)
     copula = cp.Nataf(cp.J(*marginals), corr_transformed)
     corr_copula = np.corrcoef(copula.sample(10000000))
     np.testing.assert_almost_equal(corr, corr_copula, decimal=3)
 
 
-def test_gc_correlation_2d_force_calc():
-    """Test the results from force_calc are close to that from the paper."""
-    marginals, corr = get_strategies("test_gc_correlation_2d_force_calc")
-    corr_ref_numbers = gc_correlation(marginals, corr)
-    corr_force_calc = gc_correlation(marginals, corr, force_calc=True)
-    assert np.all(np.absolute(corr_ref_numbers - corr_force_calc) <= 0.1) == 1
+# def test_gc_correlation_2d():
+#     """Test for special combinations the results are accurate."""
+#     marginals, corr = get_strategies("test_gc_correlation_2d")
+#     corr_transformed = gc_correlation(marginals, corr)
+#     copula = cp.Nataf(cp.J(*marginals), corr_transformed)
+#     corr_copula = np.corrcoef(copula.sample(10000000))
+#     np.testing.assert_almost_equal(corr, corr_copula, decimal=3)
+
+
+# def test_gc_correlation_2d_force_calc():
+#     """Test the results from force_calc are close to that from the paper."""
+#     marginals, corr = get_strategies("test_gc_correlation_2d_force_calc")
+#     corr_ref_numbers = gc_correlation(marginals, corr)
+#     corr_force_calc = gc_correlation(marginals, corr, force_calc=True)
+#     assert np.all(np.absolute(corr_ref_numbers - corr_force_calc) <= 0.1) == 1
 
 
 def test_gc_correlation_exception_marginals():

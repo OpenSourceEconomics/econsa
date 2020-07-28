@@ -5,7 +5,6 @@ matrix into correlation matrix for Gaussian copulas.
 """
 import chaospy as cp
 import numpy as np
-from scipy import optimize
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
@@ -108,14 +107,15 @@ def _gc_correlation_pairwise(
         arg_2 = np.sqrt(np.prod(cp.Var(distributions)))
         arg = rho * arg_2 + arg_1
 
-        kwargs = dict()
-        kwargs["args"] = (arg, distributions, num_draws)
-        kwargs["bounds"] = (-0.99, 0.99)
-        kwargs["method"] = "bounded"
-
-        out = optimize.minimize_scalar(_criterion, **kwargs)
-        assert out["success"]
-        result = out["x"]
+        criterion_args = (arg, distributions, num_draws)
+        result = _grid_search(
+            _criterion,
+            lower=-0.99,
+            upper=0.99,
+            step=0.01,
+            args=criterion_args,
+            num_rounds=2,
+        )
 
     return result
 
@@ -178,3 +178,46 @@ def _criterion(rho_c, arg, distributions, num_draws):
     point = arg_1 * arg_2
 
     return (np.mean(point) - arg) ** 2
+
+
+def _grid_search(criterion, lower, upper, step, args, num_rounds=1):
+    """Perform a grid search for minimiser.
+
+    Parameters
+    ----------
+    criterion : function
+
+    lower, upper : float
+        Upper and lower bounds of grid
+
+    args : tuple
+
+    num_rounds : int, optional
+        Number of rounds (default value is `1`).
+    """
+    lower_init = lower
+    upper_init = upper
+
+    while num_rounds >= 1:
+        grid = np.arange(lower, upper, step)
+        grid_results = list()
+
+        for i in grid:
+            grid_results.append(_criterion(i, *args))
+
+        val, index = min((val, index) for (index, val) in enumerate(grid_results))
+
+        if grid[index] - step <= lower_init:
+            lower = grid[index]
+        else:
+            lower = grid[index] - step
+
+        if grid[index] + step >= upper_init:
+            upper = grid[index]
+        else:
+            upper = grid[index] + step
+
+        step = step * 0.01
+        num_rounds = num_rounds - 1
+
+    return grid[index]
