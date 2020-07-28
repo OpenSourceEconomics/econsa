@@ -199,6 +199,7 @@ def _grid_search(criterion, lower, upper, step, args, num_rounds=1):
     upper_init = upper
 
     while num_rounds >= 1:
+        num_rounds = num_rounds - 1
         grid = np.arange(lower, upper, step)
         grid_results = list()
 
@@ -206,18 +207,18 @@ def _grid_search(criterion, lower, upper, step, args, num_rounds=1):
             grid_results.append(_criterion(i, *args))
 
         val, index = min((val, index) for (index, val) in enumerate(grid_results))
+        result = grid[index]
 
-        if grid[index] - step <= lower_init:
-            lower = grid[index]
+        if result - step <= lower_init:
+            lower = result
         else:
-            lower = grid[index] - step
+            lower = result - step
 
-        if grid[index] + step >= upper_init:
-            upper = grid[index]
+        if result + step >= upper_init:
+            upper = result
         else:
-            upper = grid[index] + step
+            upper = result + step
 
         step = step * 0.01
-        num_rounds = num_rounds - 1
 
-    return grid[index]
+    return result
