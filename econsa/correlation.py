@@ -114,7 +114,7 @@ def _gc_correlation_pairwise(
             upper=0.99,
             step=0.01,
             args=criterion_args,
-            num_rounds=2,
+            num_rounds=3,
         )
 
     return result
