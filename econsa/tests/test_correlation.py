@@ -88,6 +88,18 @@ def test_gc_correlation_functioning():
     return "the function ended without error"
 
 
+def test_gc_correlation_2d():
+    """Test the results from the paper are accurate."""
+    marginals, corr_desired = get_strategies("test_gc_correlation_2d")
+    rtol, atol = 0.01, 0.01
+
+    corr_transformed = gc_correlation(marginals, corr_desired)
+    copula = cp.Nataf(cp.J(*marginals), corr_transformed)
+    corr_copula = np.corrcoef(copula.sample(10000000))
+
+    np.testing.assert_allclose(corr_desired, corr_copula, rtol, atol)
+
+
 def test_gc_correlation_2d_force_calc():
     """Test for low dimensional special cases the results are accurate."""
     marginals, corr_desired = get_strategies("test_gc_correlation_2d_force_calc")
