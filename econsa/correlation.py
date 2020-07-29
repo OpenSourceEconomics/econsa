@@ -10,7 +10,7 @@ import numpy as np
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
-def gc_correlation(marginals, corr, force_calc=False):
+def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=10000):
     """Correlation for Gaussian copula.
 
     This function implements the algorithm outlined in Section 4.2 of [K2012]_
@@ -86,7 +86,9 @@ def gc_correlation(marginals, corr, force_calc=False):
     for i, j in list(zip(*indices)):
         subset = [marginals[i], marginals[j]]
         distributions, rho = cp.J(*subset), corr[i, j]
-        gc_corr[i, j] = _gc_correlation_pairwise(distributions, rho, force_calc)
+        gc_corr[i, j] = _gc_correlation_pairwise(
+            distributions, rho, force_calc, num_points, rule,
+        )
 
     # Align upper triangular with lower triangular.
     gc_corr = gc_corr + gc_corr.T - np.diag(np.diag(gc_corr))
@@ -98,7 +100,7 @@ def gc_correlation(marginals, corr, force_calc=False):
 
 
 def _gc_correlation_pairwise(
-    distributions, rho, force_calc, num_draws=10000,
+    distributions, rho, force_calc, num_points=1000, rule="sobol",
 ):
     assert len(distributions) == 2
 
@@ -112,7 +114,8 @@ def _gc_correlation_pairwise(
 
         kwargs = dict()
         kwargs["distributions"] = distributions
-        kwargs["num_draws"] = num_draws
+        kwargs["num_points"] = num_points
+        kwargs["rule"] = rule
         kwargs["arg"] = arg
 
         grid = np.linspace(-0.99, 0.99, num=199, endpoint=True)
@@ -167,11 +170,11 @@ def _special_dist(distributions):
         return success
 
 
-def _criterion(rho_c, arg, distributions, num_draws):
+def _criterion(rho_c, arg, distributions, num_points, rule):
     cov = np.identity(2)
     cov[1, 0] = cov[0, 1] = rho_c
     distribution = cp.MvNormal(loc=np.zeros(2), scale=cov)
-    draws = distribution.sample(num_draws, rule="sobol").T.reshape(num_draws, 2)
+    draws = distribution.sample(num_points, rule=rule).T.reshape(num_points, 2)
     x_1, x_2 = np.split(draws, 2, axis=1)
 
     standard_norm_cdf = cp.Normal().cdf

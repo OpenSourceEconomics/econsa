@@ -1,12 +1,12 @@
 """Test for correlation transformation."""
+from econsa.copula import _cov2corr
+from econsa.correlation import _find_positive_definite
+from econsa.correlation import gc_correlation
+
 import chaospy as cp
 import numpy as np
 import pytest
 from scipy.stats import norm
-
-from econsa.copula import _cov2corr
-from econsa.correlation import _find_positive_definite
-from econsa.correlation import gc_correlation
 
 
 def get_strategies(name):
@@ -92,10 +92,20 @@ def test_gc_correlation_functioning():
 def test_gc_correlation_2d():
     """Test for special combinations the results are accurate."""
     marginals, corr = get_strategies("test_gc_correlation_2d")
-    corr_transformed = gc_correlation(marginals, corr)
-    copula = cp.Nataf(cp.J(*marginals), corr_transformed)
-    corr_copula = np.corrcoef(copula.sample(1000000))
-    np.testing.assert_almost_equal(corr, corr_copula, decimal=3)
+
+    candidates = dict()
+    candidates["corr"], candidates["stat"] = list(), list()
+    for num_points in [1000, 10000]:
+        for rule in ["halton", "sobol"]:
+            corr_transformed = gc_correlation(
+                marginals, corr, rule=rule, num_points=num_points,
+            )
+            copula = cp.Nataf(cp.J(*marginals), corr_transformed)
+            corr_copula = np.corrcoef(copula.sample(10000000))
+            candidates["stat"].append(np.abs(corr[0, 1] - corr_copula[0, 1]))
+            candidates["corr"].append(corr_copula)
+    corr_copula = candidates["corr"][np.argmin(candidates["stat"])]
+    np.testing.assert_allclose(corr, corr_copula, rtol=0.01, atol=0.01)
 
 
 def test_gc_correlation_2d_force_calc():
