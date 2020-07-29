@@ -100,14 +100,22 @@ def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=1
 
 
 def _gc_correlation_pairwise(
-    distributions, rho, force_calc, num_points=1000, rule="sobol",
+    distributions, rho, force_calc=False, num_points=1000, rule="sobol",
 ):
     assert len(distributions) == 2
 
-    if force_calc and type(_special_dist(distributions)) is not bool:
-        result = rho * _special_dist(distributions)[1]
+    # Check if this is special combination
+    special_dist_result = _special_dist(distributions)
+    if type(special_dist_result) is bool:
+        check_success = False
     else:
+        f = special_dist_result
+        check_success = True
 
+    # If not force_calc and is special combination
+    if force_calc is False and check_success is True:
+        result = rho * f
+    else:
         arg_1 = np.prod(cp.E(distributions))
         arg_2 = np.sqrt(np.prod(cp.Var(distributions)))
         arg = rho * arg_2 + arg_1
@@ -140,34 +148,39 @@ def _special_dist(distributions):
     """Test whether [L1986]_ is applicable."""
     dist_type = list()
     for dist in distributions:
-        dist_type.append(str(dist).split(sep="(", maxsplit=1)[0].lower())
+        dist_type.append(str(dist).split(sep="(", maxsplit=1)[0])
 
-    success = True
+    success = False
 
-    if any(dist_type) == "normal":
-        dist_norm = dist_type.index("normal")
+    if "Normal" in dist_type:
+        # Take the Normal distribution out
+        dist_norm = dist_type.index("Normal")
         dist_type.pop(dist_norm)
-        dist_other = dist_type[0]
-        if "normal" == dist_other:
-            f = 1
-        elif "uniform" == dist_other:
-            f = 1.023
-        elif "exponential" == dist_other:
-            f = 1.107
-        elif "rayleigh" == dist_other:
-            f = 1.014
-        elif "logweibull" == dist_other:
-            # Type-I extreme value, Gumbel
-            f = 1.031
-        else:
-            success = False
-    else:
-        success = False
 
-    if success:
-        return success, f
+        # Check the other distribution
+        dist_other = dist_type[0]
+
+        if "Normal" == dist_other:
+            f = 1
+            success = True
+        elif "Uniform" == dist_other:
+            f = 1.023
+            success = True
+        elif "Exponential" == dist_other:
+            f = 1.107
+            success = True
+        elif "Rayleigh" == dist_other:
+            f = 1.014
+            success = True
+        elif "LogWeibull" == dist_other:
+            # Type-I extreme value, or Gumbel
+            f = 1.031
+            success = True
+
+    if success is True:
+        return f
     else:
-        return success
+        return False
 
 
 def _criterion(rho_c, arg, distributions, num_points, rule):
