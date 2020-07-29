@@ -6,3 +6,6 @@ Sampling methods
 
 .. automodule:: econsa.copula
     :members:
+
+.. automodule:: econsa.correlation
+    :members:
