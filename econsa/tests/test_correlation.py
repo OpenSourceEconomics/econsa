@@ -56,10 +56,9 @@ def get_strategies(name):
         dist2 = distributions[np.random.choice(len(distributions))](means[1])
         marginals.append(dist2)
 
-        cov = np.random.uniform(-1, 1, size=(dim, dim))
-        cov = cov @ cov.T
+        corr = np.identity(2)
+        corr[0, 1] = corr[1, 0] = np.random.uniform(-0.75, 0.75)
 
-        corr = _cov2corr(cov).round(8)
     elif name == "test_gc_correlation_exception_marginals":
         marginals = list()
         for i in range(dim):
@@ -91,11 +90,34 @@ def test_gc_correlation_functioning():
 
 def test_gc_correlation_2d():
     """Test for special combinations the results are accurate."""
-    marginals, corr = get_strategies("test_gc_correlation_2d")
-    corr_transformed = gc_correlation(marginals, corr)
-    copula = cp.Nataf(cp.J(*marginals), corr_transformed)
-    corr_copula = np.corrcoef(copula.sample(10000000))
-    np.testing.assert_almost_equal(corr, corr_copula, decimal=3)
+    marginals, corr_desired = get_strategies("test_gc_correlation_2d")
+
+    rtol, atol = 0.01, 0.01
+    precision = atol + rtol * abs(corr_desired[0, 1])
+
+    candidates = dict()
+    candidates["corr"], candidates["stat"] = list(), list()
+
+    is_success = False
+    for num_points in [1000, 10000, 100000]:
+        for rule in ["halton", "sobol"]:
+            if is_success:
+                break
+
+            kwargs = dict()
+            kwargs["num_points"] = num_points
+            kwargs["rule"] = rule
+
+            corr_transformed = gc_correlation(marginals, corr_desired, **kwargs)
+            copula = cp.Nataf(cp.J(*marginals), corr_transformed)
+            corr_copula = np.corrcoef(copula.sample(10000000))
+            candidates["stat"].append(np.abs(corr_desired[0, 1] - corr_copula[0, 1]))
+            candidates["corr"].append(corr_copula)
+
+            is_success = candidates["stat"][-1] < precision
+
+    corr_copula = candidates["corr"][np.argmin(candidates["stat"])]
+    np.testing.assert_allclose(corr_desired, corr_copula, rtol, atol)
 
 
 def test_gc_correlation_2d_force_calc():
@@ -103,7 +125,7 @@ def test_gc_correlation_2d_force_calc():
     marginals, corr = get_strategies("test_gc_correlation_2d_force_calc")
     corr_ref_numbers = gc_correlation(marginals, corr)
     corr_force_calc = gc_correlation(marginals, corr, force_calc=True)
-    assert np.all(np.absolute(corr_ref_numbers - corr_force_calc) <= 0.1) == 1
+    assert np.all(np.absolute(corr_ref_numbers - corr_force_calc) <= 0.01) == 1
 
 
 def test_gc_correlation_exception_marginals():
