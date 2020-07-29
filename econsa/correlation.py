@@ -11,7 +11,7 @@ from statsmodels.stats.correlation_tools import corr_nearest
 
 
 def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=1000):
-    """Correlation for Gaussian copula.
+    r"""Correlation for Gaussian copula.
 
     This function implements the algorithm outlined in Section 4.2 of [K2012]_
     to map arbitrary correlation matrix to an correlation matrix for
@@ -35,6 +35,17 @@ def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=1
     force_calc : bool, optional
         When `True`, calculate the covariances ignoring all special combinations of marginals
         (default value is `False`).
+
+    rule : str, optional
+        The rule passed to `chaospy's distribution sampler generator`_
+        for generating samples for integration using (quasi) Monte Carlo simulations
+        (default value is `sobol`).
+
+        .. _chaospy's distribution sampler generator: https://chaospy.readthedocs.io/en/master/
+            _modules/chaospy/distributions/sampler/generator.html
+
+    num_points : int, optional
+        The number of samples to generate for integration (default value is `1000`).
 
     Returns
     -------
