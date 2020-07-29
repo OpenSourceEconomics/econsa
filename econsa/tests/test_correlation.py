@@ -1,12 +1,12 @@
 """Test for correlation transformation."""
-from econsa.copula import _cov2corr
-from econsa.correlation import _find_positive_definite
-from econsa.correlation import gc_correlation
-
 import chaospy as cp
 import numpy as np
 import pytest
 from scipy.stats import norm
+
+from econsa.copula import _cov2corr
+from econsa.correlation import _find_positive_definite
+from econsa.correlation import gc_correlation
 
 
 def get_strategies(name):
