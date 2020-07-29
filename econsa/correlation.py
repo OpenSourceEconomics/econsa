@@ -10,7 +10,7 @@ import numpy as np
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
-def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=10000):
+def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=1000):
     """Correlation for Gaussian copula.
 
     This function implements the algorithm outlined in Section 4.2 of [K2012]_
