@@ -56,10 +56,9 @@ def get_strategies(name):
         dist2 = distributions[np.random.choice(len(distributions))](means[1])
         marginals.append(dist2)
 
-        cov = np.random.uniform(-1, 1, size=(dim, dim))
-        cov = cov @ cov.T
+        corr = np.identity(2)
+        corr[0, 1] = corr[1, 0] = np.random.uniform(-0.75, 0.75)
 
-        corr = _cov2corr(cov).round(8)
     elif name == "test_gc_correlation_exception_marginals":
         marginals = list()
         for i in range(dim):
