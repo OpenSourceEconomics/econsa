@@ -1,8 +1,8 @@
 """Functions for computation of global sensitivity indices with dependent variables.
 
 This module implements functionalities described by S. Kucherenko, S. Tarantola,
-P. Annoni in "Estimation of global sensitivity indices for models with dependent
-variables" --(Comput. Phys. Commun., 183 (4) (2012), pp. 937-946)
+P. Annoni in 'Estimation of global sensitivity indices for models with dependent
+variables' --(Comput. Phys. Commun., 183 (4) (2012), pp. 937-946)
 
 References to Tables, Equations, etc. correspond to references in the paper mentioned
 above. Variable names resemble variable names in the paper or try to be self-
@@ -79,31 +79,18 @@ def kucherenko_indices(
             Kucherenko indices.
 
     """
-    # assert input
-    n_params = len(sampling_mean)
-
-    assert sampling_cov.shape == (n_params, n_params,), (
-        "Argument 'sampling_cov' does not have a compatible dimension with argument "
-        "'sampling_mean'."
+    assert_input_kucherenko_indices(
+        func,
+        sampling_mean,
+        sampling_cov,
+        n_draws=10_000,
+        sampling_scheme="sobol",
+        n_jobs=1,
+        parallel_backend="loky",
+        skip=0,
+        seed_list=None,
     )
-    assert (
-        isinstance(n_draws, int) and n_draws > 0
-    ), "Argument 'n_draws' must be a positive integer."
-    assert sampling_scheme in {
-        "random",
-        "sobol",
-    }, "Argument 'sampling_scheme' must be in {'random', 'sobol'}."
-    assert (
-        isinstance(n_jobs, int) and n_jobs >= 1
-    ), "Argument 'n_jobs' must be a positive integer."
-
-    if seed_list is not None and len(seed_list) != n_params:
-        warnings.warn(
-            "Argument 'seed_list' does not has the same length as argument"
-            "'sampling_mean'; Using seed_list = range(len(sampling_mean)).",
-            UserWarning,
-        )
-        seed_list = range(n_params)
+    n_params = len(sampling_mean)
     seed_list = seed_list if seed_list is not None else range(n_params)
 
     # parallelize computation
@@ -486,6 +473,7 @@ def _uniform_to_multivariate_normal(uniform, mean, cov):
     >>> assert m_draws.mean(axis=0) == approx(mean, abs=0.1)
     >>> assert np.cov(m_draws, rowvar=False) == approx(cov, abs=0.1)
     """
+    cov = np.atleast_2d(cov)
     standard_normal = _uniform_to_standard_normal(uniform)
     normal = _standard_normal_to_multivariate_normal(standard_normal, mean, cov)
     return normal
@@ -673,3 +661,39 @@ def _unshift_array(arr, k):
     n_params = arr.shape[1]
     unshifted = _shift_array(arr, n_params - k)
     return unshifted
+
+
+def assert_input_kucherenko_indices(
+    func,
+    sampling_mean,
+    sampling_cov,
+    n_draws,
+    sampling_scheme,
+    n_jobs,
+    parallel_backend,
+    skip,
+    seed_list,
+):
+    n_params = len(sampling_mean)
+
+    assert sampling_cov.shape == (n_params, n_params,), (
+        "Argument 'sampling_cov' does not have a compatible dimension with argument "
+        "'sampling_mean'."
+    )
+    assert (
+        isinstance(n_draws, int) and n_draws > 0
+    ), "Argument 'n_draws' must be a positive integer."
+    assert sampling_scheme in {
+        "random",
+        "sobol",
+    }, "Argument 'sampling_scheme' must be in {'random', 'sobol'}."
+    assert (
+        isinstance(n_jobs, int) and n_jobs >= 1
+    ), "Argument 'n_jobs' must be a positive integer."
+
+    if seed_list is not None and len(seed_list) != n_params:
+        warnings.warn(
+            "Argument 'seed_list' does not has the same length as argument"
+            "'sampling_mean'; Using seed_list = range(len(sampling_mean)).",
+            UserWarning,
+        )
