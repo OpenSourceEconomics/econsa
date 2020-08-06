@@ -58,11 +58,12 @@ extensions = [
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
-    "numpydoc",
+    "sphinx.ext.napoleon",
     "nbsphinx",
     "sphinx.ext.mathjax",
     "sphinxcontrib.bibtex",
     "sphinx.ext.doctest",
+    "sphinxcontrib.cairosvgconverter",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -92,9 +93,18 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
 
-# Configuration for numpydoc
-numpydoc_xref_param_type = True
-numpydoc_xref_ignore = {"type", "optional", "default"}
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = True
+napoleon_use_param = True
+napoleon_use_rtype = True
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -131,11 +141,14 @@ nbsphinx_execute = "auto"
 
 nbsphinx_prolog = r"""
 {% set docname = 'docs/source/' + env.doc2path(env.docname, base=None) %}
+.. |binder| image:: https://mybinder.org/badge_logo.svg
+     :target: https://mybinder.org/v2/gh/OpenSourceEconomics/econsa/master?filepath={{ docname|e }}
 
 .. only:: html
 
     .. nbinfo::
         Download the notebook :download:`here <https://nbviewer.jupyter.org/github/OpenSourceEconomics/econsa/blob/master/{{ docname }}>`!
+        Interactive online version: |binder|
 """
 
 

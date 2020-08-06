@@ -2,12 +2,10 @@ import numpy as np
 import pandas as pd
 from numpy.testing import assert_array_almost_equal as aaae
 
-from econsa.morris import (
-    _shift_cov,
-    _shift_sample,
-    _uniform_to_standard_normal,
-    elementary_effects,
-)
+from econsa.morris import _shift_cov
+from econsa.morris import _shift_sample
+from econsa.morris import _uniform_to_standard_normal
+from econsa.morris import elementary_effects
 
 
 def test_uniform_to_standard_normal():
@@ -37,7 +35,7 @@ def test_shift_sample_3d():
         [
             [[1.0, 2.0, 3, 4, 0], [8.0, 9.0, 5.0, 6.0, 7.0]],
             [[11.0, 12.0, 13.0, 14.0, 10.0], [18.0, 19.0, 15.0, 16.0, 17.0]],
-        ]
+        ],
     )
     aaae(calculated, expected)
 
@@ -45,7 +43,12 @@ def test_shift_sample_3d():
 def test_shift_cov():
     np.random.seed(1234)
     true_cov = np.array(
-        [[1, 0.1, 0.2, 0.3], [0.1, 2, 0.4, 0.5], [0.2, 0.4, 3, 0.6], [0.3, 0.5, 0.6, 4]]
+        [
+            [1, 0.1, 0.2, 0.3],
+            [0.1, 2, 0.4, 0.5],
+            [0.2, 0.4, 3, 0.6],
+            [0.3, 0.5, 0.6, 4],
+        ],
     )
     data = np.random.multivariate_normal(mean=np.zeros(4), cov=true_cov, size=20)
     df = pd.DataFrame(data=data)

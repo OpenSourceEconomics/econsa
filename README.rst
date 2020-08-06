@@ -1,6 +1,8 @@
-econsa
-======
+.. |logo| image:: logos/econsa_logo_no_type_RGB.svg
+   :height: 20px
 
+|logo| econsa
+=============
 
     I prefer true but imperfect knowledge, even if it leaves much undetermined and unpredictable, to a pretence of exact knowledge that is likely to be false.
 
@@ -33,5 +35,6 @@ econsa
 Supported by
 ------------
 
-.. image:: docs/_static/images/ose-logo.jpg
+.. image:: docs/_static/images/OSE_sb_web.svg
+    :width: 22 %
     :target: https://github.com/OpenSourceEconomics

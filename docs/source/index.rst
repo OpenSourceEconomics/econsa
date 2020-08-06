@@ -14,7 +14,7 @@ Welcome to econsa's documentation!
 .. image:: https://app.codacy.com/project/badge/Grade/b9d3b1fd4e2a461aa47e212e80f6a0eb
     :target: https://www.codacy.com/gh/OpenSourceEconomics/econsa?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenSourceEconomics/econsa&amp;utm_campaign=Badge_Grade
 
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+.. image:: ../_static/images/code-style-black.svg
     :target: https://github.com/psf/black
 
 .. image:: https://codecov.io/gh/OpenSourceEconomics/econsa/branch/master/graph/badge.svg
@@ -27,6 +27,13 @@ Welcome to econsa's documentation!
 *I prefer true but imperfect knowledge, even if it leaves much undetermined and unpredictable, to a pretence of exact knowledge that is likely to be false.*
 
 	| -- Friedrich von Hayek, Nobel Prize Lecture
+
+|
+
+.. image:: ../../logos/econsa_logo_vertical_RGB.svg
+    :alt: econsa logo
+    :width: 15%
+    :align: center
 
 ``econsa`` is an open-source package for economists that facilitates the sound analysis of computational economic models. It offers suitable methods for uncertainty propagation and global sensitivity analysis.
 
@@ -41,7 +48,8 @@ With ``conda`` available on your path, installing and testing ``econsa`` is as s
 Supported by
 ------------
 
-.. image:: ../_static/images/ose-logo.jpg
+.. image:: ../_static/images/OSE_sb_web.svg
+          :width: 30 %
 	  :target: https://github.com/OpenSourceEconomics
 
 .. toctree::

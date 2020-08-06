@@ -9,3 +9,4 @@ Here we explain and document in detail, the methods we implement in the ``econsa
 
    qualitative-analysis
    quantitative-analysis
+   sampling
