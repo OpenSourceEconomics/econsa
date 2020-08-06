@@ -1,12 +1,12 @@
+import chaospy as cp
 import numpy as np
 
+from econsa.kucherenko import _conditional_covariance
+from econsa.kucherenko import _conditional_mean
 from econsa.kucherenko import _shift_cov
 from econsa.kucherenko import _shift_mean
-from econsa.kucherenko import _unshift_mean
-from econsa.kucherenko import _unshift_cov
 from econsa.kucherenko import _uniform_to_multivariate_normal
-from econsa.kucherenko import _conditional_mean
-from econsa.kucherenko import _conditional_covariance
+from econsa.kucherenko import _unshift_mean
 
 
 def kucherenko_index(
@@ -27,13 +27,15 @@ def kucherenko_index(
     indices = {}
     for dimension in dimensions:
         index = _kucherenko_index(
-            func, dimension, mean, cov, scheme, n_joint, n_outer, n_inner, seed
+            func, dimension, mean, cov, scheme, n_joint, n_outer, n_inner, seed,
         )
         indices[dimension] = index
     return indices
 
 
-def _kucherenko_index(func, dimension, mean, cov, scheme, n_joint, n_outer, n_inner, seed):
+def _kucherenko_index(
+    func, dimension, mean, cov, scheme, n_joint, n_outer, n_inner, seed,
+):
     """Kucherenko index inner functions."""
     # draw (independent) samples100100100
     joint_samples = _create_joint_samples(n_joint, mean, cov, scheme, seed)
@@ -45,11 +47,13 @@ def _kucherenko_index(func, dimension, mean, cov, scheme, n_joint, n_outer, n_in
     # approximate double integral
     double_integral = 0
     for i in range(n_outer):
-        outer_sample = _create_outer_sample(dimension, mean, cov, scheme, seed+i)
+        outer_sample = _create_outer_sample(dimension, mean, cov, scheme, seed + i)
 
         inner_integral = 0
         for j in range(n_inner):
-            inner_sample = _create_inner_sample(outer_sample, dimension, mean, cov, scheme, seed+j)
+            inner_sample = _create_inner_sample(
+                outer_sample, dimension, mean, cov, scheme, seed + j,
+            )
             x = _combine_samples(outer_sample, inner_sample, dimension)
             inner_integral += func(x)
 
@@ -68,7 +72,7 @@ def _compute_mean(func, samples, return_evals=False):
     >>> uniform = np.random.uniform(size=1_000_000)
     >>> mean = _compute_mean(identity, uniform)
     >>> assert np.abs(mean - 0.5) < 0.01
-    
+
     """
     evaluations = _evaluate_func(func, samples)
     mean = evaluations.mean()
@@ -116,7 +120,7 @@ def _combine_samples(outer_sample, inner_sample, dimension, unshift=True):
     >>> sample = _combine_samples(2, x, 2, False)
     >>> sample
     array([0, 1, 2, 3, 4])
-    
+
     """
     sample = np.insert(inner_sample, dimension, outer_sample)
     if unshift:
@@ -126,21 +130,21 @@ def _combine_samples(outer_sample, inner_sample, dimension, unshift=True):
 
 def _evaluate_func(func, samples):
     """Evaluate func on various types of samples.
-    
+
     Args:
         func (callable): Function.
         samples (np.ndarray): 2d array with samples to evaluate.
-        
+
     Returns:
         evaluatiosn (np.ndarrary): 1d array with evaluations.
-        
+
     Example:
     >>> import numpy as np
     >>> samples = np.arange(4).reshape(2, 2)
     >>> func = lambda x: x.sum()
     >>> evals = _evaluate_func(func, samples)
     array([1, 5])
-    
+
     """
     evaluations = np.array([func(sample) for sample in samples])
     return evaluations
@@ -177,15 +181,11 @@ def _get_uniform_base_draws(n_draws, n_params, sampling_scheme, seed=0):
     np.random.seed(seed)
 
     if sampling_scheme == "sobol":
-        draws = cp.generate_samples(
-            order=n_draws + skip, domain=n_params, rule="S"
-        ).T
+        draws = cp.generate_samples(order=n_draws, domain=n_params, rule="S").T
     elif sampling_scheme == "random":
         draws = np.random.uniform(size=(n_draws, n_params))
     else:
         raise ValueError("Argument 'sampling_scheme' is not in {'sobol', 'random'}.")
-
-    skip = skip if sampling_scheme == "sobol" else 0
 
     return draws
 

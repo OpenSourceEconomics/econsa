@@ -73,12 +73,12 @@ def test_kucherenko_indices_first_example(first_example_fixture):
         cov, mean = first_example_fixture["create_covariance_and_mean"](rho)
 
         df_indices = kucherenko_indices(
-            func=func, sampling_mean=mean, sampling_cov=cov, n_draws=n_draws
+            func=func, sampling_mean=mean, sampling_cov=cov, n_draws=n_draws,
         )
 
         for var, typ in df_indices.index:
             assert df_indices.loc[(var, typ), "value"] == pytest.approx(
-                df_expected.loc[(rho, var), typ], abs=0.01
+                df_expected.loc[(rho, var), typ], abs=0.01,
             )
 
 
@@ -100,7 +100,7 @@ def second_example_fixture():
             [2.4, 4, 0, 0],
             [0, 0, 40_000, -18_000],
             [0, 0, -18_000, 90_000],
-        ]
+        ],
     )
 
     df_expected = pd.DataFrame(
@@ -126,10 +126,10 @@ def test_kucherenko_indices_second_example_my(second_example_fixture):
     sample_cov = second_example_fixture["sampling_cov"]
 
     df_indices = kucherenko_indices(
-        func, sampling_mean=sample_mean, sampling_cov=sample_cov, n_draws=n_draws
+        func, sampling_mean=sample_mean, sampling_cov=sample_cov, n_draws=n_draws,
     )
 
     for var, typ in df_indices.index:
         assert df_indices.loc[(var, typ), "value"] == pytest.approx(
-            df_expected.loc[var, typ], abs=0.01
+            df_expected.loc[var, typ], abs=0.01,
         )
