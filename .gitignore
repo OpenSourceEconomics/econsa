@@ -1,15 +1,3 @@
-# Folders (timmens)
-.vscode/
-literature/
-.idea/
-UQLab/
-dependent_morris/
-notebooks/
-
-# Files (timmens)
-econsa/scribble.py
-
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
