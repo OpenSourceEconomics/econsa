@@ -64,16 +64,7 @@ def _kucherenko_index(
 
 
 def _compute_mean(func, samples, return_evals=False):
-    """Compute mean of func using samples.
-
-    Example:
-    >>> np.random.seed(1)
-    >>> identity = lambda x: x
-    >>> uniform = np.random.uniform(size=1_000_000)
-    >>> mean = _compute_mean(identity, uniform)
-    >>> assert np.abs(mean - 0.5) < 0.01
-
-    """
+    """Compute mean of func using samples."""
     evaluations = _evaluate_func(func, samples)
     mean = evaluations.mean()
 
@@ -82,16 +73,7 @@ def _compute_mean(func, samples, return_evals=False):
 
 
 def _compute_variance(func, samples, mean=None, evaluations=None):
-    """Compute variance of func using samples.
-
-    Example:
-    >>> np.random.seed(1)
-    >>> identity = lambda x: x
-    >>> uniform = np.random.uniform(size=1_000_000)
-    >>> var = _compute_variance(identity, uniform)
-    >>> assert np.abs(var - 1/12) < 0.01
-
-    """
+    """Compute variance of func using samples."""
     if mean is None:
         mean = _compute_mean(func, samples)
 
@@ -114,13 +96,6 @@ def _combine_samples(outer_sample, inner_sample, dimension, unshift=True):
     Returns:
         sample (np.ndarray): The combined sample.
 
-    Example:
-    >>> import numpy as np
-    >>> x = np.array([0, 1, 3, 4])
-    >>> sample = _combine_samples(2, x, 2, False)
-    >>> sample
-    array([0, 1, 2, 3, 4])
-
     """
     sample = np.insert(inner_sample, dimension, outer_sample)
     if unshift:
@@ -137,13 +112,6 @@ def _evaluate_func(func, samples):
 
     Returns:
         evaluatiosn (np.ndarrary): 1d array with evaluations.
-
-    Example:
-    >>> import numpy as np
-    >>> samples = np.arange(4).reshape(2, 2)
-    >>> func = lambda x: x.sum()
-    >>> evals = _evaluate_func(func, samples)
-    array([1, 5])
 
     """
     evaluations = np.array([func(sample) for sample in samples])

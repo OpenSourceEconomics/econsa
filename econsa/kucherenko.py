@@ -311,18 +311,6 @@ def _conditional_mean(y, mean_z, mean_y, cov_y, cov_yz):
     Returns:
         mean_z_given_y (np.ndarray): Conditional mean of `z` given the realization y.
 
-    Example:
-    >>> import numpy as np
-    >>> mean = np.array([-1., 2.])
-    >>> cov = np.array([[1, 0.5], [0.5, 2]])
-    >>> y = np.array([0, 1, 2, 1, 2]).reshape(-1, 1)
-    >>> mean_z = mean[:1]
-    >>> mean_y = mean[1:]
-    >>> cov_y = cov[1:, 1:]
-    >>> cov_yz = cov[0, 1:]
-    >>> mean_z_given_y = _conditional_mean(y, mean_z, mean_y, cov_y, cov_yz)
-    >>> mean_z_given_y
-    array([-1.5 , -1.25, -1.  , -1.25, -1.  ])
 
     """
     update = cov_yz.dot(np.linalg.inv(cov_y)).dot((y - mean_y).T).T
@@ -352,16 +340,6 @@ def _conditional_covariance(cov_z, cov_y, cov_zy):
 
     Returns:
         cov_z_given_y (np.ndarray): Conditional covariance of `z` given `y`.
-
-    Example:
-    >>> import numpy as np
-    >>> cov = np.array([[1, 0.5], [0.5, 2]])
-    >>> cov_z = cov[:1, :1]
-    >>> cov_y = cov[1:, 1:]
-    >>> cov_yz = cov[0, 1:]
-    >>> cov_z_given_y = _conditional_covariance(cov_z, cov_y, cov_yz)
-    >>> cov_z_given_y
-    array([[0.875]])
 
     """
     update = cov_zy.dot(np.linalg.inv(cov_y)).dot(cov_zy.T)
@@ -435,15 +413,6 @@ def _standard_normal_to_multivariate_normal(draws, mean, cov):
         multivariate_draws (np.ndarray): Draws from the multivariate normal. Shape has
             the form (n_draws, n_params).
 
-    Example:
-    >>> import numpy as np
-    >>> draws = np.random.randn(10_000, 2)
-    >>> mean = np.array([-1., 2])
-    >>> cov = np.array([[1, 0.5], [0.5, 2]])
-    >>> m_draws = _standard_normal_to_multivariate_normal(draws, mean, cov)
-    >>> assert m_draws.mean(axis=0) == approx(mean, abs=0.1)
-    >>> assert np.cov(m_draws, rowvar=False) == approx(cov, abs=0.1)
-
     """
     cholesky = np.linalg.cholesky(cov)
     multivariate_draws = mean + cholesky.dot(draws.T).T
@@ -463,14 +432,6 @@ def _uniform_to_multivariate_normal(uniform, mean, cov):
         normal (np.ndarray): Draws from the multivariate normal. Shape has the form
             (n_draws, n_params).
 
-    Example:
-    >>> import numpy as np
-    >>> draws = np.random.uniform(size=(10_000, 2))
-    >>> mean = np.array([-1., 2])
-    >>> cov = np.array([[1, 0.5], [0.5, 2]])
-    >>> m_draws = _uniform_to_multivariate_normal(draws, mean, cov)
-    >>> assert m_draws.mean(axis=0) == approx(mean, abs=0.1)
-    >>> assert np.cov(m_draws, rowvar=False) == approx(cov, abs=0.1)
     """
     cov = np.atleast_2d(cov)
     standard_normal = _uniform_to_standard_normal(uniform)
@@ -518,14 +479,6 @@ def _shift_cov(cov, k):
     Returns:
         shifted (np.ndarray): Same shape as cov.
 
-    Example:
-    >>> import numpy as np
-    >>> cov = np.array([[1, 0, 0], [0, 2, 0.5], [0, 0.5, 3]])
-    >>> _shift_cov(cov, 2)
-    array([[3. , 0. , 0.5],
-           [0. , 1. , 0. ],
-           [0.5, 0. , 2. ]])
-
     """
     n_params = len(cov)
     old_order = np.arange(n_params).astype(int)
@@ -545,15 +498,6 @@ def _unshift_cov(cov, k):
     Returns:
         unshifted (np.ndarray): Same shape as cov.
 
-    Example:
-    >>> import numpy as np
-    >>> cov = np.array([[1, 0, 0], [0, 2, 0.5], [0, 0.5, 3]])
-    >>> shifted = _shift_cov(cov, 2)
-    >>> _unshift_cov(shifted, 2)
-    array([[1. , 0. , 0. ],
-           [0. , 2. , 0.5],
-           [0. , 0.5, 3. ]])
-
     """
     n_params = len(cov)
     unshifted = _shift_cov(cov, n_params - k)
@@ -569,12 +513,6 @@ def _shift_mean(mean, k):
 
     Returns:
         shifted (np.ndarray): Same shape as mean.
-
-    Example:
-    >>> import numpy as np
-    >>> mean = np.arange(10)
-    >>> _shift_mean(mean, 5)
-    array([5, 6, 7, 8, 9, 0, 1, 2, 3, 4])
 
     """
     n_params = len(mean)
@@ -595,12 +533,6 @@ def _unshift_mean(mean, k):
     Returns:
         unshifted (np.ndarray): Same shape as mean.
 
-    Example:
-    >>> import numpy as np
-    >>> mean = np.arange(10)
-    >>> _shift_mean(mean, 5)
-    array([5, 6, 7, 8, 9, 0, 1, 2, 3, 4])
-
     """
     n_params = len(mean)
     unshifted = _shift_mean(mean, n_params - k)
@@ -616,13 +548,6 @@ def _shift_array(arr, k):
 
     Returns:
         shifted (np.ndarray): Same shape as array.
-
-    Example:
-    >>> import numpy as np
-    >>> arr = np.arange(10).reshape(2, 5)
-    >>> _shift_array(arr, 3)
-    array([[3, 4, 0, 1, 2],
-           [8, 9, 5, 6, 7]])
 
     """
     n_params = arr.shape[1]
@@ -647,14 +572,6 @@ def _unshift_array(arr, k):
 
     Returns:
         unshifted (np.ndarray): Same shape as array.
-
-    Example:
-    >>> import numpy as np
-    >>> arr = np.arange(10).reshape(2, 5)
-    >>> shifted = _shift_array(arr, 3)
-    >>> _unshift_array(shifted, 3)
-    array([[0, 1, 2, 3, 4],
-           [5, 6, 7, 8, 9]])
 
     """
     n_params = arr.shape[1]
