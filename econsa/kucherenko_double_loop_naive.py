@@ -173,19 +173,7 @@ def _create_inner_sample(outer_sample, dimension, mean, cov, scheme, seed):
 
 
 def _get_uniform_base_draws(n_draws, n_params, sampling_scheme, seed=0):
-    """Get uniform random draws.
-
-    Args:
-        n_draws (int): Number of uniform draws to generate.
-        n_params (int): Number of parameters of model.
-        sampling_scheme (str): one of ["sobol", "random"]
-        seed (int): Random number generator seed; default is 0.
-
-    Returns:
-        u, u_prime (np.ndarray): Arrays of shape (n_draws, n_params-1) and (n_draws,1)
-            with i.i.d draws from a uniform [0, 1] distribution.
-
-    """
+    """Get uniform random draws."""
     np.random.seed(seed)
 
     if sampling_scheme == "sobol":
