@@ -9,7 +9,7 @@ dependencies:
   - python=3.7
   - sphinx
   - pandas
-  - numpy
+  - numpy=1.18
   - pip
   - scipy
   - statsmodels
@@ -20,7 +20,7 @@ dependencies:
   - pdbpp
   - temfpy>=1.1
   - chaospy
-  - pytest
+  - pytest=5.4.3
   - pytest-black
   - pytest-flake8
   - pytest-cov
