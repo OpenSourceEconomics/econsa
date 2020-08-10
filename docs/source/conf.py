@@ -63,7 +63,6 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinxcontrib.bibtex",
     "sphinx.ext.doctest",
-    "sphinxcontrib.cairosvgconverter",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

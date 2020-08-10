@@ -14,7 +14,7 @@ Welcome to econsa's documentation!
 .. image:: https://app.codacy.com/project/badge/Grade/b9d3b1fd4e2a461aa47e212e80f6a0eb
     :target: https://www.codacy.com/gh/OpenSourceEconomics/econsa?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenSourceEconomics/econsa&amp;utm_campaign=Badge_Grade
 
-.. image:: ../_static/images/code-style-black.svg
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
 
 .. image:: https://codecov.io/gh/OpenSourceEconomics/econsa/branch/master/graph/badge.svg
@@ -48,7 +48,7 @@ With ``conda`` available on your path, installing and testing ``econsa`` is as s
 Supported by
 ------------
 
-.. image:: ../_static/images/OSE_sb_web.svg
+.. image:: https://raw.githubusercontent.com/OpenSourceEconomics/ose-corporate-design/master/logos/OSE_logo_RGB.svg
           :width: 30 %
 	  :target: https://github.com/OpenSourceEconomics
 
