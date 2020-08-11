@@ -47,10 +47,10 @@ def cond_mvn(
 
     Returns
     -------
-    cond_mean : array_like
+    cond_mean : numpy.ndarray
                 The conditional mean of dependent variables.
 
-    cond_cov : arrray_like
+    cond_cov : numpy.ndarray
                The conditional covariance matrix of dependent variables.
 
     Examples
