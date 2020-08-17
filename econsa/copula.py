@@ -40,10 +40,6 @@ def cond_gaussian_copula(cov, dependent_ind, given_ind, given_value_u, size=1):
 
     Examples
     --------
-    .. TODO::
-        This is too long but very suitable for a tutorial notebook,
-        let's just have a hard-coded direct use of the function.
-
     >>> np.random.seed(123)
     >>> cov = np.array([[ 3.290887,  0.465004, -3.411841],
     ...                 [ 0.465004,  3.962172, -0.574745],
