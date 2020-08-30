@@ -10,7 +10,7 @@ import numpy as np
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
-def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=1000):
+def gc_correlation(marginals, corr, force_calc=False, order=15):
     r"""Correlation for Gaussian copula.
 
     This function implements the algorithm outlined in Section 4.2 of [K2012]_
@@ -36,16 +36,9 @@ def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=1
         When `True`, calculate the covariances ignoring all special combinations of marginals
         (default value is `False`).
 
-    rule : str, optional
-        The rule passed to `chaospy's distribution sampler generator`_
-        for generating samples for integration using (quasi) Monte Carlo simulations
-        (default value is `sobol`).
-
-        .. _chaospy's distribution sampler generator: https://chaospy.readthedocs.io/en/master/
-            _modules/chaospy/distributions/sampler/generator.html
-
-    num_points : int, optional
-        The number of samples to generate for integration (default value is `1000`).
+    order : int, optional
+        The order of grids used to generate for integration
+        (default value is `15`).
 
     Returns
     -------
@@ -97,9 +90,7 @@ def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=1
     for i, j in list(zip(*indices)):
         subset = [marginals[i], marginals[j]]
         distributions, rho = cp.J(*subset), corr[i, j]
-        gc_corr[i, j] = _gc_correlation_pairwise(
-            distributions, rho, force_calc, num_points, rule,
-        )
+        gc_corr[i, j] = _gc_correlation_pairwise(distributions, rho, force_calc, order)
 
     # Align upper triangular with lower triangular.
     gc_corr = gc_corr + gc_corr.T - np.diag(np.diag(gc_corr))
@@ -111,7 +102,7 @@ def gc_correlation(marginals, corr, force_calc=False, rule="sobol", num_points=1
 
 
 def _gc_correlation_pairwise(
-    distributions, rho, force_calc=False, num_points=1000, rule="sobol",
+    distributions, rho, force_calc=False, order=15,
 ):
     assert len(distributions) == 2
 
@@ -133,12 +124,11 @@ def _gc_correlation_pairwise(
 
         kwargs = dict()
         kwargs["distributions"] = distributions
-        kwargs["num_points"] = num_points
-        kwargs["rule"] = rule
+        kwargs["order"] = order
         kwargs["arg"] = arg
 
         grid = np.linspace(-0.99, 0.99, num=199, endpoint=True)
-        v_p_criterion = np.vectorize(partial(_criterion, **kwargs))
+        v_p_criterion = np.vectorize(partial(_criterion_gh, **kwargs))
         result = grid[np.argmin(v_p_criterion(grid))]
 
     return result
@@ -194,16 +184,39 @@ def _special_dist(distributions):
         return False
 
 
-def _criterion(rho_c, arg, distributions, num_points, rule):
+def _criterion_gh(rho_c, arg, distributions, order=15, rule="gaussian"):
+    """
+    Evaluates the integral using a Gauss-Hermite rule in 2 dimensions.
+    It requires the Cholesky decomposition of the covariance matrix in order to
+    transform the integral properly.
+
+    Changed parameters (compared to _criterion)
+    ----------
+    order : int
+        (order+1)^2 is the total number of used nodes => sparse grids could be
+        further improvements in higher dimensions. For d=2, this is not necessary.
+        order==15 seemed sufficient in some first test cases. Choosing order>20
+        is not beneficial as the corresponding weights decrease to 1e-30.
+        For fixed order, nodes and weights could be precomputed for every integral
+        evaluation as the rule is deterministic.
+
+    rule : string
+        Not necessary anymore as "gaussian" is the only applicable here.
+
+    """
     cov = np.identity(2)
     cov[1, 0] = cov[0, 1] = rho_c
-    distribution = cp.MvNormal(loc=np.zeros(2), scale=cov)
-    draws = distribution.sample(num_points, rule=rule).T.reshape(num_points, 2)
-    x_1, x_2 = np.split(draws, 2, axis=1)
+
+    chol = np.linalg.cholesky(cov)
+    distribution = cp.Iid(cp.Normal(0, 1), 2)
+
+    nodes, weights = cp.generate_quadrature(order, distribution, rule="gaussian")
+
+    x_1, x_2 = np.split(chol @ nodes, 2)
 
     standard_norm_cdf = cp.Normal().cdf
     arg_1 = distributions[0].inv(standard_norm_cdf(x_1))
     arg_2 = distributions[1].inv(standard_norm_cdf(x_2))
     point = arg_1 * arg_2
 
-    return (np.mean(point) - arg) ** 2
+    return (sum(point[0] * weights) - arg) ** 2
