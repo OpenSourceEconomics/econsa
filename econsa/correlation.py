@@ -102,7 +102,10 @@ def gc_correlation(marginals, corr, force_calc=False, order=15):
 
 
 def _gc_correlation_pairwise(
-    distributions, rho, force_calc=False, order=15,
+    distributions,
+    rho,
+    force_calc=False,
+    order=15,
 ):
     assert len(distributions) == 2
 

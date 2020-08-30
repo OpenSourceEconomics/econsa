@@ -9,26 +9,27 @@ repos:
     -   id: check-yaml
         exclude: meta.yaml
     -   id: end-of-file-fixer
-        exclude: '(.*\.svg)'
+        exclude: '\.svg'
     -   id: mixed-line-ending
     -   id: trailing-whitespace
 -   repo: https://github.com/psf/black
     rev: stable
     hooks:
     -   id: black
-        files: '(\.pyi?|wscript)$'
+        files: '(\.pyi?|wscript|ipynb)$'
         language_version: python3.7
+        additional_dependencies: [black-nb]
 -   repo: https://github.com/asottile/blacken-docs
     rev: v1.7.0
     hooks:
     -   id: blacken-docs
         additional_dependencies: [black]
-        files: '(\.md|\.rst)$'
+        files: '(\.md|rst)$'
 -   repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.3
     hooks:
     -   id: flake8
-        files: '(\.pyi?|wscript)$'
+        files: '(\.pyi?|wscript|ipynb)$'
         exclude: (configurations|submodules|conf\.py|fig-eoq-sensitivity-analysis-example\.py)
         args: [
           '--max-line-length=100',

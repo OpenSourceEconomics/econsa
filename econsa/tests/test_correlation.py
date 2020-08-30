@@ -120,7 +120,10 @@ def test_gc_correlation_2d_force_calc():
         kwargs["order"] = order
 
         corr_transformed = gc_correlation(
-            marginals, corr_desired, **kwargs, force_calc=True,
+            marginals,
+            corr_desired,
+            **kwargs,
+            force_calc=True,
         )
         copula = cp.Nataf(cp.J(*marginals), corr_transformed)
         corr_copula = np.corrcoef(copula.sample(10000000))
