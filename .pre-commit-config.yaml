@@ -29,6 +29,7 @@ repos:
     hooks:
     -   id: flake8
         files: '(\.pyi?|wscript)$'
+        exclude: (configurations|submodules|conf\.py|fig-eoq-sensitivity-analysis-example\.py)
         args: [
           '--max-line-length=100',
           '--ignore=E203,E402,E501,E800,W503', # Black compatibility
