@@ -10,7 +10,7 @@ import numpy as np
 from statsmodels.stats.correlation_tools import corr_nearest
 
 
-def gc_correlation(marginals, corr, force_calc=False, order=15):
+def gc_correlation(marginals, corr, order=15, force_calc=False):
     r"""Correlation for Gaussian copula.
 
     This function implements the algorithm outlined in Section 4.2 of [K2012]_
@@ -32,13 +32,14 @@ def gc_correlation(marginals, corr, force_calc=False, order=15):
     corr : array_like
         The correlation matrix to be transformed.
 
+    order : int, optional
+        The order of grids used to generate for integration.
+        The total number of used points is calculated as :math:`(\text{order}+1)^2`.
+        Values larger than 20 are not recommended. (default value is `15`)
+
     force_calc : bool, optional
         When `True`, calculate the covariances ignoring all special combinations of marginals
         (default value is `False`).
-
-    order : int, optional
-        The order of grids used to generate for integration
-        (default value is `15`).
 
     Returns
     -------
@@ -102,10 +103,7 @@ def gc_correlation(marginals, corr, force_calc=False, order=15):
 
 
 def _gc_correlation_pairwise(
-    distributions,
-    rho,
-    force_calc=False,
-    order=15,
+    distributions, rho, force_calc=False, order=15,
 ):
     assert len(distributions) == 2
 
@@ -131,7 +129,7 @@ def _gc_correlation_pairwise(
         kwargs["arg"] = arg
 
         grid = np.linspace(-0.99, 0.99, num=199, endpoint=True)
-        v_p_criterion = np.vectorize(partial(_criterion_gh, **kwargs))
+        v_p_criterion = np.vectorize(partial(_criterion, **kwargs))
         result = grid[np.argmin(v_p_criterion(grid))]
 
     return result
@@ -187,25 +185,11 @@ def _special_dist(distributions):
         return False
 
 
-def _criterion_gh(rho_c, arg, distributions, order=15, rule="gaussian"):
+def _criterion(rho_c, arg, distributions, order=15):
     """
     Evaluates the integral using a Gauss-Hermite rule in 2 dimensions.
     It requires the Cholesky decomposition of the covariance matrix in order to
     transform the integral properly.
-
-    Changed parameters (compared to _criterion)
-    ----------
-    order : int
-        (order+1)^2 is the total number of used nodes => sparse grids could be
-        further improvements in higher dimensions. For d=2, this is not necessary.
-        order==15 seemed sufficient in some first test cases. Choosing order>20
-        is not beneficial as the corresponding weights decrease to 1e-30.
-        For fixed order, nodes and weights could be precomputed for every integral
-        evaluation as the rule is deterministic.
-
-    rule : string
-        Not necessary anymore as "gaussian" is the only applicable here.
-
     """
     cov = np.identity(2)
     cov[1, 0] = cov[0, 1] = rho_c
