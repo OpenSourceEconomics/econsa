@@ -23,6 +23,8 @@ def gc_correlation(marginals, corr, order=15, force_calc=False):
     this function also checks the output,
     and transforms to nearest positive definite matrix if it is not already.
 
+    Numerical integration is calculated with Gauss-Hermite quadrature ([J1998]_, pp. 261-263).
+
     Parameters
     ----------
     marginals : chaospy.distributions
@@ -55,6 +57,9 @@ def gc_correlation(marginals, corr, order=15, force_calc=False):
     .. [L1986] Liu, P.-L., & Der Kiureghian, A. (1986).
         Multivariate distribution models with prescribed marginals
         and covariances. Probabilistic Engineering Mechanics, 1(2), 105–112.
+
+    .. [J1998] Judd, K. L., & Judd, K. L. (1998). Numerical methods in economics. MIT Press.
+
 
     Examples
     --------
@@ -91,7 +96,7 @@ def gc_correlation(marginals, corr, order=15, force_calc=False):
     for i, j in list(zip(*indices)):
         subset = [marginals[i], marginals[j]]
         distributions, rho = cp.J(*subset), corr[i, j]
-        gc_corr[i, j] = _gc_correlation_pairwise(distributions, rho, force_calc, order)
+        gc_corr[i, j] = _gc_correlation_pairwise(distributions, rho, order, force_calc)
 
     # Align upper triangular with lower triangular.
     gc_corr = gc_corr + gc_corr.T - np.diag(np.diag(gc_corr))
@@ -103,7 +108,7 @@ def gc_correlation(marginals, corr, order=15, force_calc=False):
 
 
 def _gc_correlation_pairwise(
-    distributions, rho, force_calc=False, order=15,
+    distributions, rho, order=15, force_calc=False,
 ):
     assert len(distributions) == 2
 

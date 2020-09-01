@@ -7,12 +7,7 @@ import numpy as np
 
 
 def cond_mvn(
-    mean,
-    cov,
-    dependent_ind,
-    given_ind=None,
-    given_value=None,
-    check_cov=True,
+    mean, cov, dependent_ind, given_ind=None, given_value=None, check_cov=True,
 ):
     r"""Conditional mean and variance function.
 
