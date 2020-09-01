@@ -29,8 +29,8 @@ jobs:
         pytest --cov=econsa --cov-report=xml
 
         # We want to make sure proper formatting of the notebooks.
-        # flake8-nb; [ $? -eq 0 ] || exit 1
-        # black-nb --check .; [ $? -eq 0 ] || exit 1
+        flake8-nb; [ $? -eq 0 ] || exit 1
+        black-nb --check .; [ $? -eq 0 ] || exit 1
 
     - name: Run figures.
       if: runner.os == 'Linux'

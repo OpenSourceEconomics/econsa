@@ -23,7 +23,7 @@ def gc_correlation(marginals, corr, order=15, force_calc=False):
     this function also checks the output,
     and transforms to nearest positive definite matrix if it is not already.
 
-    Numerical integration is calculated with Gauss-Hermite quadrature ([J1998]_, pp. 261-263).
+    Numerical integration is calculated with Gauss-Hermite quadrature ([D2007]_).
 
     Parameters
     ----------
@@ -58,8 +58,8 @@ def gc_correlation(marginals, corr, order=15, force_calc=False):
         Multivariate distribution models with prescribed marginals
         and covariances. Probabilistic Engineering Mechanics, 1(2), 105–112.
 
-    .. [J1998] Judd, K. L., & Judd, K. L. (1998). Numerical methods in economics. MIT Press.
-
+    .. [D2007] Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration.
+        Courier Corporation.
 
     Examples
     --------
@@ -108,7 +108,10 @@ def gc_correlation(marginals, corr, order=15, force_calc=False):
 
 
 def _gc_correlation_pairwise(
-    distributions, rho, order=15, force_calc=False,
+    distributions,
+    rho,
+    order=15,
+    force_calc=False,
 ):
     assert len(distributions) == 2
 
