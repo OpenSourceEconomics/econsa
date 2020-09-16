@@ -54,12 +54,12 @@ def gc_correlation(marginals, corr, order=15, force_calc=False):
         Estimation of global sensitivity indices for models with
         dependent variables. Computer Physics Communications, 183(4), 937–946.
 
-    .. [L1986] Liu, P.-L., & Der Kiureghian, A. (1986).
+    .. [L1986] Liu, P., & Der Kiureghian, A. (1986).
         Multivariate distribution models with prescribed marginals
         and covariances. Probabilistic Engineering Mechanics, 1(2), 105–112.
 
-    .. [D1984] Davis, P. K., Davis, P. J., Davis, P. F., & Rabinowitz, P. (1984).
-        Methods of Numerical Integration. Academic Press.
+    .. [D1984] Davis, P. J., & Rabinowitz, P. (1984).
+        Methods of numerical integration (2nd ed.). Academic Press.
 
     Examples
     --------
