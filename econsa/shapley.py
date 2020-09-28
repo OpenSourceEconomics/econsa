@@ -9,8 +9,8 @@ import numpy as np
 import pandas as pd
 import chaospy as cp
 from tqdm import tqdm
-#from econsa.sampling import cond_mvn
-# from econsa.sampling import _r_condmvn
+from econsa.sampling import cond_mvn
+from econsa.sampling import _r_condmvn
 
 def get_shapley(
         method, model, Xall, Xcond, n_perms, n_inputs, n_output, n_outer, n_inner,
@@ -181,56 +181,3 @@ def get_shapley(
     ).T
 
     return effects
-
-
-#====================================================================================
-# sampling function from econsa to be used
-def _cond_mvn(
-    mean, cov, dependent_ind, given_ind=None, given_value=None, check_cov=True,
-):
-
-    dependent_ind_np = np.array(dependent_ind)
-    mean_np = np.array(mean)
-    cov_np = np.array(cov)
-    given_ind_np = np.array(given_ind, ndmin=1)
-    given_value_np = np.array(given_value, ndmin=1)
-
-    # Check `cov` is symmetric and positive-definite:
-    if check_cov:
-        if not np.allclose(cov_np, cov_np.T):
-            raise ValueError("cov is not a symmetric matrix")
-        elif np.all(np.linalg.eigvals(cov_np) > 0) == 0:
-            raise ValueError("cov is not positive-definite")
-
-    # When `given_ind` is None, return mean and variances of dependent values:
-    if given_ind is None:
-        cond_mean = np.array(mean_np[dependent_ind_np])
-        cond_cov = np.array(cov_np[dependent_ind_np, :][:, dependent_ind_np])
-        return cond_mean, cond_cov
-
-    # Make sure that `given_value` aligns with `given_len`. This includes the case that
-    # `given_value` is empty.
-    if len(given_value_np) != len(given_ind_np):
-        raise ValueError("lengths of given_value and given_ind must be the same")
-
-    b = cov_np[dependent_ind_np, :][:, dependent_ind_np]
-    c = cov_np[dependent_ind_np, :][:, given_ind]
-    d = cov_np[given_ind, :][:, given_ind]
-    c_dinv = c @ np.linalg.inv(d)
-
-    cond_mean = mean_np[dependent_ind_np] + c_dinv @ (given_value - mean_np[given_ind])
-    cond_cov = b - c_dinv @ c.T
-
-    return cond_mean, cond_cov
-
-
-# Generate conditional law
-def _r_condmvn(n, mean, cov, dependent_ind, given_ind, X_given):
-    """ Function to simulate conditional gaussian distribution of X[dependent.ind] | X[given.ind] = X.given
-    where X is multivariateNormal(mean = mean, covariance = cov)"""
-    cond_mean,cond_var = _cond_mvn(
-        mean, cov, dependent_ind = dependent_ind, given_ind = given_ind, given_value = X_given,
-    )
-    distribution = cp.MvNormal(cond_mean, cond_var)
-
-    return distribution.sample(n)
