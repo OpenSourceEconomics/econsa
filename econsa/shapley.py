@@ -3,14 +3,12 @@ This module contains functions to estimate shapley effects for models with
 dependent inputs.
 
 """
-# import neccesary modules
+
 import itertools
 import numpy as np
 import pandas as pd
 import chaospy as cp
-from tqdm import tqdm
 from econsa.sampling import cond_mvn
-from econsa.sampling import _r_condmvn
 
 def get_shapley(
         method, model, Xall, Xcond, n_perms, n_inputs, n_output, n_outer, n_inner,
@@ -77,8 +75,8 @@ def get_shapley(
 
     Sources
     -------
-    .. Shapley exact permutations: https://rdrr.io/cran/sensitivity/src/R/shapleyPermEx.R
-    .. Shapley random permutations: https://rdrr.io/cran/sensitivity/src/R/shapleyPermRand.R
+    Shapley exact permutations: https://rdrr.io/cran/sensitivity/src/R/shapleyPermEx.R
+    Shapley random permutations: https://rdrr.io/cran/sensitivity/src/R/shapleyPermRand.R
 
     Contributor
     -----------
@@ -101,7 +99,7 @@ def get_shapley(
     model_inputs = np.zeros((n_output + n_perms * (n_inputs - 1) * n_outer * n_inner, n_inputs))
     model_inputs[:n_output, :] = Xall(n_output).T
 
-    for p in tqdm(range(n_perms)):
+    for p in range(n_perms):
 
         perms = permutations[p]
         perms_sorted = np.argsort(perms)
@@ -140,7 +138,7 @@ def get_shapley(
     conditional_variance = np.zeros(n_outer)
 
 
-    for p in tqdm(range(n_perms)):
+    for p in range(n_perms):
 
         perms = permutations[p]
         previous_cost = 0
@@ -181,3 +179,20 @@ def get_shapley(
     ).T
 
     return effects
+
+
+# Function to generate conditional law
+def _r_condmvn(
+        n, mean, cov, dependent_ind, given_ind, X_given
+):
+    """
+    Function to simulate conditional gaussian distribution of X[dependent.ind] | X[given.ind] = X.given
+    where X is multivariateNormal(mean = mean, covariance = cov)
+
+    """
+    cond_mean,cond_var = cond_mvn(
+        mean, cov, dependent_ind = dependent_ind, given_ind = given_ind, given_value = X_given,
+    )
+    distribution = cp.MvNormal(cond_mean, cond_var)
+
+    return distribution.sample(n)

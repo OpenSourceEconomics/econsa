@@ -106,15 +106,3 @@ def cond_mvn(
     cond_cov = b - c_dinv @ c.T
 
     return cond_mean, cond_cov
-
-
-# Generate conditional law ## make doctring and pretty
-def r_condmvn(n, mean, cov, dependent_ind, given_ind, X_given):
-    """ Function to simulate conditional gaussian distribution of X[dependent.ind] | X[given.ind] = X.given
-    where X is multivariateNormal(mean = mean, covariance = cov)"""
-    cond_mean,cond_var = cond_mvn(
-        mean, cov, dependent_ind = dependent_ind, given_ind = given_ind, given_value = X_given,
-    )
-    distribution = cp.MvNormal(cond_mean, cond_var)
-
-    return distribution.sample(n)
