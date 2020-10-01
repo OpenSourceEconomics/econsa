@@ -4,6 +4,7 @@ channels:
   - defaults
   - conda-forge
   - opensourceeconomics
+  - janosg
 
 dependencies:
   - python=3.7
@@ -18,6 +19,7 @@ dependencies:
   - seaborn
   - numba
   - pdbpp
+  - matplotlib
   - temfpy>=1.1
   - chaospy
   - pytest=5.4.3
@@ -30,6 +32,7 @@ dependencies:
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex
   - r-base
+  - estimagic>=0.0.14
   - r-r.utils
   - r-condmvnorm
   - rpy2==2.9.4
@@ -45,3 +48,7 @@ dependencies:
     - numpydoc
     - cairosvg
     - sphinxcontrib-svg2pdfconverter[CairoSVG]
+    - chaospy
+    - pre-commit
+    - codecov
+    - pytest-cov
