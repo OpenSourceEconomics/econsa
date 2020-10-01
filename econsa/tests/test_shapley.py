@@ -8,11 +8,9 @@ import numpy as np
 import chaospy as cp
 from numpy.testing import assert_array_almost_equal as aaae
 from pandas.testing import assert_series_equal
+from econsa.shapley import _r_condmvn
+from econsa.shapley import  get_shapley
 
-from shapley import (
-    _r_condmvn,
-    get_shapley,
-)
 
 
 def test_get_shapley_exact():
