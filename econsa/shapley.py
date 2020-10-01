@@ -10,8 +10,9 @@ import pandas as pd
 import chaospy as cp
 from econsa.sampling import cond_mvn
 
+
 def get_shapley(
-        method, model, Xall, Xcond, n_perms, n_inputs, n_output, n_outer, n_inner,
+    method, model, Xall, Xcond, n_perms, n_inputs, n_output, n_outer, n_inner,
 ):
     """
 
@@ -83,20 +84,22 @@ def get_shapley(
     Linda Maokomatanda
 
     """
-    if (method == 'exact'):
+    if method == "exact":
         permutations = list(itertools.permutations(range(n_inputs), n_inputs))
         permutations = [list(i) for i in permutations]
 
         n_perms = len(permutations)
     else:
-        permutations = np.zeros((n_perms,n_inputs), dtype = np.int64)
+        permutations = np.zeros((n_perms, n_inputs), dtype=np.int64)
         for i in range(n_perms):
             permutations[i] = np.random.permutation(n_inputs)
 
         n_perms = np.int(permutations.shape[0])
 
     # initiate empty input array for sampling
-    model_inputs = np.zeros((n_output + n_perms * (n_inputs - 1) * n_outer * n_inner, n_inputs))
+    model_inputs = np.zeros(
+        (n_output + n_perms * (n_inputs - 1) * n_outer * n_inner, n_inputs)
+    )
     model_inputs[:n_output, :] = Xall(n_output).T
 
     for p in range(n_perms):
@@ -104,7 +107,7 @@ def get_shapley(
         perms = permutations[p]
         perms_sorted = np.argsort(perms)
 
-        for j in range(1,n_inputs):
+        for j in range(1, n_inputs):
             # set of the 0st-(j-1)th elements in perms
             Sj = perms[:j]
             # set of the jth-n_perms elements in perms
@@ -118,9 +121,18 @@ def get_shapley(
 
                 # sample values of inputs in Sj conditional on xjc
                 sample_inputs = np.matrix(Xcond(n_inner, Sj, Sjc, xjc.flat)).T
-                concatenated_sample = np.concatenate((sample_inputs, np.ones((n_inner, 1)) * xjc), axis = 1)
-                inner_indices = n_output + p * (n_inputs - 1) * n_outer * n_inner + (j - 1) * n_outer * n_inner + l * n_inner
-                model_inputs[inner_indices:(inner_indices + n_inner), :] = concatenated_sample[:, perms_sorted]
+                concatenated_sample = np.concatenate(
+                    (sample_inputs, np.ones((n_inner, 1)) * xjc), axis=1
+                )
+                inner_indices = (
+                    n_output
+                    + p * (n_inputs - 1) * n_outer * n_inner
+                    + (j - 1) * n_outer * n_inner
+                    + l * n_inner
+                )
+                model_inputs[
+                    inner_indices : (inner_indices + n_inner), :
+                ] = concatenated_sample[:, perms_sorted]
 
     # calculate model output
     output = model(model_inputs)
@@ -137,14 +149,13 @@ def get_shapley(
     # estimate shapley, main and total sobol effects
     conditional_variance = np.zeros(n_outer)
 
-
     for p in range(n_perms):
 
         perms = permutations[p]
         previous_cost = 0
 
         for j in range(n_inputs):
-            if (j == (n_inputs - 1)):
+            if j == (n_inputs - 1):
                 estimated_cost = output_variance
                 delta = estimated_cost - previous_cost
 
@@ -152,46 +163,51 @@ def get_shapley(
                 for l in range(n_outer):
                     model_output = output[:n_inner]
                     output = output[n_inner:]
-                    conditional_variance[l] = np.var(model_output, ddof = 1)
+                    conditional_variance[l] = np.var(model_output, ddof=1)
                 estimated_cost = np.mean(conditional_variance)
                 delta = estimated_cost - previous_cost
 
             shapley_effects[perms[j]] = shapley_effects[perms[j]] + delta
-            shapley_effects_squared[perms[j]] = shapley_effects_squared[perms[j]] + delta**2
+            shapley_effects_squared[perms[j]] = (
+                shapley_effects_squared[perms[j]] + delta ** 2
+            )
 
             previous_cost = estimated_cost
 
     shapley_effects = shapley_effects / n_perms / output_variance
-    shapley_effects_squared = shapley_effects_squared / n_perms /(output_variance ** 2)
-    standard_errors = np.sqrt((shapley_effects_squared - shapley_effects**2) / n_perms)
-
+    shapley_effects_squared = shapley_effects_squared / n_perms / (output_variance ** 2)
+    standard_errors = np.sqrt(
+        (shapley_effects_squared - shapley_effects ** 2) / n_perms
+    )
 
     # confidence intervals
     CI_min = shapley_effects - 1.96 * standard_errors
     CI_max = shapley_effects + 1.96 * standard_errors
 
-    col = ['X' + str(i) for i in np.arange(n_inputs) + 1]
+    col = ["X" + str(i) for i in np.arange(n_inputs) + 1]
 
     effects = pd.DataFrame(
         np.array([shapley_effects, standard_errors, CI_min, CI_max]),
-        index = ['Shapley effects', 'std. errors', 'CI_min', 'CI_max'],
-        columns = col,
+        index=["Shapley effects", "std. errors", "CI_min", "CI_max"],
+        columns=col,
     ).T
 
     return effects
 
 
 # Function to generate conditional law
-def _r_condmvn(
-        n, mean, cov, dependent_ind, given_ind, X_given
-):
+def _r_condmvn(n, mean, cov, dependent_ind, given_ind, X_given):
     """
     Function to simulate conditional gaussian distribution of X[dependent.ind] | X[given.ind] = X.given
     where X is multivariateNormal(mean = mean, covariance = cov)
 
     """
-    cond_mean,cond_var = cond_mvn(
-        mean, cov, dependent_ind = dependent_ind, given_ind = given_ind, given_value = X_given,
+    cond_mean, cond_var = cond_mvn(
+        mean,
+        cov,
+        dependent_ind=dependent_ind,
+        given_ind=given_ind,
+        given_value=X_given,
     )
     distribution = cp.MvNormal(cond_mean, cond_var)
 
