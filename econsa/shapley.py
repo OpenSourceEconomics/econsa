@@ -12,7 +12,7 @@ from econsa.sampling import cond_mvn
 
 
 def get_shapley(
-    method, model, Xall, Xcond, n_perms, n_inputs, n_output, n_outer, n_inner,
+    method, model, x_all, x_cond, n_perms, n_inputs, n_output, n_outer, n_inner,
 ):
     """
 
@@ -37,11 +37,11 @@ def get_shapley(
     model : string
           The model/function you will calculate the shapley effects on.
 
-    Xall : string (n)
+    x_all : string (n)
          A function that takes `n´ as an argument and generates a n-sample of
          a d-dimensional input vector.
 
-    Xset : string (n, Sj, Sjc, xjc)
+    x_cond: string (n, Sj, Sjc, xjc)
          A function that takes `n, Sj, Sjc, xjc´ as arguments and generates
          a n- sample an input vector corresponding to the indices in `Sj´
          conditional on the input values `xjc´ with the index set `Sjc´.
@@ -76,8 +76,11 @@ def get_shapley(
 
     Sources
     -------
-    Shapley exact permutations: https://rdrr.io/cran/sensitivity/src/R/shapleyPermEx.R
-    Shapley random permutations: https://rdrr.io/cran/sensitivity/src/R/shapleyPermRand.R
+    R's `sensitiity´ package for the shapleyPermEx_ and shapleyPermRand_ functions.
+
+    .. _shapleyPermEx: https://rdrr.io/cran/sensitivity/src/R/shapleyPermEx.R
+
+    .. _shapleyPermRand: https://rdrr.io/cran/sensitivity/src/R/shapleyPermRand.R
 
     Contributor
     -----------
@@ -100,7 +103,7 @@ def get_shapley(
     model_inputs = np.zeros(
         (n_output + n_perms * (n_inputs - 1) * n_outer * n_inner, n_inputs)
     )
-    model_inputs[:n_output, :] = Xall(n_output).T
+    model_inputs[:n_output, :] = x_all(n_output).T
 
     for p in range(n_perms):
 
@@ -114,13 +117,17 @@ def get_shapley(
             Sjc = perms[j:]
 
             # sampled values of the inputs in Sjc
-            xjc_sampled = np.matrix(Xcond(n_outer, Sjc, None, None)).T
+            xjc_sampled = np.array(x_cond(n_outer, Sjc, None, None)).T
 
-            for l in range(n_outer):
-                xjc = xjc_sampled[l, :]
+            for length in range(n_outer):
+                xjc = xjc_sampled[
+                    length,
+                ]
 
                 # sample values of inputs in Sj conditional on xjc
-                sample_inputs = np.matrix(Xcond(n_inner, Sj, Sjc, xjc.flat)).T
+                sample_inputs = np.array(x_cond(n_inner, Sj, Sjc, xjc.flat)).T.reshape(
+                    n_inner, -1
+                )
                 concatenated_sample = np.concatenate(
                     (sample_inputs, np.ones((n_inner, 1)) * xjc), axis=1
                 )
@@ -128,10 +135,10 @@ def get_shapley(
                     n_output
                     + p * (n_inputs - 1) * n_outer * n_inner
                     + (j - 1) * n_outer * n_inner
-                    + l * n_inner
+                    + length * n_inner
                 )
                 model_inputs[
-                    inner_indices : (inner_indices + n_inner), :
+                    inner_indices: (inner_indices + n_inner), :
                 ] = concatenated_sample[:, perms_sorted]
 
     # calculate model output
@@ -160,10 +167,10 @@ def get_shapley(
                 delta = estimated_cost - previous_cost
 
             else:
-                for l in range(n_outer):
+                for length in range(n_outer):
                     model_output = output[:n_inner]
                     output = output[n_inner:]
-                    conditional_variance[l] = np.var(model_output, ddof=1)
+                    conditional_variance[length] = np.var(model_output, ddof=1)
                 estimated_cost = np.mean(conditional_variance)
                 delta = estimated_cost - previous_cost
 
@@ -198,8 +205,8 @@ def get_shapley(
 # Function to generate conditional law
 def _r_condmvn(n, mean, cov, dependent_ind, given_ind, X_given):
     """
-    Function to simulate conditional gaussian distribution of X[dependent.ind] | X[given.ind] = X.given
-    where X is multivariateNormal(mean = mean, covariance = cov)
+    Function to simulate conditional gaussian distribution of X[dependent.ind]
+    | X[given.ind] = X.given where X is multivariateNormal(mean = mean, covariance = cov)
 
     """
     cond_mean, cond_var = cond_mvn(

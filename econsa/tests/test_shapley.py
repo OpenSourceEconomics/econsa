@@ -6,22 +6,19 @@ This module contains all tests for th Shapley effects.
 
 import numpy as np
 import chaospy as cp
-from numpy.testing import assert_array_almost_equal as aaae
-from pandas.testing import assert_series_equal
 from econsa.shapley import _r_condmvn
-from econsa.shapley import  get_shapley
-
+from econsa.shapley import get_shapley
 
 
 def test_get_shapley_exact():
     def gaussian_model(X):
         return np.sum(X, 1)
 
-    def Xall(n):
+    def x_all(n):
         distribution = cp.MvNormal(mean, cov)
         return distribution.sample(n)
 
-    def Xcond(n, subset_j, subsetj_conditional, xjc):
+    def x_cond(n, subset_j, subsetj_conditional, xjc):
         if subsetj_conditional is None:
             cov_int = np.array(cov)
             cov_int = cov_int.take(subset_j, axis=1)
@@ -50,8 +47,8 @@ def test_get_shapley_exact():
     get_shapley(
         method,
         gaussian_model,
-        Xall,
-        Xcond,
+        x_all,
+        x_cond,
         n_perms,
         n_inputs,
         n_output,
@@ -64,11 +61,11 @@ def test_get_shapley_random():
     def gaussian_model(X):
         return np.sum(X, 1)
 
-    def Xall(n):
+    def x_all(n):
         distribution = cp.MvNormal(mean, cov)
         return distribution.sample(n)
 
-    def Xcond(n, subset_j, subsetj_conditional, xjc):
+    def x_cond(n, subset_j, subsetj_conditional, xjc):
         if subsetj_conditional is None:
             cov_int = np.array(cov)
             cov_int = cov_int.take(subset_j, axis=1)
@@ -97,8 +94,8 @@ def test_get_shapley_random():
     get_shapley(
         method,
         gaussian_model,
-        Xall,
-        Xcond,
+        x_all,
+        x_cond,
         n_perms,
         n_inputs,
         n_output,
