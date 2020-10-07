@@ -146,7 +146,7 @@ def get_shapley(
                     + length * n_inner
                 )
                 model_inputs[
-                    inner_indices : (inner_indices + n_inner), :
+                    inner_indices : (inner_indices + n_inner), :  # noqa: E203
                 ] = concatenated_sample[:, perms_sorted]
 
     # calculate model output
