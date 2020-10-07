@@ -1,9 +1,9 @@
 """Capabilities for computation of Shapley effects.
+
 This module contains functions to estimate shapley effects for models with
 dependent inputs.
 
 """
-
 import itertools
 import numpy as np
 import pandas as pd
@@ -12,7 +12,15 @@ from econsa.sampling import cond_mvn
 
 
 def get_shapley(
-    method, model, x_all, x_cond, n_perms, n_inputs, n_output, n_outer, n_inner,
+    method,
+    model,
+    x_all,
+    x_cond,
+    n_perms,
+    n_inputs,
+    n_output,
+    n_outer,
+    n_inner,
 ):
     """
 
@@ -138,7 +146,7 @@ def get_shapley(
                     + length * n_inner
                 )
                 model_inputs[
-                    inner_indices : (inner_indices + n_inner), :
+                    inner_indices: (inner_indices + n_inner), :
                 ] = concatenated_sample[:, perms_sorted]
 
     # calculate model output
@@ -203,8 +211,16 @@ def get_shapley(
 
 
 # Function to generate conditional law
-def _r_condmvn(n, mean, cov, dependent_ind, given_ind, X_given):
+def _r_condmvn(
+        n,
+        mean,
+        cov,
+        dependent_ind,
+        given_ind,
+        X_given,
+):
     """
+
     Function to simulate conditional gaussian distribution of X[dependent.ind]
     | X[given.ind] = X.given where X is multivariateNormal(mean = mean, covariance = cov)
 
