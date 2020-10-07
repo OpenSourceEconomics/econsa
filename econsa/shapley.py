@@ -146,7 +146,7 @@ def get_shapley(
                     + length * n_inner
                 )
                 model_inputs[
-                    inner_indices: (inner_indices + n_inner), :
+                    inner_indices : (inner_indices + n_inner), :
                 ] = concatenated_sample[:, perms_sorted]
 
     # calculate model output
@@ -212,12 +212,12 @@ def get_shapley(
 
 # Function to generate conditional law
 def _r_condmvn(
-        n,
-        mean,
-        cov,
-        dependent_ind,
-        given_ind,
-        X_given,
+    n,
+    mean,
+    cov,
+    dependent_ind,
+    given_ind,
+    X_given,
 ):
     """
 
