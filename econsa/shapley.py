@@ -109,7 +109,7 @@ def get_shapley(
 
     # initiate empty input array for sampling
     model_inputs = np.zeros(
-        (n_output + n_perms * (n_inputs - 1) * n_outer * n_inner, n_inputs)
+        (n_output + n_perms * (n_inputs - 1) * n_outer * n_inner, n_inputs),
     )
     model_inputs[:n_output, :] = x_all(n_output).T
 
@@ -134,10 +134,10 @@ def get_shapley(
 
                 # sample values of inputs in Sj conditional on xjc
                 sample_inputs = np.array(x_cond(n_inner, Sj, Sjc, xjc.flat)).T.reshape(
-                    n_inner, -1
+                    n_inner, -1,
                 )
                 concatenated_sample = np.concatenate(
-                    (sample_inputs, np.ones((n_inner, 1)) * xjc), axis=1
+                    (sample_inputs, np.ones((n_inner, 1)) * xjc), axis=1,
                 )
                 inner_indices = (
                     n_output
@@ -192,7 +192,7 @@ def get_shapley(
     shapley_effects = shapley_effects / n_perms / output_variance
     shapley_effects_squared = shapley_effects_squared / n_perms / (output_variance ** 2)
     standard_errors = np.sqrt(
-        (shapley_effects_squared - shapley_effects ** 2) / n_perms
+        (shapley_effects_squared - shapley_effects ** 2) / n_perms,
     )
 
     # confidence intervals
