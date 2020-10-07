@@ -1,5 +1,3 @@
-import chaospy as cp
-
 """Capabilities for sampling of random input parameters.
 
 This module contains functions to sample random input parameters.
