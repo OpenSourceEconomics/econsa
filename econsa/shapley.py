@@ -5,9 +5,11 @@ dependent inputs.
 
 """
 import itertools
+
+import chaospy as cp
 import numpy as np
 import pandas as pd
-import chaospy as cp
+
 from econsa.sampling import cond_mvn
 
 
