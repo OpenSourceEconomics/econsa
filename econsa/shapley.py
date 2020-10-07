@@ -134,10 +134,12 @@ def get_shapley(
 
                 # sample values of inputs in Sj conditional on xjc
                 sample_inputs = np.array(x_cond(n_inner, Sj, Sjc, xjc.flat)).T.reshape(
-                    n_inner, -1,
+                    n_inner,
+                    -1,
                 )
                 concatenated_sample = np.concatenate(
-                    (sample_inputs, np.ones((n_inner, 1)) * xjc), axis=1,
+                    (sample_inputs, np.ones((n_inner, 1)) * xjc),
+                    axis=1,
                 )
                 inner_indices = (
                     n_output
