@@ -16,3 +16,6 @@ Shapley values
 We implement the methods outlined in :cite:`Owen.2014`.
 
 **Constributor:** Linda Maokomatanda (`lindamaok899 <https://github.com/lindamaok899>`_)
+
+.. automodule:: econsa.shapley
+    :members:
