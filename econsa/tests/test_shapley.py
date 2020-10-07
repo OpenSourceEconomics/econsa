@@ -3,11 +3,11 @@
 This module contains all tests for th Shapley effects.
 
 """
-
-import numpy as np
-import chaospy as cp
 from econsa.shapley import _r_condmvn
 from econsa.shapley import get_shapley
+
+import chaospy as cp
+import numpy as np
 
 
 def test_get_shapley_exact():
