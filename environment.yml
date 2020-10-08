@@ -25,6 +25,8 @@ dependencies:
   - pytest=5.4.3
   - pytest-cov
   - pytest-sugar
+  - pytest-black
+  - pytest-flake8
   - hypothesis
   - nbsphinx
   - sphinx_rtd_theme
