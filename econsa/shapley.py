@@ -24,7 +24,7 @@ def get_shapley(
     n_outer,
     n_inner,
 ):
-    """
+    """Shapley value function.
 
     This function calculates Shapley effects and their standard errors for
     models with both dependent and independent inputs. We allow for two ways
@@ -122,12 +122,12 @@ def get_shapley(
 
         for j in range(1, n_inputs):
             # set of the 0st-(j-1)th elements in perms
-            Sj = perms[:j]
+            sj = perms[:j]
             # set of the jth-n_perms elements in perms
-            Sjc = perms[j:]
+            sjc = perms[j:]
 
             # sampled values of the inputs in Sjc
-            xjc_sampled = np.array(x_cond(n_outer, Sjc, None, None)).T
+            xjc_sampled = np.array(x_cond(n_outer, sjc, None, None)).T
 
             for length in range(n_outer):
                 xjc = xjc_sampled[
@@ -135,7 +135,7 @@ def get_shapley(
                 ]
 
                 # sample values of inputs in Sj conditional on xjc
-                sample_inputs = np.array(x_cond(n_inner, Sj, Sjc, xjc.flat)).T.reshape(
+                sample_inputs = np.array(x_cond(n_inner, sj, sjc, xjc.flat)).T.reshape(
                     n_inner,
                     -1,
                 )
@@ -150,7 +150,7 @@ def get_shapley(
                     + length * n_inner
                 )
                 model_inputs[
-                    inner_indices : (inner_indices + n_inner), :  # noqa: E203
+                    inner_indices : (inner_indices + n_inner), :
                 ] = concatenated_sample[:, perms_sorted]
 
     # calculate model output
@@ -200,13 +200,13 @@ def get_shapley(
     )
 
     # confidence intervals
-    CI_min = shapley_effects - 1.96 * standard_errors
-    CI_max = shapley_effects + 1.96 * standard_errors
+    ci_min = shapley_effects - 1.96 * standard_errors
+    ci_max = shapley_effects + 1.96 * standard_errors
 
     col = ["X" + str(i) for i in np.arange(n_inputs) + 1]
 
     effects = pd.DataFrame(
-        np.array([shapley_effects, standard_errors, CI_min, CI_max]),
+        np.array([shapley_effects, standard_errors, ci_min, ci_max]),
         index=["Shapley effects", "std. errors", "CI_min", "CI_max"],
         columns=col,
     ).T
@@ -214,16 +214,15 @@ def get_shapley(
     return effects
 
 
-# Function to generate conditional law
 def _r_condmvn(
     n,
     mean,
     cov,
     dependent_ind,
     given_ind,
-    X_given,
+    x_given,
 ):
-    """
+    """Function to generate conditional law.
 
     Function to simulate conditional gaussian distribution of X[dependent.ind]
     | X[given.ind] = X.given where X is multivariateNormal(mean = mean, covariance = cov)
@@ -234,7 +233,7 @@ def _r_condmvn(
         cov,
         dependent_ind=dependent_ind,
         given_ind=given_ind,
-        given_value=X_given,
+        given_value=x_given,
     )
     distribution = cp.MvNormal(cond_mean, cond_var)
 

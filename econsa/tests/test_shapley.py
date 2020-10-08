@@ -11,8 +11,8 @@ from econsa.shapley import get_shapley
 
 
 def test_get_shapley_exact():
-    def gaussian_model(X):
-        return np.sum(X, 1)
+    def gaussian_model(x):
+        return np.sum(x, 1)
 
     def x_all(n):
         distribution = cp.MvNormal(mean, cov)
@@ -32,7 +32,7 @@ def test_get_shapley_exact():
                 cov=cov,
                 dependent_ind=subset_j,
                 given_ind=subsetj_conditional,
-                X_given=xjc,
+                x_given=xjc,
             )
 
     n_inputs = 3
@@ -58,8 +58,8 @@ def test_get_shapley_exact():
 
 
 def test_get_shapley_random():
-    def gaussian_model(X):
-        return np.sum(X, 1)
+    def gaussian_model(x):
+        return np.sum(x, 1)
 
     def x_all(n):
         distribution = cp.MvNormal(mean, cov)
@@ -79,7 +79,7 @@ def test_get_shapley_random():
                 cov=cov,
                 dependent_ind=subset_j,
                 given_ind=subsetj_conditional,
-                X_given=xjc,
+                x_given=xjc,
             )
 
     n_inputs = 3
