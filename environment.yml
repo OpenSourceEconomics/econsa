@@ -4,7 +4,6 @@ channels:
   - defaults
   - conda-forge
   - opensourceeconomics
-  - janosg
 
 dependencies:
   - python=3.7
@@ -22,9 +21,8 @@ dependencies:
   - matplotlib
   - temfpy>=1.1
   - chaospy
+  - pre-commit
   - pytest=5.4.3
-  - pytest-black
-  - pytest-flake8
   - pytest-cov
   - pytest-sugar
   - hypothesis
@@ -32,11 +30,9 @@ dependencies:
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex
   - r-base
-  - estimagic>=0.0.14
   - r-r.utils
   - r-condmvnorm
   - rpy2==2.9.4
-  - pre-commit
 
   - pip:
     - isort
@@ -48,7 +44,3 @@ dependencies:
     - numpydoc
     - cairosvg
     - sphinxcontrib-svg2pdfconverter[CairoSVG]
-    - chaospy
-    - pre-commit
-    - codecov
-    - pytest-cov
