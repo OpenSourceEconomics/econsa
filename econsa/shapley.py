@@ -14,8 +14,16 @@ from econsa.sampling import cond_mvn
 
 
 def get_shapley(
-    method, model, x_all, x_cond, n_perms, n_inputs, n_output, n_outer, n_inner,
-):
+    method,
+    model,
+    x_all,
+    x_cond,
+    n_perms,
+    n_inputs,
+    n_output,
+    n_outer,
+    n_inner,
+ ):
     """Shapley value function.
 
     This function calculates Shapley effects and their standard errors for
@@ -126,10 +134,12 @@ def get_shapley(
 
                 # sample values of inputs in Sj conditional on xjc
                 sample_inputs = np.array(x_cond(n_inner, sj, sjc, xjc.flat)).T.reshape(
-                    n_inner, -1,
+                    n_inner,
+                    -1,
                 )
                 concatenated_sample = np.concatenate(
-                    (sample_inputs, np.ones((n_inner, 1)) * xjc), axis=1,
+                    (sample_inputs, np.ones((n_inner, 1)) * xjc),
+                    axis=1,
                 )
                 inner_indices = (
                     n_output
@@ -203,12 +213,17 @@ def get_shapley(
 
 
 def _r_condmvn(
-    n, mean, cov, dependent_ind, given_ind, x_given,
+    n,
+    mean,
+    cov,
+    dependent_ind,
+    given_ind,
+    x_given,
 ):
     """Function to generate conditional law.
 
-    Function to simulate conditional gaussian distribution of X[dependent.ind]
-    | X[given.ind] = X.given where X is multivariateNormal(mean = mean, covariance = cov)
+    Function to simulate conditional gaussian distribution of x[dependent.ind]
+    | x[given.ind] = x.given where x is multivariateNormal(mean = mean, covariance = cov)
 
     """
     cond_mean, cond_var = cond_mvn(
