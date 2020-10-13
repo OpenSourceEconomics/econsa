@@ -14,15 +14,7 @@ from econsa.sampling import cond_mvn
 
 
 def get_shapley(
-    method,
-    model,
-    x_all,
-    x_cond,
-    n_perms,
-    n_inputs,
-    n_output,
-    n_outer,
-    n_inner,
+    method, model, x_all, x_cond, n_perms, n_inputs, n_output, n_outer, n_inner,
 ):
     """Shapley value function.
 
@@ -34,6 +26,15 @@ def get_shapley(
     The function is a translation of the exact and random permutation funtions
     in the ``sensitivity`` package in R, and takes the method (exact or random)
     as an argument and therefore estimates shapley effects in both ways.
+
+    The functions where obtained from R's `sensitiity` package for the
+    shapleyPermEx_ and shapleyPermRand_ functions.
+
+    .. _shapleyPermEx: https://rdrr.io/cran/sensitivity/src/R/shapleyPermEx.R
+
+    .. _shapleyPermRand: https://rdrr.io/cran/sensitivity/src/R/shapleyPermRand.R
+
+    Contributor: Linda Maokomatanda
 
 
     Parameters
@@ -48,13 +49,13 @@ def get_shapley(
           The model/function you will calculate the shapley effects on.
 
     x_all : string (n)
-         A function that takes `n´ as an argument and generates a n-sample of
+         A function that takes `n` as an argument and generates a n-sample of
          a d-dimensional input vector.
 
     x_cond: string (n, Sj, Sjc, xjc)
-         A function that takes `n, Sj, Sjc, xjc´ as arguments and generates
-         a n- sample an input vector corresponding to the indices in `Sj´
-         conditional on the input values `xjc´ with the index set `Sjc´.
+         A function that takes `n, Sj, Sjc, xjc` as arguments and generates
+         a n- sample an input vector corresponding to the indices in `Sj`
+         conditional on the input values `xjc` with the index set `Sjc`.
 
     n_perms : scalar
             This is an input for the number of permutations you want the model
@@ -68,15 +69,15 @@ def get_shapley(
 
     n_output : scalar
              Monte Carlo (MC) sample size to estimate the output variance of
-             the model output `Y´.
+             the model output `Y`.
 
     n_outer : scalar
             The outer Monte Carlo sample size to estimate the cost function for
-            `c(J) = E[Var[Y|X]]´.
+            `c(J) = E[Var[Y|X]]`.
 
     n_inner : scalar
             The inner Monte Carlo sample size to estimate the cost function for
-            `c(J) = Var[Y|X]´.
+            `c(J) = Var[Y|X]`.
 
     Returns
     -------
@@ -84,17 +85,6 @@ def get_shapley(
             n dimensional DataFrame with the estimated shapley effects, the
             standard errors and the confidence intervals for the input vectors.
 
-    Sources
-    -------
-    R's `sensitiity´ package for the shapleyPermEx_ and shapleyPermRand_ functions.
-
-    .. _shapleyPermEx: https://rdrr.io/cran/sensitivity/src/R/shapleyPermEx.R
-
-    .. _shapleyPermRand: https://rdrr.io/cran/sensitivity/src/R/shapleyPermRand.R
-
-    Contributor
-    -----------
-    Linda Maokomatanda
 
     """
     if method == "exact":
@@ -136,12 +126,10 @@ def get_shapley(
 
                 # sample values of inputs in Sj conditional on xjc
                 sample_inputs = np.array(x_cond(n_inner, sj, sjc, xjc.flat)).T.reshape(
-                    n_inner,
-                    -1,
+                    n_inner, -1,
                 )
                 concatenated_sample = np.concatenate(
-                    (sample_inputs, np.ones((n_inner, 1)) * xjc),
-                    axis=1,
+                    (sample_inputs, np.ones((n_inner, 1)) * xjc), axis=1,
                 )
                 inner_indices = (
                     n_output
@@ -215,12 +203,7 @@ def get_shapley(
 
 
 def _r_condmvn(
-    n,
-    mean,
-    cov,
-    dependent_ind,
-    given_ind,
-    x_given,
+    n, mean, cov, dependent_ind, given_ind, x_given,
 ):
     """Function to generate conditional law.
 
