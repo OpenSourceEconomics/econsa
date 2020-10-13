@@ -5,6 +5,8 @@ This module contains all tests for th Shapley effects.
 """
 import chaospy as cp
 import numpy as np
+import pandas as pd
+from numpy.testing import assert_array_almost_equal as aaae
 
 from econsa.shapley import _r_condmvn
 from econsa.shapley import get_shapley
@@ -35,6 +37,7 @@ def test_get_shapley_exact():
                 x_given=xjc,
             )
 
+    np.random.seed(123)
     n_inputs = 3
     mean = np.zeros(3)
     cov = np.array([[1.0, 0, 0], [0, 1.0, 1.8], [0, 1.8, 4.0]])
@@ -44,7 +47,21 @@ def test_get_shapley_exact():
     n_outer = 10 ** 3
     n_inner = 10 ** 2
 
-    get_shapley(
+    col = ["X" + str(i) for i in np.arange(n_inputs) + 1]
+    names = ["Shapley effects", "std. errors", "CI_min", "CI_max"]
+
+    expected = pd.DataFrame(
+        data=[
+            [0.101309, 0.418989, 0.479701],
+            [0.00241549, 0.16297, 0.163071],
+            [0.096575, 0.0995681, 0.160083],
+            [0.106044, 0.73841, 0.79932],
+        ],
+        index=names,
+        columns=col,
+    ).T
+
+    calculated = get_shapley(
         method,
         gaussian_model,
         x_all,
@@ -55,6 +72,8 @@ def test_get_shapley_exact():
         n_outer,
         n_inner,
     )
+
+    aaae(calculated, expected)
 
 
 def test_get_shapley_random():
@@ -91,7 +110,21 @@ def test_get_shapley_random():
     n_outer = 1
     n_inner = 3
 
-    get_shapley(
+    col = ["X" + str(i) for i in np.arange(n_inputs) + 1]
+    names = ["Shapley effects", "std. errors", "CI_min", "CI_max"]
+
+    expected = pd.DataFrame(
+        data=[
+            [0.100584, 0.419825, 0.479592],
+            [0.00683065, 0.00728448, 0.00710203],
+            [0.0871954, 0.405547, 0.465672],
+            [0.113972, 0.434102, 0.493512],
+        ],
+        index=names,
+        columns=col,
+    ).T
+
+    calculated = get_shapley(
         method,
         gaussian_model,
         x_all,
@@ -102,3 +135,5 @@ def test_get_shapley_random():
         n_outer,
         n_inner,
     )
+
+    aaae(calculated, expected, decimal=5)
