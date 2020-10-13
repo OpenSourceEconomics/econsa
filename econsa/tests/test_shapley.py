@@ -136,4 +136,4 @@ def test_get_shapley_random():
         n_inner,
     )
 
-    aaae(calculated, expected, decimal=5)
+    aaae(calculated, expected)
