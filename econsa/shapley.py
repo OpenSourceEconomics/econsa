@@ -23,7 +23,7 @@ def get_shapley(
     n_output,
     n_outer,
     n_inner,
- ):
+):
     """Shapley value function.
 
     This function calculates Shapley effects and their standard errors for
