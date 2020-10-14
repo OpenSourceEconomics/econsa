@@ -36,30 +36,30 @@ Again, we now apply this to the **EOQ** model. Given the current limits to our i
 Shapely values
 ^^^^^^^^^^^^^^
 
-In motivational overview, we give brief notational insights on variance-based sensitivity analysis as well as the Shapley value's theoratical framework (:cite:`Song.2016`). We follow the framework on variance-based sensitivity analysis and Shapley values developed by :cite:`Song.2016`. 
+In motivational overview, we give brief notational insights on variance-based sensitivity analysis as well as the Shapley value's theoratical framework (:cite:`Song.2016`). We follow the framework on variance-based sensitivity analysis and Shapley values developed by :cite:`Song.2016`.
 
 Variance-based Sensitivity Analysis (SA) can be illustrated in the following manner. Consider a model with :math:`k` inputs denoted by :math:`X_K = \{X_1, X_2, X_3, \dots, X_k \}` where :math:`K = \{1, 2, \dots, k\}`. Consider also :math:`X_J`, which indicates the vector of inputs included in the index set :math:`J \subseteq X`. The uncertainty in :math:`X_K` is represented by the joint cumulative distribution :math:`G_K`. Furthermore, we denote the joint distribution of inputs included in the index set :math:`J` as :math:`G_J` and the marginal distribution of each :math:`X_i` as :math:`G_i`. The model is treated as a blackbox, and only the model response is analysed. The model response :math:`Y` is a function of the inputs, i.e., :math:`Y = f(X_K)` and therefore :math:`f(X_K)` is stochastic due to the uncertainty in :math:`X_K` although :math:`f(\cdot)` is deterministic. Often, :math:`f(\cdot)` has a complex structure, and does not have a closed form expression. The overall uncertainty in the model output :math:`Y` caused by :math:`X_K` is :math:`Var[Y]`, where the variance is calculated with respect to the joint distribution :math:`G_K`. The Shapley value then, helps us to quantify how much of :math:`Var[Y]` can be attributed to each each :math:`X_i`.
 
-An analogous framework to the one developed for variance-based sensitivity analysis above is apparent in the specification of the Shapley value. Formally, a *k-player game* with the set of players :math:`K = \{1,2, \dots, k\}` is defined as a real valued function that maps a subset of :math:`K` to its corresponding cost (or value), i.e., :math:`c: 2^K \rightarrow  {\rm I\!R}` with :math:`c(\emptyset) = 0`. With this in mind, :math:`c(J)` then, represents the cost that arises when the players in the subset :math:`J` of :math:`K` participate in the game. The Shapley value for player :math:`i` with respect to :math:`c(\cdot)` is defined as 
+An analogous framework to the one developed for variance-based sensitivity analysis above is apparent in the specification of the Shapley value. Formally, a *k-player game* with the set of players :math:`K = \{1,2, \dots, k\}` is defined as a real valued function that maps a subset of :math:`K` to its corresponding cost (or value), i.e., :math:`c: 2^K \rightarrow  {\rm I\!R}` with :math:`c(\emptyset) = 0`. With this in mind, :math:`c(J)` then, represents the cost that arises when the players in the subset :math:`J` of :math:`K` participate in the game. The Shapley value for player :math:`i` with respect to :math:`c(\cdot)` is defined as
 
-.. math:: 
+.. math::
 
-v_i = \sum_{J \subseteq K \backslash \{i\}}^{} \frac{(k -|J| - 1)! |J|!}{k!} \cdot (c(J \cup \{i\}) -c(J)),
+  v_i = \sum_{J \subseteq K \backslash \{i\}}^{} \frac{(k -|J| - 1)! |J|!}{k!} \cdot (c(J \cup \{i\}) -c(J)),
 
-where :math:`|J|` indicates the size of :math:`J`. In other words, :math:`v_i` is the incremental cost of including player :math:`i` in set :math:`J` averaged over all sets :math:`J \subseteq K \backslash \{i\}`.  The Shapley value gives equal weight to each :math:`k` subset sizes and equal weights amongst the subsets of the same size, which is important in determining the fairness of the variance allocation in the calculation of Shapley effects in variance-based sensitivity analysis (:cite:`Song.2016`).  Reconciling the two frameworks by direct comparison, we can think of the set of :math:`K` players as the set of inputs of :math:`f(\cdot)` and define :math:`c(\cdot)` so that for :math:`J \subseteq K`, :math:`c(J)` measures the variance of :math:`c(J)` caused by the uncertainty of the inputs in :math:`J`. 
+where :math:`|J|` indicates the size of :math:`J`. In other words, :math:`v_i` is the incremental cost of including player :math:`i` in set :math:`J` averaged over all sets :math:`J \subseteq K \backslash \{i\}`.  The Shapley value gives equal weight to each :math:`k` subset sizes and equal weights amongst the subsets of the same size, which is important in determining the fairness of the variance allocation in the calculation of Shapley effects in variance-based sensitivity analysis (:cite:`Song.2016`).  Reconciling the two frameworks by direct comparison, we can think of the set of :math:`K` players as the set of inputs of :math:`f(\cdot)` and define :math:`c(\cdot)` so that for :math:`J \subseteq K`, :math:`c(J)` measures the variance of :math:`c(J)` caused by the uncertainty of the inputs in :math:`J`.
 
 The ideal :math:`c(\cdot)` should satisfy the conditions: :math:`c(\emptyset) = 0` and :math:`c(K) = Var[Y]`. Two such candidates for such :math:`c(\cdot)` can be considered, and have been shown to be equivalent are equivalent (:cite:`Song.2016`).
 The first cost function is 
 
 .. math::
 
-\tilde{c}(J) = Var[E[Y|X_J]].
+  \tilde{c}(J) = Var[E[Y|X_J]].
 
 This cost function satisfies the two conditions from above and was originally put forth by :cite:`Owen.2014` and later adopted by :cite:`Song.2016` in their paper. The cost function can be rewritten as :math:`\tilde{c}(J) = Var[Y] - E[Var[Y|X_J]]`, and interpreted as the expected reduction in the output variance when the values of :math:`X_J` are known. The second cost function that satisfies the required conditions is
 
 .. math::
 
-c(J) = E[Var[Y|X_{-J}]]
+  c(J) = E[Var[Y|X_{-J}]]
 
 where :math:`X_{-J} = X_{K \backslash J}`. :math:`c(J)` is interpreted as the expected remaining variance in :math:`Y` when the values of :math:`X_{-J}` are known. In this case, the incremental cost :math:`c(J \cup \{i\}) -c(J)` can be interpreted as the expected decrease in the variance of :math:`Y` conditional on the known input values of :math:`X_i` out of all the unknown inputs in :math:`J \cup \{i\}`. 
 
@@ -67,6 +67,6 @@ Although both cost functions result in the same Shapley values, their resultant 
 
 .. math::
 
-\sum_{k}^{i=1} Sh_i = Var[Y],
+  \sum_{k}^{i=1} Sh_i = Var[Y],
 
 even if there is dependence or structural interactions amongst the elements in :math:`X_K`. Throughout the package, we use :math:`Sh_i` to denote the Shapley effect and :math:`v_i` to denote the generic Shapley value.
