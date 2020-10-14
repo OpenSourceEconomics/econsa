@@ -23,7 +23,7 @@ which implies that
 
 .. math::
 
-  1 = \frac{\text{Var}_y(\mathbb{E}_z\left[\mathcal{M}(y, z) \mid y \right])}{D} + \frac{\mathbb{E}_y\left[\text{Var}_z(\mathcal{M}(y, z) \mid y)\right]}{D} =: S_y + S_z^T
+  1 = \frac{\text{Var}_y(\mathbb{E}_z\left[\mathcal{M}(y, z) \mid y \right])}{D} + \frac{\mathbb{E}_y\left[\text{Var}_z(\mathcal{M}(y, z) \mid y)\right]}{D} =: S_y +     S_z^T
 
 We call :math:`S_y` the *first order effect index* of the subset :math:`y` and we call :math:`S_z^T` the *total effect* of the subset :math:`z`. Notice that for each partition of the input space :math:`y` and :math:`z`, the above provides a way of computing the fraction of explained variance. For the sake of clarity, assume :math:`y` represent only a single input variable. Then :math:`S_y` can be interpreted as the effect of :math:`y` on the variability of :math:`\mathcal{M}` **without** considering any interaction effects with other variables. While :math:`S_y^T` can be thought of as representing the effect of :math:`y` on the variance via itself **and** all other input variables.
 
@@ -46,8 +46,6 @@ An analogous framework to the one developed for variance-based sensitivity analy
 
 v_i = \sum_{J \subseteq K \backslash \{i\}}^{} \frac{(k -|J| - 1)! |J|!}{k!} \cdot (c(J \cup \{i\}) -c(J)),
 
-.. math::
-
 where :math:`|J|` indicates the size of :math:`J`. In other words, :math:`v_i` is the incremental cost of including player :math:`i` in set :math:`J` averaged over all sets :math:`J \subseteq K \backslash \{i\}`.  The Shapley value gives equal weight to each :math:`k` subset sizes and equal weights amongst the subsets of the same size, which is important in determining the fairness of the variance allocation in the calculation of Shapley effects in variance-based sensitivity analysis (:cite:`Song.2016`).  Reconciling the two frameworks by direct comparison, we can think of the set of :math:`K` players as the set of inputs of :math:`f(\cdot)` and define :math:`c(\cdot)` so that for :math:`J \subseteq K`, :math:`c(J)` measures the variance of :math:`c(J)` caused by the uncertainty of the inputs in :math:`J`. 
 
 The ideal :math:`c(\cdot)` should satisfy the conditions: :math:`c(\emptyset) = 0$ and $c(K) = Var[Y]`. Two such candidates for such :math:`c(\cdot)` can be considered, and have been shown to be equivalent are equivalent (:cite:`Song.2016`).
@@ -57,21 +55,18 @@ The first cost function is
 
 \tilde{c}(J) = Var[E[Y|X_J]].
 
-.. math::
-
 This cost function satisfies the two conditions from above and was originally put forth by :cite:`Owen.2014` and later adopted by :cite:`Song.2016` in their paper. The cost function can be rewritten as :math:`\tilde{c}(J) = Var[Y] - E[Var[Y|X_J]]`, and interpreted as the expected reduction in the output variance when the values of :math:`X_J` are known. The second cost function that satisfies the required conditions is
 
 .. math::
 
 c(J) = E[Var[Y|X_{-J}]]
-.. math::
 
 where :math:`X_{-J} = X_{K \backslash J}`. :math:`c(J)` is interpreted as the expected remaining variance in :math:`Y` when the values of :math:`X_{-J}` are known. In this case, the incremental cost :math:`c(J \cup \{i\}) -c(J)` can be interpreted as the expected decrease in the variance of :math:`Y` conditional on the known input values of :math:`X_i` out of all the unknown inputs in :math:`J \cup \{i\}`. 
 
 Although both cost functions result in the same Shapley values, their resultant estimators from Monte Carlo simulation are different. :cite:`Sun.2011` reveal that the Monte Carlo estimator that results from the simulation of :math:`\tilde{c}(J)` can be severely biased if the inner level sample size used to estimate the conditional expectation is not large enough. Given the already computationally demanding structure of microeconomic models, this added computational complexity is costly. In contrast however, the estimator of :math:`c(J)` is unbiased for all sample sizes. Because of this added feature, we follow :cite:`Song.2016` in using the cost function :math:`c(J)` rather that :math:`\tilde{c}(J)`. We therefore define the *Shapley effect* of the :math:`i_{th}` input, :math:`Sh_i`, as the Shapley value obtained by applying the cost function :math:`c(J)` to the Shapley value equation. Indeed, any Shapley value defined by the satisfaction of the two conditions: :math:`c(\emptyset) = 0` and :math:`c(K) = Var[Y]` imply that
 
 .. math::
+
 \sum_{k}^{i=1} Sh_i = Var[Y],
 
-.. math:: 
 even if there is dependence or structural interactions amongst the elements in :math:`X_K`. Throughout the package, we use :math:`Sh_i` to denote the Shapley effect and :math:`v_i` to denote the generic Shapley value.
