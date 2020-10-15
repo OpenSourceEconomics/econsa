@@ -40,7 +40,7 @@ In this overview, we give brief notational insights on variance-based sensitivit
 follow the framework on variance-based sensitivity analysis and Shapley values developed by :cite:`Song.2016`.
 
 Variance-based Sensitivity Analysis (SA) can be illustrated in the following manner. Consider a model with :math:`k` inputs denoted by :math:`X_K = \{X_1, X_2, X_3,
-\dots, X_k \}` where :math:`K = \{1, 2, \dots, k\}`. Consider also :math:`X_J`, which indicates the vector of inputs included in the index set :math:`J \subseteq X`.
+\dots, X_k\}` where :math:`K = \{1, 2, \dots, k\}`. Consider also :math:`X_J`, which indicates the vector of inputs included in the index set :math:`J \subseteq X`.
 The uncertainty in :math:`X_K` is represented by the joint cumulative distribution :math:`G_K`. Furthermore, we denote the joint distribution of inputs included in the
 index set :math:`J` as :math:`G_J` and the marginal distribution of each :math:`X_i` as :math:`G_i`. The model is treated as a blackbox, and only the model response is
 analysed. The model response :math:`Y` is a function of the inputs, i.e., :math:`Y = f(X_K)` and therefore :math:`f(X_K)` is stochastic due to the uncertainty in
@@ -65,7 +65,7 @@ define :math:`c(\cdot)` so that for :math:`J \subseteq K`, :math:`c(J)` measures
 
 The ideal :math:`c(\cdot)` should satisfy the conditions: :math:`c(\emptyset) = 0` and :math:`c(K) = Var[Y]`. Two such candidates for such :math:`c(\cdot)` can be
 considered, and have been shown to be equivalent are equivalent (:cite:`Song.2016`).
-The first cost function is 
+The first cost function is
 
 .. math::
 
@@ -81,7 +81,7 @@ cost function can be rewritten as :math:`\tilde{c}(J) = Var[Y] - E[Var[Y|X_J]]`,
 
 where :math:`X_{-J} = X_{K \backslash J}`. :math:`c(J)` is interpreted as the expected remaining variance in :math:`Y` when the values of :math:`X_{-J}` are known.
 In this case, the incremental cost :math:`c(J \cup \{i\}) -c(J)` can be interpreted as the expected decrease in the variance of :math:`Y` conditional on the known
-input values of :math:`X_i` out of all the unknown inputs in :math:`J \cup \{i\}`. 
+input values of :math:`X_i` out of all the unknown inputs in :math:`J \cup \{i\}`.
 
 Although both cost functions result in the same Shapley values, their resultant estimators from Monte Carlo simulation are different. :cite:`Sun.2011` reveal that the
 Monte Carlo estimator that results from the simulation of :math:`\tilde{c}(J)` can be severely biased if the inner level sample size used to estimate the conditional
