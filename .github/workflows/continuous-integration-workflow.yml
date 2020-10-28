@@ -43,6 +43,7 @@ jobs:
         file: coverage.xml
 
     - name: Run pre-commits.
+      if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
         pre-commit install

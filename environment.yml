@@ -18,13 +18,15 @@ dependencies:
   - seaborn
   - numba
   - pdbpp
+  - matplotlib
   - temfpy>=1.1
   - chaospy
+  - pre-commit
   - pytest=5.4.3
-  - pytest-black
-  - pytest-flake8
   - pytest-cov
   - pytest-sugar
+  - pytest-black
+  - pytest-flake8
   - hypothesis
   - nbsphinx
   - sphinx_rtd_theme
@@ -33,7 +35,6 @@ dependencies:
   - r-r.utils
   - r-condmvnorm
   - rpy2==2.9.4
-  - pre-commit
 
   - pip:
     - isort
