@@ -13,12 +13,12 @@ dependencies:
   - pip
   - scipy
   - statsmodels
-  - jupyter
+  - ipykernel
   - jupyterlab
   - seaborn
   - numba
   - pdbpp
-  - matplotlib
+  - matplotlib-base
   - temfpy>=1.1
   - chaospy
   - pre-commit
@@ -38,7 +38,6 @@ dependencies:
   - rpy2==2.9.4
 
   - pip:
-    - isort
     - pytest-stress
     - pytest-randomly
     - black-nb

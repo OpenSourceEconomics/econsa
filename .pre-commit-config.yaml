@@ -19,9 +19,10 @@ repos:
         files: '(\.md|\.rst)$'
         additional_dependencies: [black]
 -   repo: https://github.com/psf/black
-    rev: stable
+    rev: 20.8b0
     hooks:
     -   id: black
+        args: ['--line-length=100']
         files: '(\.pyi?|wscript|ipynb)$'
         language_version: python3.7
         additional_dependencies: [black-nb]
