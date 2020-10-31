@@ -40,9 +40,7 @@ def get_strategies(name):
         cov = _find_positive_definite(cov)
         # The rounding is necessary to prevent ValueError("corr must be between 0 and 1")
         corr = _cov2corr(cov).round(8)
-    elif (
-        name == "test_gc_correlation_2d" or name == "test_gc_correlation_2d_force_calc"
-    ):
+    elif name == "test_gc_correlation_2d" or name == "test_gc_correlation_2d_force_calc":
         dim = 2
         means = np.random.uniform(-100, 100, dim)
         distributions = [
