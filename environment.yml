@@ -40,7 +40,7 @@ dependencies:
     - isort
     - pytest-stress
     - pytest-randomly
-    - black>=20
+    - black>=20.8b0
     - black-nb
     - flake8-nb
     - numpydoc
