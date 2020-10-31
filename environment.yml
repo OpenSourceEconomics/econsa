@@ -27,7 +27,6 @@ dependencies:
   - pytest-sugar
   - pytest-black
   - pytest-flake8
-  - black
   - hypothesis
   - nbsphinx
   - sphinx_rtd_theme
@@ -41,6 +40,7 @@ dependencies:
     - isort
     - pytest-stress
     - pytest-randomly
+    - black
     - black-nb
     - flake8-nb
     - numpydoc
