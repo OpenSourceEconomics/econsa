@@ -147,9 +147,10 @@ def get_shapley(
                     + (j - 1) * n_outer * n_inner
                     + length * n_inner
                 )
-                model_inputs[
-                    inner_indices : (inner_indices + n_inner), :
-                ] = concatenated_sample[:, perms_sorted]
+                model_inputs[inner_indices : (inner_indices + n_inner), :] = concatenated_sample[
+                    :,
+                    perms_sorted,
+                ]
 
     # calculate model output
     output = model(model_inputs)
@@ -185,9 +186,7 @@ def get_shapley(
                 delta = estimated_cost - previous_cost
 
             shapley_effects[perms[j]] = shapley_effects[perms[j]] + delta
-            shapley_effects_squared[perms[j]] = (
-                shapley_effects_squared[perms[j]] + delta ** 2
-            )
+            shapley_effects_squared[perms[j]] = shapley_effects_squared[perms[j]] + delta ** 2
 
             previous_cost = estimated_cost
 
