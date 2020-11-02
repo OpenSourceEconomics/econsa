@@ -6,9 +6,10 @@ are used as benchmarks for verification of numerical estimates.
 import numpy as np
 import pytest
 from numpy.testing import assert_almost_equal
-from quantile_measures_double_loop import dlr_mcs_quantile
 from scipy.stats import norm
 from temfpy.uncertainty_quantification import simple_linear_function
+
+from econsa.quantile_measures_double_loop import dlr_mcs_quantile
 
 
 @pytest.fixture
