@@ -193,7 +193,7 @@ def _bf_conditional_sample(x, x_prime):
 
 def _bf_unconditional_quantile_y(x, alp, func):
     """Calculate quantiles of outputs with unconditional sample set as input."""
-    n_draws, n_params = x.shape
+    n_draws = x.shape[0]
 
     y_x = np.zeros((n_draws, n_draws, 1))  # N*N*1
     y_x_asc = np.zeros((n_draws, n_draws, 1))  # N*N*1
@@ -203,9 +203,9 @@ def _bf_unconditional_quantile_y(x, alp, func):
         y_x[j] = np.vstack(func(x))
         y_x_asc[j] = np.sort(y_x[j], axis=0)
         # conditioanl q_y(alp)
-        for pp in range(len(alp)):
+        for pp, a in enumerate(alp):
             quantile_y_x[j, pp] = y_x_asc[j][
-                (np.floor(alp[pp] * n_draws)).astype(int)
+                (np.floor(a * n_draws)).astype(int)
             ]  # quantiles corresponding to alpha
 
     return quantile_y_x
@@ -226,9 +226,9 @@ def _bf_conditional_quantile_y(x_mix, alp, func):
             y_x_mix[j, i] = np.vstack(func(x_mix[j, i]))
             y_x_mix_asc[j, i] = np.sort(y_x_mix[j, i], axis=0)
             # conditioanl q_y(alp)
-            for pp in range(len(alp)):
+            for pp, a in enumerate(alp):
                 quantile_y_x_mix[j, i, pp] = y_x_mix_asc[j, i][
-                    (np.floor(alp[pp] * n_draws)).astype(int)
+                    (np.floor(a * n_draws)).astype(int)
                 ]  # quantiles corresponding to alpha
 
     return quantile_y_x_mix
