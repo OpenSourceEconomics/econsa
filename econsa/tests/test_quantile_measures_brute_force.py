@@ -35,18 +35,14 @@ def first_example_fixture():
     dalp = (0.98 - 0.02) / 30
     alp = np.arange(0.02, 0.98 + dalp, dalp)  # len(alp) = 31
 
-    # inverse error function
-    phi_inv = norm.ppf(alp)
-
     # q_2: PDF of the out put Y(Eq.30)
     expect_q_2 = []
-
-    for a in range(len(alp)):
+    for a in alp:
         q_2_a = []
         for i in range(n_params_1):
             q_2_i = (
                 cov_1[i, i]
-                + phi_inv[a] ** 2
+                + norm.ppf(a) ** 2
                 * (
                     np.sqrt(np.trace(cov_1))
                     - np.sqrt(sum(cov_1[j, j] for j in range(n_params_1) if j != i))
@@ -60,11 +56,10 @@ def first_example_fixture():
 
     # Q_2: normalized quantile based sensitivity measure 2.(Eq.14)
     expect_norm_q_2 = []
-
-    for a in range(len(alp)):
+    for q in expect_q_2:
         norm_q_2_a = []
         for i in range(n_params_1):
-            norm_q_2_i = expect_q_2[a, i] / sum(expect_q_2[a])
+            norm_q_2_i = q[i] / sum(q)
             norm_q_2_a.append(norm_q_2_i)
         expect_norm_q_2.append(norm_q_2_a)
 
