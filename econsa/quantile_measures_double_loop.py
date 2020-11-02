@@ -240,9 +240,9 @@ def _dlr_conditional_quantile_y(x_mix, func, alp):
             y_x_mix[j, i] = np.vstack(func(x_mix[j, i]))
             y_x_mix[j, i].sort(axis=0)
             y_x_mix_asc[j, i] = y_x_mix[j, i]
-            for pp in range(len(alp)):
+            for pp, a in enumerate(alp):
                 quantile_y_x_mix[0, i, pp, j] = y_x_mix_asc[j, i][
-                    (np.floor(alp[pp] * n_draws)).astype(int)
+                    (np.floor(a * n_draws)).astype(int)
                 ]  # quantiles corresponding to alpha
     return quantile_y_x_mix
 
