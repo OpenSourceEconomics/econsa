@@ -1,4 +1,4 @@
-"""Test for the DLR estimators of quantile based global sensitivity measures.
+"""Test for the brute force estimators of quantile based global sensitivity measures.
 
 Analytical values of linear model with normally distributed variables
 are used as benchmarks for verification of numerical estimates.
@@ -9,6 +9,7 @@ from numpy.testing import assert_almost_equal
 from scipy.stats import norm
 from temfpy.uncertainty_quantification import simple_linear_function
 
+from econsa.quantile_measures_brute_force import bf_mcs_quantile
 from econsa.quantile_measures_double_loop import dlr_mcs_quantile
 
 
@@ -65,7 +66,7 @@ def first_example_fixture():
 
     expect_norm_q_2 = np.hstack(expect_norm_q_2).reshape((len(alp), n_params_1))
 
-    quantile_measures_expected = expect_norm_q_2
+    quantile_measures_true = expect_norm_q_2
 
     out = {
         "func": simple_linear_function_transposed,
@@ -73,29 +74,38 @@ def first_example_fixture():
         "loc": mean_1,
         "scale": cov_1,
         "dist_type": "Normal",
-        "n_draws": 2 ** 13,
-        "quantile_measures_expected": quantile_measures_expected,
+        "n_draws_dlr": 2 ** 13,
+        "n_draws_bf": 3000,
+        "quantile_measures_true": quantile_measures_true,
     }
 
     return out
 
 
 def test_quantile_measures_first_example(first_example_fixture):
-    quantile_measures_expected = first_example_fixture["quantile_measures_expected"]
+    quantile_measures_true = first_example_fixture["quantile_measures_true"]
     func = first_example_fixture["func"]
     n_params = first_example_fixture["n_params"]
     loc = first_example_fixture["loc"]
     scale = first_example_fixture["scale"]
     dist_type = first_example_fixture["dist_type"]
-    n_draws = first_example_fixture["n_draws"]
+    n_draws_dlr = first_example_fixture["n_draws_dlr"]
+    n_draws_br = first_example_fixture["n_draws_bf"]
 
-    quantile_measures = dlr_mcs_quantile(
-        func=func,
-        n_params=n_params,
-        loc=loc,
-        scale=scale,
-        dist_type=dist_type,
-        n_draws=n_draws,
-    )
-
-    assert_almost_equal(quantile_measures[3], quantile_measures_expected, decimal=2)
+    for method, n_draws in zip(
+        [dlr_mcs_quantile, bf_mcs_quantile],
+        [n_draws_dlr, n_draws_br],
+    ):
+        quantile_measures_solve = method(
+            func=func,
+            n_params=n_params,
+            loc=loc,
+            scale=scale,
+            dist_type=dist_type,
+            n_draws=n_draws,
+        )
+        assert_almost_equal(
+            quantile_measures_solve[3],
+            quantile_measures_true,
+            decimal=2,
+        )
