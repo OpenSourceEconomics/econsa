@@ -1,16 +1,15 @@
-"""Test for the brute force estimators of quantile based global sensitivity measures.
+"""Test for quantile based global sensitivity measures.
 
 Analytical values of linear model with normally distributed variables
 are used as benchmarks for verification of numerical estimates.
 """
 import numpy as np
 import pytest
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_array_almost_equal
 from scipy.stats import norm
 from temfpy.uncertainty_quantification import simple_linear_function
 
-from econsa.quantile_measures_brute_force import bf_mcs_quantile
-from econsa.quantile_measures_double_loop import dlr_mcs_quantile
+from econsa.quantile_measures import mc_quantile_measures
 
 
 @pytest.fixture
@@ -37,36 +36,27 @@ def first_example_fixture():
     alp = np.arange(0.02, 0.98 + dalp, dalp)  # len(alp) = 31
 
     # q_2: PDF of the out put Y(Eq.30)
-    expect_q_2 = []
-    for a in alp:
-        q_2_a = []
-        for i in range(n_params_1):
-            q_2_i = (
-                cov_1[i, i]
-                + norm.ppf(a) ** 2
-                * (
-                    np.sqrt(np.trace(cov_1))
-                    - np.sqrt(sum(cov_1[j, j] for j in range(n_params_1) if j != i))
-                )
-                ** 2
+    q_2_true = [
+        (
+            cov_1[i, i]
+            + norm.ppf(a) ** 2
+            * (
+                np.sqrt(np.trace(cov_1))
+                - np.sqrt(sum(cov_1[j, j] for j in range(n_params_1) if j != i))
             )
-            q_2_a.append(q_2_i)
-        expect_q_2.append(q_2_a)
-
-    expect_q_2 = np.vstack(expect_q_2).reshape((len(alp), n_params_1))
+            ** 2
+        )
+        for a in alp
+        for i in range(n_params_1)
+    ]
+    # reshape
+    q_2_true = np.vstack(q_2_true).reshape((len(alp), n_params_1))
 
     # Q_2: normalized quantile based sensitivity measure 2.(Eq.14)
-    expect_norm_q_2 = []
-    for q in expect_q_2:
-        norm_q_2_a = []
-        for i in range(n_params_1):
-            norm_q_2_i = q[i] / sum(q)
-            norm_q_2_a.append(norm_q_2_i)
-        expect_norm_q_2.append(norm_q_2_a)
+    norm_q_2_true = [q[i] / sum(q) for q in q_2_true for i in range(n_params_1)]
+    norm_q_2_true = np.hstack(norm_q_2_true).reshape((len(alp), n_params_1))
 
-    expect_norm_q_2 = np.hstack(expect_norm_q_2).reshape((len(alp), n_params_1))
-
-    quantile_measures_true = expect_norm_q_2
+    quantile_measures_true = norm_q_2_true
 
     out = {
         "func": simple_linear_function_transposed,
@@ -92,11 +82,12 @@ def test_quantile_measures_first_example(first_example_fixture):
     n_draws_dlr = first_example_fixture["n_draws_dlr"]
     n_draws_br = first_example_fixture["n_draws_bf"]
 
-    for method, n_draws in zip(
-        [dlr_mcs_quantile, bf_mcs_quantile],
+    for estimator, n_draws in zip(
+        ["DLR", "brute force"],
         [n_draws_dlr, n_draws_br],
     ):
-        quantile_measures_solve = method(
+        quantile_measures_solve = mc_quantile_measures(
+            estimator,
             func=func,
             n_params=n_params,
             loc=loc,
@@ -104,8 +95,8 @@ def test_quantile_measures_first_example(first_example_fixture):
             dist_type=dist_type,
             n_draws=n_draws,
         )
-        assert_almost_equal(
-            quantile_measures_solve[3],
+        assert_array_almost_equal(
+            quantile_measures_solve.loc["Q_2"],
             quantile_measures_true,
             decimal=2,
         )
