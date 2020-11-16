@@ -125,7 +125,7 @@ def mc_quantile_measures(
         [dict_measures.keys(), alpha_grid],
         names=["Measures", "alpha"],
     )
-    df_measures.columns = ["x_%d" % (i + 1) for i in range(n_params)]
+    df_measures.columns = [f"x_{i + 1}" for i in range(n_params)]
 
     return df_measures
 
