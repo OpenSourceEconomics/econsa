@@ -97,3 +97,8 @@ applying the cost function :math:`c(J)` to the Shapley value equation. Indeed, a
 
 even if there is dependence or structural interactions amongst the elements in :math:`X_K`. Throughout the package, we use :math:`Sh_i` to denote the Shapley effect
 and :math:`v_i` to denote the generic Shapley value.
+
+Quantile based sensitivity measures
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This part will be written by `Yulei Li <https://github.com/Yuleii>`_ as part of her thesis.
