@@ -1,7 +1,7 @@
 """Test for quantile based global sensitivity measures.
 
 Analytical values of linear model with normally distributed variables
-are used as benchmarks for verification of numerical estimates.
+are calculated as benchmarks for verification of numerical estimates.
 """
 import numpy as np
 import pytest
