@@ -13,3 +13,4 @@ Acknowledgements
 - Janos Gabler (`janosg <https://github.com/janosg>`_)
 - Tim Mensinger (`timmens <https://github.com/timmens>`_)
 - Leiqiong Wan (`loikein <https://github.com/loikein>`_)
+- Yulei Li (`Yuleii <https://github.com/Yuleii>`_)
