@@ -248,7 +248,7 @@ def _dlr_conditional_samples(x):
     """
     n_draws, n_params = x.shape
 
-    # The dependence of m versus n_draws accroding to [K2017] fig.1
+    # The dependence of m versus n_draws accroding to S. Kucherenko and S. Song(2017).
     if n_draws == 2 ** 6:
         m = 2 ** 3
     elif n_draws <= 2 ** 9:
