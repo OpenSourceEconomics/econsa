@@ -16,9 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - uses: goanpeca/setup-miniconda@v1
+    - uses: conda-incubator/setup-miniconda@v2
       with:
-          auto-update-conda: false
+          miniconda-version: "latest"
           activate-environment: econsa
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
