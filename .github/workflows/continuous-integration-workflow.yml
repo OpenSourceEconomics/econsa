@@ -18,7 +18,7 @@ jobs:
 
     - uses: goanpeca/setup-miniconda@v1
       with:
-          auto-update-conda: false
+          miniconda-version: "latest"
           activate-environment: econsa
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
