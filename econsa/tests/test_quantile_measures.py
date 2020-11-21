@@ -1,21 +1,24 @@
-"""Test for quantile based global sensitivity measures.
+"""This module contains tests for quantile based sensitivity measures.
 
+We implement tests replicating the results presented in Kucherenko et al. 2019.
 Analytical values of linear model with normally distributed variables
-are calculated as benchmarks for verification of numerical estimates.
+are used as benchmarks for the first test case. Numerical
+estimates of double loop reordering approach with 2^13 draws are
+used as benchmarks for verifying other cases.
 """
 import numpy as np
 from numpy.testing import assert_array_almost_equal
 from scipy.stats import norm
+from temfpy.uncertainty_quantification import ishigami
 from temfpy.uncertainty_quantification import simple_linear_function
 
 from econsa.quantile_measures import mc_quantile_measures
-
-# from temfpy.uncertainty_quantification import ishigami
 
 
 def test_1():
     """First test case."""
 
+    # Objective function
     def simple_linear_function_transposed(x):
         """Simple linear function model but with variables stored in columns."""
         return simple_linear_function(x.T)
@@ -58,28 +61,33 @@ def test_1():
         [2 ** 13, 3000],
     ):
         norm_q_2_solve = mc_quantile_measures(
-            estimator,
-            simple_linear_function_transposed,
-            n_params,
-            mean,
-            cov,
-            "Normal",
-            n_draws,
+            estimator=estimator,
+            func=simple_linear_function_transposed,
+            n_params=n_params,
+            loc=mean,
+            scale=cov,
+            dist_type="Normal",
+            n_draws=n_draws,
         )
+        # Numerical approximation can be more precise with the increase of n_draws.
         assert_array_almost_equal(
             norm_q_2_solve.loc["Q_2"],
             norm_q_2_true,
-            decimal=2,  # Numeric approximation can be more precise with the increase of n_draws.
+            decimal=2,
         )
 
 
 def test_2():
     """Second test case."""
 
-    def test_function_2(x):
-        result = x[:, 0] - x[:, 1] + x[:, 2] - x[:, 3]
-        return result
+    # Objective function
+    def simple_linear_function_modified(x):
+        """Simple linear function model with variables stored in columns and signs changed."""
+        a = [1, -1, 1, -1]
+        b = [q for q in x.T]
+        return simple_linear_function([i * q for i, q in zip(a, b)])
 
+    # Numerical estimates using double loop reordering approach with 2^13 draws
     norm_q_2_true = np.array(
         [
             [0.178, 0.344, 0.17, 0.309],
@@ -124,15 +132,12 @@ def test_2():
     ):
         norm_q_2_solve = mc_quantile_measures(
             estimator=estimator,
-            func=test_function_2,
+            func=simple_linear_function_modified,
             n_params=n_params,
             loc=0,
             scale=1,
             dist_type="Exponential",
             n_draws=n_draws,
-            sampling_scheme="sobol",
-            seed=0,
-            skip=0,
         )
         assert_array_almost_equal(
             norm_q_2_solve.loc["Q_2"],
@@ -144,14 +149,12 @@ def test_2():
 def test_3():
     """Third test case."""
 
-    def ishigami(x, a=7, b=0.1):
-        rslt = (1 + b * x[2] ** 4) * np.sin(x[0]) + a * np.sin(x[1]) ** 2
-        return rslt
-
+    # Objective function
     def ishigami_transposed(x, a=7, b=0.1):
-        """Simple linear function model but with variables stored in columns."""
+        """Ishigami function with variables stored in columns."""
         return ishigami(x.T, a=7, b=0.1)
 
+    # Numerical estimates using double loop reordering approach with 2^13 draws
     norm_q_2_true = np.array(
         [
             [0.513, 0.2, 0.287],
@@ -206,9 +209,6 @@ def test_3():
             scale=interval,
             dist_type="Uniform",
             n_draws=n_draws,
-            sampling_scheme="sobol",
-            seed=0,
-            skip=0,
         )
         assert_array_almost_equal(
             norm_q_2_solve.loc["Q_2"],
