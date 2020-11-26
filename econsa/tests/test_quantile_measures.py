@@ -3,6 +3,7 @@
 We implement tests replicating the results presented in Kucherenko et al. 2019.
 """
 import numpy as np
+import pytest
 from numpy.testing import assert_array_almost_equal
 from scipy.stats import norm
 from temfpy.uncertainty_quantification import ishigami
@@ -11,7 +12,8 @@ from temfpy.uncertainty_quantification import simple_linear_function
 from econsa.quantile_measures import mc_quantile_measures
 
 
-def test_1():
+@pytest.fixture
+def test_1_fixture():
     """First test case."""
 
     # Objective function
@@ -54,17 +56,37 @@ def test_1():
     norm_q_2_true = [q[i] / sum(q) for q in q_2_true for i in range(n_params)]
     norm_q_2_true = np.hstack(norm_q_2_true).reshape((len(alp), n_params))
 
+    out = {
+        "func": simple_linear_function_transposed,
+        "n_params": n_params,
+        "loc": mean,
+        "scale": cov,
+        "dist_type": "Normal",
+        "norm_q_2_true": norm_q_2_true,
+    }
+
+    return out
+
+
+def test_1(test_1_fixture):
+    norm_q_2_true = test_1_fixture["norm_q_2_true"]
+    func = test_1_fixture["func"]
+    n_params = test_1_fixture["n_params"]
+    loc = test_1_fixture["loc"]
+    scale = test_1_fixture["scale"]
+    dist_type = test_1_fixture["dist_type"]
+
     for estimator, n_draws in zip(
         ["DLR", "brute force"],
         [2 ** 13, 3000],
     ):
         norm_q_2_solve = mc_quantile_measures(
             estimator=estimator,
-            func=simple_linear_function_transposed,
+            func=func,
             n_params=n_params,
-            loc=mean,
-            scale=cov,
-            dist_type="Normal",
+            loc=loc,
+            scale=scale,
+            dist_type=dist_type,
             n_draws=n_draws,
         )
         # Numerical approximation can be more precise with the increase of n_draws.
@@ -72,6 +94,57 @@ def test_1():
             norm_q_2_solve.loc["Q_2"],
             norm_q_2_true,
             decimal=2,
+        )
+
+
+def test_wrong_value_criterion(test_1_fixture):
+    """Make sure an error is raised if an argument has a wrong value."""
+    func = test_1_fixture["func"]
+    n_params = test_1_fixture["n_params"]
+    loc = test_1_fixture["loc"]
+    scale = test_1_fixture["scale"]
+    dist_type = test_1_fixture["dist_type"]
+
+    with pytest.raises(ValueError):
+        mc_quantile_measures(
+            estimator="double loop reordering",
+            func=func,
+            n_params=n_params,
+            loc=loc,
+            scale=scale,
+            dist_type=dist_type,
+            n_draws=2 ** 13,
+        )
+
+    with pytest.raises(ValueError):
+        mc_quantile_measures(
+            estimator="DLR",
+            func=func,
+            n_params=n_params,
+            loc=loc,
+            scale=scale,
+            dist_type=dist_type,
+            n_draws=2 ** 13,
+            sampling_scheme="halton",
+        )
+
+
+def test_not_implemented_criterion(test_1_fixture):
+    """Make sure an error is raised if a given `dist_type` haven't been implemented."""
+    func = test_1_fixture["func"]
+    n_params = test_1_fixture["n_params"]
+    loc = test_1_fixture["loc"]
+    scale = test_1_fixture["scale"]
+
+    with pytest.raises(NotImplementedError):
+        mc_quantile_measures(
+            estimator="DLR",
+            func=func,
+            n_params=n_params,
+            loc=loc,
+            scale=scale,
+            dist_type="Gamma",
+            n_draws=2 ** 13,
         )
 
 
