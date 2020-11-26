@@ -88,7 +88,7 @@ def mc_quantile_measures(
         dist_type,
         loc,
         scale,
-        sampling_scheme="sobol",
+        sampling_scheme,
         seed=0,
         skip=0,
     )
