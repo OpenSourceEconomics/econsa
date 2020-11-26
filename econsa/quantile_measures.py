@@ -99,7 +99,7 @@ def mc_quantile_measures(
     elif estimator == "DLR":
         x_mix = _dlr_conditional_samples(x)
     else:
-        raise NotImplementedError
+        raise ValueError("Argument 'estimator' is not in {'brute force', 'DLR'}.")
 
     # quantiles of output with unconditional input
     quantile_y_x = _unconditional_quantile_y(x, alpha_grid, func)
@@ -136,7 +136,7 @@ def _unconditional_samples(
     dist_type,
     loc,
     scale,
-    sampling_scheme="sobol",
+    sampling_scheme,
     seed=0,
     skip=0,
 ):
