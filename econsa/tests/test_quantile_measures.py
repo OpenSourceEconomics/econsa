@@ -2,14 +2,15 @@
 
 We implement tests replicating the results presented in Kucherenko et al. 2019.
 """
+from functools import partial
+
 import numpy as np
 import pytest
 from numpy.testing import assert_array_almost_equal
+from quantile_measures import mc_quantile_measures
 from scipy.stats import norm
 from temfpy.uncertainty_quantification import ishigami
 from temfpy.uncertainty_quantification import simple_linear_function
-
-from econsa.quantile_measures import mc_quantile_measures
 
 
 @pytest.fixture
@@ -106,28 +107,19 @@ def test_wrong_value_criterion(test_1_fixture):
     scale = test_1_fixture["scale"]
     dist_type = test_1_fixture["dist_type"]
 
-    with pytest.raises(ValueError):
-        mc_quantile_measures(
-            estimator="double loop reordering",
-            func=func,
-            n_params=n_params,
-            loc=loc,
-            scale=scale,
-            dist_type=dist_type,
-            n_draws=2 ** 6,
-        )
-
-    with pytest.raises(ValueError):
-        mc_quantile_measures(
-            estimator="DLR",
-            func=func,
-            n_params=n_params,
-            loc=loc,
-            scale=scale,
-            dist_type=dist_type,
-            n_draws=2 ** 6,
-            sampling_scheme="halton",
-        )
+    for argument in [
+        {"sampling_scheme": "halton"},
+        {"estimator": "double loop reordering"},
+    ]:
+        p_measures = partial(mc_quantile_measures, argument, n_draws=2 ** 6)
+        with pytest.raises(ValueError):
+            p_measures(
+                func=func,
+                n_params=n_params,
+                loc=loc,
+                scale=scale,
+                dist_type=dist_type,
+            )
 
 
 def test_not_implemented_criterion(test_1_fixture):
@@ -137,27 +129,15 @@ def test_not_implemented_criterion(test_1_fixture):
     loc = test_1_fixture["loc"]
     scale = test_1_fixture["scale"]
 
-    with pytest.raises(NotImplementedError):
-        mc_quantile_measures(
+    for dist_type, n_draws in zip(["Gamma", "Normal"], [2 ** 10, 2 ** 5]):
+        p_measures = partial(
+            mc_quantile_measures,
             estimator="DLR",
-            func=func,
-            n_params=n_params,
-            loc=loc,
-            scale=scale,
-            dist_type="Gamma",
-            n_draws=2 ** 13,
+            dist_type=dist_type,
+            n_draws=n_draws,
         )
-
-    with pytest.raises(NotImplementedError):
-        mc_quantile_measures(
-            estimator="DLR",
-            func=func,
-            n_params=n_params,
-            loc=loc,
-            scale=scale,
-            dist_type="Normal",
-            n_draws=2 ** 5,
-        )
+        with pytest.raises(NotImplementedError):
+            p_measures(func=func, n_params=n_params, loc=loc, scale=scale)
 
 
 def test_2():
