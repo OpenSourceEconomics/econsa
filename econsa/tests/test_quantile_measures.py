@@ -7,10 +7,11 @@ from functools import partial
 import numpy as np
 import pytest
 from numpy.testing import assert_array_almost_equal
-from quantile_measures import mc_quantile_measures
 from scipy.stats import norm
 from temfpy.uncertainty_quantification import ishigami
 from temfpy.uncertainty_quantification import simple_linear_function
+
+from econsa.quantile_measures import mc_quantile_measures
 
 
 @pytest.fixture
@@ -190,9 +191,6 @@ def test_2():
 
     n_params = norm_q_2_expected.shape[1]
 
-    # Here we test the performance of DLR approach with 2^10 draws, which only achieves
-    # 1 decimal digit precision when compared with the brute force estimates with 3000 draws.
-    # To achieve good convergence the DLR draw should be lager.
     for estimator, n_draws in zip(
         ["DLR", "brute force"],
         [2 ** 14, 3000],
