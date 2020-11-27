@@ -102,33 +102,25 @@ def test_1(test_1_fixture):
 
 def test_wrong_value_criterion(test_1_fixture):
     """Make sure an error is raised if an argument has a wrong value."""
-    func = test_1_fixture["func"]
-    n_params = test_1_fixture["n_params"]
-    loc = test_1_fixture["loc"]
-    scale = test_1_fixture["scale"]
-    dist_type = test_1_fixture["dist_type"]
+    # remove the last item in dictionary.
+    test_1_fixture.popitem()
 
-    for argument in [
-        {"sampling_scheme": "halton"},
-        {"estimator": "double loop reordering"},
-    ]:
-        p_measures = partial(mc_quantile_measures, argument, n_draws=2 ** 6)
+    for estimator, scheme in zip(["double loop reordering", "DLR"], ["sobol", "halton"]):
+        p_measures = partial(
+            mc_quantile_measures,
+            estimator=estimator,
+            sampling_scheme=scheme,
+            n_draws=2 ** 10,
+        )
         with pytest.raises(ValueError):
-            p_measures(
-                func=func,
-                n_params=n_params,
-                loc=loc,
-                scale=scale,
-                dist_type=dist_type,
-            )
+            p_measures(**test_1_fixture)
 
 
 def test_not_implemented_criterion(test_1_fixture):
     """Make sure an error is raised if an argument can not be implemented."""
-    func = test_1_fixture["func"]
-    n_params = test_1_fixture["n_params"]
-    loc = test_1_fixture["loc"]
-    scale = test_1_fixture["scale"]
+    # remove the items we don't use in dictionary.
+    for a in ["dist_type", "norm_q_2_true"]:
+        test_1_fixture.pop(a)
 
     for dist_type, n_draws in zip(["Gamma", "Normal"], [2 ** 10, 2 ** 5]):
         p_measures = partial(
@@ -138,7 +130,7 @@ def test_not_implemented_criterion(test_1_fixture):
             n_draws=n_draws,
         )
         with pytest.raises(NotImplementedError):
-            p_measures(func=func, n_params=n_params, loc=loc, scale=scale)
+            p_measures(**test_1_fixture)
 
 
 def test_2():
