@@ -76,9 +76,10 @@ def test_1(test_1_fixture):
     scale = test_1_fixture["scale"]
     dist_type = test_1_fixture["dist_type"]
 
-    for estimator, n_draws in zip(
-        ["DLR", "brute force"],
-        [2 ** 13, 3000],
+    for estimator, n_draws, decimal in zip(
+        ["DLR", "DLR", "DLR", "DLR", "brute force"],
+        [2 ** 6, 2 ** 9, 2 ** 10, 2 ** 13, 3000],
+        [0, 1, 1, 2, 2],
     ):
         norm_q_2_solve = mc_quantile_measures(
             estimator=estimator,
@@ -93,7 +94,7 @@ def test_1(test_1_fixture):
         assert_array_almost_equal(
             norm_q_2_solve.loc["Q_2"],
             norm_q_2_true,
-            decimal=2,
+            decimal=decimal,
         )
 
 
@@ -113,7 +114,7 @@ def test_wrong_value_criterion(test_1_fixture):
             loc=loc,
             scale=scale,
             dist_type=dist_type,
-            n_draws=2 ** 9,
+            n_draws=2 ** 6,
         )
 
     with pytest.raises(ValueError):
@@ -130,7 +131,7 @@ def test_wrong_value_criterion(test_1_fixture):
 
 
 def test_not_implemented_criterion(test_1_fixture):
-    """Make sure an error is raised if a given `dist_type` haven't been implemented."""
+    """Make sure an error is raised if an argument can not be implemented."""
     func = test_1_fixture["func"]
     n_params = test_1_fixture["n_params"]
     loc = test_1_fixture["loc"]
@@ -147,6 +148,17 @@ def test_not_implemented_criterion(test_1_fixture):
             n_draws=2 ** 13,
         )
 
+    with pytest.raises(NotImplementedError):
+        mc_quantile_measures(
+            estimator="DLR",
+            func=func,
+            n_params=n_params,
+            loc=loc,
+            scale=scale,
+            dist_type="Normal",
+            n_draws=2 ** 5,
+        )
+
 
 def test_2():
     """Second test case."""
@@ -158,40 +170,41 @@ def test_2():
         b = [q for q in x.T]
         return simple_linear_function([i * q for i, q in zip(a, b)])
 
-    # Set numerical estimates of brute force estimator with 2^13 draws as benchmark
+    # benchmark: mean values of brute force estimates with 3000 draws
+    # and DLR estimates with 2^14 draws.
     norm_q_2_expected = np.array(
         [
-            [0.181, 0.324, 0.177, 0.318],
-            [0.213, 0.288, 0.217, 0.282],
-            [0.228, 0.273, 0.226, 0.272],
-            [0.231, 0.267, 0.234, 0.268],
-            [0.243, 0.258, 0.242, 0.257],
-            [0.247, 0.257, 0.244, 0.253],
-            [0.25, 0.252, 0.249, 0.249],
-            [0.252, 0.249, 0.251, 0.248],
-            [0.253, 0.248, 0.252, 0.246],
-            [0.253, 0.248, 0.252, 0.246],
-            [0.254, 0.248, 0.253, 0.246],
-            [0.253, 0.248, 0.252, 0.246],
-            [0.251, 0.249, 0.253, 0.247],
-            [0.25, 0.25, 0.251, 0.249],
-            [0.248, 0.253, 0.249, 0.25],
-            [0.247, 0.253, 0.249, 0.251],
-            [0.247, 0.253, 0.248, 0.252],
-            [0.247, 0.254, 0.247, 0.252],
-            [0.247, 0.254, 0.247, 0.252],
-            [0.245, 0.256, 0.246, 0.253],
-            [0.243, 0.257, 0.243, 0.256],
-            [0.244, 0.257, 0.244, 0.254],
-            [0.246, 0.255, 0.246, 0.253],
-            [0.246, 0.254, 0.246, 0.253],
-            [0.248, 0.252, 0.248, 0.251],
-            [0.253, 0.249, 0.251, 0.247],
-            [0.256, 0.244, 0.257, 0.244],
-            [0.269, 0.234, 0.262, 0.235],
-            [0.272, 0.228, 0.278, 0.222],
-            [0.275, 0.221, 0.285, 0.219],
-            [0.303, 0.203, 0.296, 0.198],
+            [0.182, 0.327, 0.178, 0.313],
+            [0.21, 0.291, 0.211, 0.288],
+            [0.224, 0.276, 0.223, 0.276],
+            [0.231, 0.268, 0.233, 0.269],
+            [0.24, 0.26, 0.24, 0.261],
+            [0.245, 0.256, 0.243, 0.256],
+            [0.249, 0.252, 0.248, 0.251],
+            [0.251, 0.248, 0.25, 0.25],
+            [0.253, 0.247, 0.252, 0.248],
+            [0.253, 0.246, 0.253, 0.248],
+            [0.254, 0.245, 0.253, 0.248],
+            [0.253, 0.246, 0.253, 0.249],
+            [0.252, 0.247, 0.253, 0.249],
+            [0.251, 0.248, 0.251, 0.251],
+            [0.249, 0.25, 0.249, 0.252],
+            [0.248, 0.25, 0.249, 0.253],
+            [0.247, 0.251, 0.247, 0.255],
+            [0.247, 0.252, 0.246, 0.255],
+            [0.246, 0.253, 0.246, 0.255],
+            [0.245, 0.254, 0.244, 0.257],
+            [0.244, 0.255, 0.243, 0.258],
+            [0.245, 0.254, 0.244, 0.257],
+            [0.246, 0.253, 0.245, 0.256],
+            [0.247, 0.251, 0.246, 0.255],
+            [0.25, 0.249, 0.248, 0.253],
+            [0.255, 0.245, 0.252, 0.248],
+            [0.259, 0.24, 0.258, 0.244],
+            [0.27, 0.231, 0.264, 0.236],
+            [0.276, 0.223, 0.278, 0.224],
+            [0.283, 0.214, 0.288, 0.215],
+            [0.308, 0.192, 0.307, 0.192],
         ],
     )
 
@@ -202,7 +215,7 @@ def test_2():
     # To achieve good convergence the DLR draw should be lager.
     for estimator, n_draws in zip(
         ["DLR", "brute force"],
-        [2 ** 10, 3000],
+        [2 ** 14, 3000],
     ):
         norm_q_2_solve = mc_quantile_measures(
             estimator=estimator,
@@ -216,7 +229,7 @@ def test_2():
         assert_array_almost_equal(
             norm_q_2_solve.loc["Q_2"],
             norm_q_2_expected,
-            decimal=1,
+            decimal=2,
         )
 
 
