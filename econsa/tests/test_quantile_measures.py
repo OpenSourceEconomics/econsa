@@ -113,7 +113,7 @@ def test_wrong_value_criterion(test_1_fixture):
             loc=loc,
             scale=scale,
             dist_type=dist_type,
-            n_draws=2 ** 13,
+            n_draws=2 ** 9,
         )
 
     with pytest.raises(ValueError):
@@ -124,7 +124,7 @@ def test_wrong_value_criterion(test_1_fixture):
             loc=loc,
             scale=scale,
             dist_type=dist_type,
-            n_draws=2 ** 13,
+            n_draws=2 ** 6,
             sampling_scheme="halton",
         )
 
