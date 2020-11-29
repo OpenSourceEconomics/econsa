@@ -16,8 +16,6 @@ from econsa.quantile_measures import mc_quantile_measures
 
 @pytest.fixture
 def test_1_fixture():
-    """First test case."""
-
     # Objective function
     def simple_linear_function_transposed(x):
         """Simple linear function model but with variables stored in columns."""
@@ -71,31 +69,25 @@ def test_1_fixture():
 
 
 def test_1(test_1_fixture):
-    norm_q_2_true = test_1_fixture["norm_q_2_true"]
-    func = test_1_fixture["func"]
-    n_params = test_1_fixture["n_params"]
-    loc = test_1_fixture["loc"]
-    scale = test_1_fixture["scale"]
-    dist_type = test_1_fixture["dist_type"]
+    """First test case."""
+    #  store and remove the last item in dictionary.
+    norm_q_2_true = test_1_fixture.popitem()
+
+    p_measures = partial(mc_quantile_measures, **test_1_fixture)
 
     for estimator, n_draws, decimal in zip(
         ["DLR", "DLR", "DLR", "DLR", "brute force"],
         [2 ** 6, 2 ** 9, 2 ** 10, 2 ** 13, 3000],
         [0, 1, 1, 2, 2],
     ):
-        norm_q_2_solve = mc_quantile_measures(
+        norm_q_2_solve = p_measures(
             estimator=estimator,
-            func=func,
-            n_params=n_params,
-            loc=loc,
-            scale=scale,
-            dist_type=dist_type,
             n_draws=n_draws,
         )
-        # Numerical approximation can be more precise with the increase of n_draws.
+
         assert_array_almost_equal(
             norm_q_2_solve.loc["Q_2"],
-            norm_q_2_true,
+            norm_q_2_true[1],
             decimal=decimal,
         )
 
@@ -105,15 +97,11 @@ def test_wrong_value_criterion(test_1_fixture):
     # remove the last item in dictionary.
     test_1_fixture.popitem()
 
+    p_measures = partial(mc_quantile_measures, n_draws=2 ** 10, **test_1_fixture)
+
     for estimator, scheme in zip(["double loop reordering", "DLR"], ["sobol", "halton"]):
-        p_measures = partial(
-            mc_quantile_measures,
-            estimator=estimator,
-            sampling_scheme=scheme,
-            n_draws=2 ** 10,
-        )
         with pytest.raises(ValueError):
-            p_measures(**test_1_fixture)
+            p_measures(estimator=estimator, sampling_scheme=scheme)
 
 
 def test_not_implemented_criterion(test_1_fixture):
@@ -122,15 +110,11 @@ def test_not_implemented_criterion(test_1_fixture):
     for a in ["dist_type", "norm_q_2_true"]:
         test_1_fixture.pop(a)
 
+    p_measures = partial(mc_quantile_measures, estimator="DLR", **test_1_fixture)
+
     for dist_type, n_draws in zip(["Gamma", "Normal"], [2 ** 10, 2 ** 5]):
-        p_measures = partial(
-            mc_quantile_measures,
-            estimator="DLR",
-            dist_type=dist_type,
-            n_draws=n_draws,
-        )
         with pytest.raises(NotImplementedError):
-            p_measures(**test_1_fixture)
+            p_measures(dist_type=dist_type, n_draws=n_draws)
 
 
 def test_2():
