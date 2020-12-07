@@ -8,11 +8,11 @@ labels: "Type: Bug"
 
 ### System information
 
-- OS: [e.g. Ubuntu 18.04]
-- Version of Python: [e.g. 3.7]
+- OS: (e.g. Ubuntu 18.04)
+- Version of Python: (e.g. 3.7)
 
 <!-- We don't have releases yet :(
-- Version of this package [e.g. econsa 0.0.1]
+- Version of this package (e.g. econsa 0.0.1)
  -->
 
 ### Bug description
