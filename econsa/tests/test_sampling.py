@@ -1,7 +1,6 @@
 """Tests for the sampling.
 
 This module contains all tests for the sampling setup.
-
 """
 import numpy as np
 import pytest
