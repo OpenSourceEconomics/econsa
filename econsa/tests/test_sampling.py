@@ -62,26 +62,28 @@ def test_cond_mvn():
 
 
 def test_cond_mvn_given_valid():
-    """ Valid case: only `given_ind` is empty or both `given_ind` and `given_value` are empty. """
+    """Test valid case: only `given_ind` is empty
+    or both `given_ind` and `given_value` are empty.
+    """
     cond_mvn(*get_strategies("cond_mvn_given_valid"))
 
 
 def test_cond_mvn_given_invalid():
-    """`given_value` is empty or does not align with `given_ind`."""
+    """Test invalid case: `given_value` is empty or does not align with `given_ind`."""
     with pytest.raises(ValueError) as e:
         cond_mvn(*get_strategies("cond_mvn_given_invalid"))
     assert "lengths of given_value and given_ind must be the same" in str(e.value)
 
 
 def test_cond_mvn_cov_negative():
-    # `cov` is negative definite matrix
+    """Test invalid case: `cov` is not positive definite."""
     with pytest.raises(ValueError) as e:
         cond_mvn(*get_strategies("cond_mvn_cov_negative"))
     assert "cov is not positive-definite" in str(e.value)
 
 
 def test_cond_mvn_cov_asymmetric():
-    """`cov` is not symmetric."""
+    """Test invalid case: `cov` is not symmetric."""
     with pytest.raises(ValueError) as e:
         cond_mvn(*get_strategies("cond_mvn_cov_asymmetric"))
     assert "cov is not a symmetric matrix" in str(e.value)
