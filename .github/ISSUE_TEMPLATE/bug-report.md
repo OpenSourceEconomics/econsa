@@ -12,7 +12,7 @@ labels: "Type: Bug"
 -   Version of Python: (e.g. 3.7)
 
 <!-- We don't have releases yet :(
-- Version of this package (e.g. econsa 0.01)
+-   Version of this package (e.g. econsa 0.01)
  -->
 
 ### Bug description
