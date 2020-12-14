@@ -29,7 +29,7 @@ dependencies:
   - hypothesis
   - nbsphinx
   - sphinx_rtd_theme
-  - sphinxcontrib-bibtex
+  - sphinxcontrib-bibtex<2.0.0
   - pre-commit
 
   - pip:
