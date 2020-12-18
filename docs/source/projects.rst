@@ -12,9 +12,9 @@ Research
 Thesis
 ------
 
-* Maokomatanda, L. (2020). ...
+* Maokomatanda, L. (2020). Sensitivity Analysis for Structural Microeconomic Models using Shapley Values.
 
-* Mensinger, T. (2020). ...
+* Mensinger, T. (2020). On the Use of Surrogate Models in Structural Microeconometrics.
 
 * Wan, L. (2020). ...
 
