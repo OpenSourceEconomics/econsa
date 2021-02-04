@@ -123,7 +123,14 @@ def kucherenko_indices(
 
 
 def _kucherenko_indices_single_variable(
-    k, seed, func, sampling_mean, sampling_cov, n_draws, sampling_scheme, skip,
+    k,
+    seed,
+    func,
+    sampling_mean,
+    sampling_cov,
+    n_draws,
+    sampling_scheme,
+    skip,
 ):
     """Compute Kucherenko indices for the k-th variable.
 
@@ -155,7 +162,12 @@ def _kucherenko_indices_single_variable(
     shifted_mean = _shift_mean(sampling_mean, k)
 
     shifted_samples = _kucherenko_samples(
-        shifted_mean, shifted_cov, n_draws, sampling_scheme, seed, skip,
+        shifted_mean,
+        shifted_cov,
+        n_draws,
+        sampling_scheme,
+        seed,
+        skip,
     )
     first_order, total = _general_sobol_indices(func, shifted_samples, k)
 
@@ -271,10 +283,14 @@ def _kucherenko_samples(mean, cov, n_draws, sampling_scheme, seed, skip):
 
     # h)
     z_bar = _standard_normal_to_multivariate_normal(
-        z_tilde, mean_z_given_y, cov_z_given_y,
+        z_tilde,
+        mean_z_given_y,
+        cov_z_given_y,
     )
     y_bar = _standard_normal_to_multivariate_normal(
-        y_tilde, mean_y_given_z, cov_y_given_z,
+        y_tilde,
+        mean_y_given_z,
+        cov_y_given_z,
     )
 
     # i) Combine results.
@@ -282,7 +298,8 @@ def _kucherenko_samples(mean, cov, n_draws, sampling_scheme, seed, skip):
     conditional = np.hstack([y_bar, z_bar])
 
     samples = namedtuple("Samples", "independent conditional")(
-        independent=independent, conditional=conditional,
+        independent=independent,
+        conditional=conditional,
     )
     return samples
 
@@ -370,7 +387,9 @@ def _get_uniform_base_draws(n_draws, n_params, sampling_scheme, seed=0, skip=0):
 
     if sampling_scheme == "sobol":
         draws = cp.generate_samples(
-            order=n_draws + skip, domain=2 * n_params, rule="S",
+            order=n_draws + skip,
+            domain=2 * n_params,
+            rule="S",
         ).T
     elif sampling_scheme == "random":
         draws = np.random.uniform(size=(n_draws, 2 * n_params))
@@ -440,7 +459,9 @@ def _uniform_to_multivariate_normal(uniform, mean, cov):
 
 
 @nb.guvectorize(
-    ["f8[:], i8, f8[:]", "i8[:], i8, i8[:]"], "(m), () -> (m)", nopython=True,
+    ["f8[:], i8, f8[:]", "i8[:], i8, i8[:]"],
+    "(m), () -> (m)",
+    nopython=True,
 )
 def _shift_sample(sample, k, out):
     """Re-sort sample such that the first k elements are moved to the end.
@@ -603,9 +624,7 @@ def assert_input_kucherenko_indices(
         "random",
         "sobol",
     }, "Argument 'sampling_scheme' must be in {'random', 'sobol'}."
-    assert (
-        isinstance(n_jobs, int) and n_jobs >= 1
-    ), "Argument 'n_jobs' must be a positive integer."
+    assert isinstance(n_jobs, int) and n_jobs >= 1, "Argument 'n_jobs' must be a positive integer."
 
     if seed_list is not None and len(seed_list) != n_params:
         warnings.warn(

@@ -27,14 +27,30 @@ def kucherenko_index(
     indices = {}
     for dimension in dimensions:
         index = _kucherenko_index(
-            func, dimension, mean, cov, scheme, n_joint, n_outer, n_inner, seed,
+            func,
+            dimension,
+            mean,
+            cov,
+            scheme,
+            n_joint,
+            n_outer,
+            n_inner,
+            seed,
         )
         indices[dimension] = index
     return indices
 
 
 def _kucherenko_index(
-    func, dimension, mean, cov, scheme, n_joint, n_outer, n_inner, seed,
+    func,
+    dimension,
+    mean,
+    cov,
+    scheme,
+    n_joint,
+    n_outer,
+    n_inner,
+    seed,
 ):
     """Kucherenko index inner functions."""
     # draw (independent) samples100100100
@@ -52,7 +68,12 @@ def _kucherenko_index(
         inner_integral = 0
         for j in range(n_inner):
             inner_sample = _create_inner_sample(
-                outer_sample, dimension, mean, cov, scheme, seed + j,
+                outer_sample,
+                dimension,
+                mean,
+                cov,
+                scheme,
+                seed + j,
             )
             x = _combine_samples(outer_sample, inner_sample, dimension)
             inner_integral += func(x)

@@ -15,7 +15,12 @@ if __name__ == "__main__":
     pytest.set_trace()
 
     samples = _kucherenko_samples(
-        mean, cov, n_draws=100_000, sampling_scheme="sobol", seed=1, skip=10_000,
+        mean,
+        cov,
+        n_draws=100_000,
+        sampling_scheme="sobol",
+        seed=1,
+        skip=10_000,
     )
 
     first_order, total = _general_sobol_indices(test_fun1, samples, 0)

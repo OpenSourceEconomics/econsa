@@ -17,8 +17,7 @@ from econsa.kucherenko import kucherenko_indices
 
 @pytest.fixture
 def first_example_fixture():
-    """First example test case. Results are given in [Table 1].
-    """
+    """First example test case. Results are given in [Table 1]."""
 
     def func1(args):
         """Test function from Kucherenko et al. 2012."""
@@ -73,19 +72,22 @@ def test_kucherenko_indices_first_example(first_example_fixture):
         cov, mean = first_example_fixture["create_covariance_and_mean"](rho)
 
         df_indices = kucherenko_indices(
-            func=func, sampling_mean=mean, sampling_cov=cov, n_draws=n_draws,
+            func=func,
+            sampling_mean=mean,
+            sampling_cov=cov,
+            n_draws=n_draws,
         )
 
         for var, typ in df_indices.index:
             assert df_indices.loc[(var, typ), "value"] == pytest.approx(
-                df_expected.loc[(rho, var), typ], abs=0.01,
+                df_expected.loc[(rho, var), typ],
+                abs=0.01,
             )
 
 
 @pytest.fixture
 def second_example_fixture():
-    """Second example test case. Results are given in [Table 2].
-    """
+    """Second example test case. Results are given in [Table 2]."""
 
     def func2(args):
         """Test function from Kucherenko et al. 2012."""
@@ -126,10 +128,14 @@ def test_kucherenko_indices_second_example_my(second_example_fixture):
     sample_cov = second_example_fixture["sampling_cov"]
 
     df_indices = kucherenko_indices(
-        func, sampling_mean=sample_mean, sampling_cov=sample_cov, n_draws=n_draws,
+        func,
+        sampling_mean=sample_mean,
+        sampling_cov=sample_cov,
+        n_draws=n_draws,
     )
 
     for var, typ in df_indices.index:
         assert df_indices.loc[(var, typ), "value"] == pytest.approx(
-            df_expected.loc[var, typ], abs=0.01,
+            df_expected.loc[var, typ],
+            abs=0.01,
         )
