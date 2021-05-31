@@ -11,14 +11,14 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        python-version: ['3.7']
+        python-version: ['3.7', '3.8', '3.9']
 
     steps:
     - uses: actions/checkout@v2
 
-    - uses: goanpeca/setup-miniconda@v1.0.2
+    - uses: conda-incubator/setup-miniconda@v2
       with:
-          auto-update-conda: true
+          auto-update-conda: false
           activate-environment: econsa
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
@@ -27,10 +27,6 @@ jobs:
       shell: bash -l {0}
       run: |
         pytest --cov=econsa --cov-report=xml
-
-        # We want to make sure proper formatting of the notebooks.
-        flake8-nb; [ $? -eq 0 ] || exit 1
-        black-nb --check .; [ $? -eq 0 ] || exit 1
 
     - name: Run figures.
       if: runner.os == 'Linux'
@@ -47,7 +43,8 @@ jobs:
         file: coverage.xml
 
     - name: Run pre-commits.
+      if: runner.os == 'Linux'
       shell: bash -l {0}
       run: |
-        pre-commit install -f --install-hooks
+        pre-commit install
         pre-commit run --all-files

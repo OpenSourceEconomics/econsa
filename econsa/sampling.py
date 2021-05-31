@@ -1,13 +1,17 @@
 """Capabilities for sampling of random input parameters.
 
 This module contains functions to sample random input parameters.
-
 """
 import numpy as np
 
 
 def cond_mvn(
-    mean, cov, dependent_ind, given_ind=None, given_value=None, check_cov=True,
+    mean,
+    cov,
+    dependent_ind,
+    given_ind=None,
+    given_value=None,
+    check_cov=True,
 ):
     r"""Conditional mean and variance function.
 
@@ -47,10 +51,10 @@ def cond_mvn(
 
     Returns
     -------
-    cond_mean : array_like
+    cond_mean : numpy.ndarray
                 The conditional mean of dependent variables.
 
-    cond_cov : arrray_like
+    cond_cov : numpy.ndarray
                The conditional covariance matrix of dependent variables.
 
     Examples

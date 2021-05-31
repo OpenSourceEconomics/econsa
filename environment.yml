@@ -9,22 +9,25 @@ dependencies:
   - python=3.7
   - sphinx
   - pandas
-  - numpy
+  - numpy=1.18
   - pip
   - scipy
   - statsmodels
-  - jupyter
+  - ipykernel
   - jupyterlab
   - seaborn
   - numba
   - pdbpp
+  - matplotlib-base
   - temfpy>=1.1
   - chaospy
-  - pytest
-  - pytest-black
-  - pytest-flake8
+  - pre-commit
+  - pytest=5.4.3
   - pytest-cov
   - pytest-sugar
+  - pytest-black
+  - pytest-flake8
+  - black>=20.8b0
   - hypothesis
   - nbsphinx
   - sphinx_rtd_theme
@@ -35,13 +38,10 @@ dependencies:
   - rpy2==2.9.4
 
   - pip:
-    - isort
     - pytest-stress
     - pytest-randomly
-    - black
     - black-nb
     - flake8-nb
     - numpydoc
-    - pre-commit
     - cairosvg
     - sphinxcontrib-svg2pdfconverter[CairoSVG]
