@@ -5,11 +5,12 @@ dependent inputs.
 
 """
 import itertools
+
 import chaospy as cp
 import numpy as np
 import pandas as pd
-
-from joblib import Parallel, delayed
+from joblib import delayed
+from joblib import Parallel
 
 from econsa.sampling import cond_mvn
 
@@ -109,12 +110,12 @@ def get_shapley(
     """
 
     if n_perms is not None:
-        assert n_perms <= np.math.factorial(n_inputs), 'Choose n_perms <= factorial of n_inputs.'
+        assert n_perms <= np.math.factorial(n_inputs), "Choose n_perms <= factorial of n_inputs."
     else:
         pass
 
     permutations, n_perms = get_permutations(method, n_inputs, n_perms, seed)
-    
+
     # initiate empty input array for sampling
     model_inputs = np.zeros(
         (n_output + n_perms * (n_inputs - 1) * n_outer * n_inner, n_inputs),
@@ -223,36 +224,26 @@ def get_permutations(method, n_inputs, n_perms, seed):
     if method == "exact":
         # permutations = list(itertools.permutations(range(n_inputs), n_inputs))
         # permutations = [list(i) for i in permutations]
-        permutations = np.asarray(
-            list(itertools.permutations(range(n_inputs), n_inputs))
-        )
+        permutations = np.asarray(list(itertools.permutations(range(n_inputs), n_inputs)))
         n_perms = len(permutations)
-    elif method == 'random':
+    elif method == "random":
         permutations = np.zeros((n_perms, n_inputs), dtype=np.int64)
         # for i in range(n_perms):
         #     permutations[i] = np.random.permutation(n_inputs)
         rng = np.random.default_rng(seed)
         permutations[0] = rng.permutation(n_inputs)
         count = 1
-    
+
         while count <= n_perms - 1:
             current_permutation = rng.permutation(n_inputs)
 
-            if (
-                np.apply_along_axis(
-                    np.array_equal, 1, permutations, current_permutation
-                ).any()
-                == False
+            if not (
+                np.apply_along_axis(np.array_equal, 1, permutations, current_permutation).any()
             ):
                 permutations[count] = current_permutation
                 count = count + 1
 
-            elif (
-                np.apply_along_axis(
-                    np.array_equal, 1, permutations, current_permutation
-                ).any()
-                == True
-            ):
+            elif np.apply_along_axis(np.array_equal, 1, permutations, current_permutation).any():
                 pass
 
         n_perms = int(permutations.shape[0])
