@@ -11,8 +11,7 @@ import pandas as pd
 
 from joblib import Parallel, delayed
 
-# from econsa.sampling import cond_mvn
-from sampling import cond_mvn
+from econsa.sampling import cond_mvn
 
 
 def get_shapley(
