@@ -36,6 +36,7 @@ dependencies:
   - r-r.utils
   - r-condmvnorm
   - rpy2==2.9.4
+  - joblib
 
   - pip:
     - pytest-stress

@@ -1,16 +1,18 @@
 """Capabilities for computation of Shapley effects.
 
-This module contains functions to estimate shapley effects for models with
+This module contains functions to estimate Shapley effects for models with
 dependent inputs.
 
 """
 import itertools
-
 import chaospy as cp
 import numpy as np
 import pandas as pd
 
-from econsa.sampling import cond_mvn
+from joblib import Parallel, delayed
+
+# from econsa.sampling import cond_mvn
+from sampling import cond_mvn
 
 
 def get_shapley(
@@ -23,6 +25,8 @@ def get_shapley(
     n_output,
     n_outer,
     n_inner,
+    n_jobs=1,
+    seed=123,
 ):
     """Shapley value function.
 
@@ -31,18 +35,20 @@ def get_shapley(
     to calculate Shapley effects: by examining all permutations of the given
     inputs or alternatively, by randomly sampling permutations of inputs.
 
-    The function is a translation of the exact and random permutation funtions
-    in the ``sensitivity`` package in R, and takes the method (exact or random)
-    as an argument and therefore estimates shapley effects in both ways.
+    This function is an implementation of algorithm 1 from Song, E., Nelson, B., &
+    Staum, J. (2016). Shapley Effects for Global Sensitivity Analysis: Theory and
+    Computation. SIAM/ASA J. Uncertain. Quantification, 4, 1060-1083.
 
-    The functions where obtained from R's `sensitiity` package for the
-    shapleyPermEx_ and shapleyPermRand_ functions.
+    The function is a translation of the exact (``shapleyPermEx_`` )and random
+    permutation functions (``shapleyPermRand_``) found in R's ``sensitivity`` package,
+    and takes the method (either ``exact`` or ``random``) as an argument and therefore
+    estimates Shapley effects in both ways.
 
     .. _shapleyPermEx: https://rdrr.io/cran/sensitivity/src/R/shapleyPermEx.R
 
     .. _shapleyPermRand: https://rdrr.io/cran/sensitivity/src/R/shapleyPermRand.R
 
-    Contributor: Linda Maokomatanda
+    Contributor: Linda Maokomatanda, Benedikt Müller
 
 
     Parameters
@@ -54,38 +60,46 @@ def get_shapley(
            ``random`` otherwise.
 
     model : string
-          The model/function you will calculate the shapley effects on.
+        The model/function you will calculate the shapley effects on.
 
     x_all : string (n)
-         A function that takes `n` as an argument and generates a n-sample of
-         a d-dimensional input vector.
+        A function that takes `n` as an argument and generates an n-sample of
+        a d-dimensional input vector.
 
     x_cond: string (n, Sj, Sjc, xjc)
-         A function that takes `n, Sj, Sjc, xjc` as arguments and generates
-         a n- sample an input vector corresponding to the indices in `Sj`
-         conditional on the input values `xjc` with the index set `Sjc`.
+        A function that takes `n, Sj, Sjc, xjc` as arguments and generates
+        an n-sample input vector corresponding to the indices in `Sj`
+        conditional on the input values `xjc` with the index set `Sjc`.
 
     n_perms : scalar
-            This is an input for the number of permutations you want the model
-            to make. For the ``exact`` method, this argument is none as the
-            number of permutations is determined by how many inputs you have,
-            and for the ``random`` method, this is determined exogeniously.
+        This is an input for the number of permutations you want the model
+        to make. For the ``exact`` method, this argument is none as the
+        number of permutations is determined by how many inputs you have,
+        and for the ``random`` method, this is determined exogenously.
 
     n_inputs : scalar
-             The number of input vectors for which shapley estimates are being
-             estimated.
+        The number of input vectors for which shapley estimates are being
+        estimated.
 
     n_output : scalar
-             Monte Carlo (MC) sample size to estimate the output variance of
-             the model output `Y`.
+        Monte Carlo (MC) sample size to estimate the total output variance of
+        the model output `Y`.
 
     n_outer : scalar
-            The outer Monte Carlo sample size to estimate the cost function for
-            `c(J) = E[Var[Y|X]]`.
+        The outer Monte Carlo sample size to estimate the cost function for
+        `c(J) = E[Var[Y|X]]`.
 
     n_inner : scalar
-            The inner Monte Carlo sample size to estimate the cost function for
-            `c(J) = Var[Y|X]`.
+        The inner Monte Carlo sample size to estimate the cost function for
+        `c(J) = Var[Y|X]`.
+
+    n_jobs : int
+        Default: 1. Number of cpu cores one wants to use for parallelizing the model
+        evaluation step using Joblib.
+
+    seed : int
+        Default: 123. Seed for randomly selecting permutations, if n_perms specified
+        by an integer <= factorial of n_inputs.
 
     Returns
     -------
@@ -93,20 +107,15 @@ def get_shapley(
             n dimensional DataFrame with the estimated shapley effects, the
             standard errors and the confidence intervals for the input vectors.
 
-
     """
-    if method == "exact":
-        permutations = list(itertools.permutations(range(n_inputs), n_inputs))
-        permutations = [list(i) for i in permutations]
 
-        n_perms = len(permutations)
+    if n_perms is not None:
+        assert n_perms <= np.math.factorial(n_inputs), 'Choose n_perms <= factorial of n_inputs.'
     else:
-        permutations = np.zeros((n_perms, n_inputs), dtype=np.int64)
-        for i in range(n_perms):
-            permutations[i] = np.random.permutation(n_inputs)
+        pass
 
-        n_perms = np.int(permutations.shape[0])
-
+    permutations, n_perms = get_permutations(method, n_inputs, n_perms, seed)
+    
     # initiate empty input array for sampling
     model_inputs = np.zeros(
         (n_output + n_perms * (n_inputs - 1) * n_outer * n_inner, n_inputs),
@@ -153,7 +162,7 @@ def get_shapley(
                 ]
 
     # calculate model output
-    output = model(model_inputs)
+    output = Parallel(n_jobs=n_jobs)(delayed(model)(inp) for inp in model_inputs)
 
     # Initialize Shapley, main and total Sobol effects for all players
     shapley_effects = np.zeros(n_inputs)
@@ -209,6 +218,47 @@ def get_shapley(
     ).T
 
     return effects
+
+
+def get_permutations(method, n_inputs, n_perms, seed):
+    if method == "exact":
+        # permutations = list(itertools.permutations(range(n_inputs), n_inputs))
+        # permutations = [list(i) for i in permutations]
+        permutations = np.asarray(
+            list(itertools.permutations(range(n_inputs), n_inputs))
+        )
+        n_perms = len(permutations)
+    elif method == 'random':
+        permutations = np.zeros((n_perms, n_inputs), dtype=np.int64)
+        # for i in range(n_perms):
+        #     permutations[i] = np.random.permutation(n_inputs)
+        rng = np.random.default_rng(seed)
+        permutations[0] = rng.permutation(n_inputs)
+        count = 1
+    
+        while count <= n_perms - 1:
+            current_permutation = rng.permutation(n_inputs)
+
+            if (
+                np.apply_along_axis(
+                    np.array_equal, 1, permutations, current_permutation
+                ).any()
+                == False
+            ):
+                permutations[count] = current_permutation
+                count = count + 1
+
+            elif (
+                np.apply_along_axis(
+                    np.array_equal, 1, permutations, current_permutation
+                ).any()
+                == True
+            ):
+                pass
+
+        n_perms = int(permutations.shape[0])
+
+    return permutations, n_perms
 
 
 def _r_condmvn(
