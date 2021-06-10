@@ -28,6 +28,7 @@ dependencies:
   - black
   - hypothesis
   - nbsphinx
+  - numpydoc
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex<2.0.0
   - pre-commit
@@ -37,6 +38,5 @@ dependencies:
     - pytest-randomly
     - black-nb
     - flake8-nb
-    - numpydoc
     - cairosvg
     - sphinxcontrib-svg2pdfconverter[CairoSVG]

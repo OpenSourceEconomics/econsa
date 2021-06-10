@@ -9,15 +9,6 @@ dependencies:
   - python
   - pip
 
-  - pip:
-    - pytest-stress
-    - pytest-randomly
-    - black-nb
-    - flake8-nb
-
-    - cairosvg
-    - sphinxcontrib-svg2pdfconverter[CairoSVG]
-
   - pandas
   - numpy
   - scipy
@@ -44,10 +35,18 @@ dependencies:
   - sphinx
   - nbsphinx
   - sphinx_rtd_theme
-  - sphinxcontrib-bibtex
+  - sphinxcontrib-bibtex<2.0.0
   - numpydoc
 
   - r-base
   - r-r.utils
   - r-condmvnorm
   - rpy2==2.9.4
+
+  - pip:
+    - pytest-stress
+    - pytest-randomly
+    - black-nb
+    - flake8-nb
+    - cairosvg
+    - sphinxcontrib-svg2pdfconverter[CairoSVG]
