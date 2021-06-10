@@ -38,5 +38,3 @@ dependencies:
     - pytest-randomly
     - black-nb
     - flake8-nb
-    - cairosvg
-    - sphinxcontrib-svg2pdfconverter[CairoSVG]
