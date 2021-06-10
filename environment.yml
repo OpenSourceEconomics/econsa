@@ -38,10 +38,11 @@ dependencies:
   - rpy2==2.9.4
 
   - pip:
+    - --ignore-installed
     - pytest-stress
     - pytest-randomly
     - black-nb
     - flake8-nb
     - numpydoc
     - cairosvg
-    # - sphinxcontrib-svg2pdfconverter[CairoSVG]
+    - sphinxcontrib-svg2pdfconverter[CairoSVG]
