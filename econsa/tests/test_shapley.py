@@ -15,13 +15,14 @@ import itertools
 import chaospy as cp
 import numpy as np
 import pandas as pd
-from numba import jit
 from numpy.testing import assert_allclose
 from numpy.testing import assert_array_almost_equal as aaae
 
 from econsa.shapley import _r_condmvn
 from econsa.shapley import get_permutations
 from econsa.shapley import get_shapley
+
+# from numba import jit
 
 
 def test_parallelism():
@@ -113,7 +114,7 @@ def test_get_permutations():
 
 
 def test_additive():
-    @jit(nopython=True)
+    # @jit(nopython=True)
     def additive_model(x):
         return x[:, 0] + x[:, 1] * x[:, 2]
 
@@ -192,7 +193,7 @@ def test_additive():
 
 
 def test_ishigami():
-    @jit(nopython=True)
+    # @jit(nopython=True)
     def ishigami_function(x):
         return np.sin(x[:, 0]) * (1 + 0.1 * (x[:, 2] ** 4)) + 7 * (np.sin(x[:, 1]) ** 2)
 

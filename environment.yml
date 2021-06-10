@@ -45,4 +45,3 @@ dependencies:
     - numpydoc
     - cairosvg
     - sphinxcontrib-svg2pdfconverter[CairoSVG]
-    - joblib
