@@ -33,10 +33,10 @@ dependencies:
   - hypothesis
 
   - sphinx
-  - numpydoc
   - nbsphinx
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex
+  - numpydoc
 
   - r-base
   - r-r.utils
@@ -48,5 +48,6 @@ dependencies:
     - pytest-randomly
     - black-nb
     - flake8-nb
+
     - cairosvg
     - sphinxcontrib-svg2pdfconverter[CairoSVG]
