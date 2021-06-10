@@ -9,8 +9,17 @@ dependencies:
   - python
   - pip
 
+  - pip:
+    - pytest-stress
+    - pytest-randomly
+    - black-nb
+    - flake8-nb
+
+    - cairosvg
+    - sphinxcontrib-svg2pdfconverter[CairoSVG]
+
   - pandas
-  - numpy=1.18
+  - numpy
   - scipy
   - statsmodels
   - seaborn
@@ -42,12 +51,3 @@ dependencies:
   - r-r.utils
   - r-condmvnorm
   - rpy2==2.9.4
-
-  - pip:
-    - pytest-stress
-    - pytest-randomly
-    - black-nb
-    - flake8-nb
-
-    - cairosvg
-    - sphinxcontrib-svg2pdfconverter[CairoSVG]
