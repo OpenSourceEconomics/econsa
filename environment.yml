@@ -7,20 +7,21 @@ channels:
 
 dependencies:
   - python
-  - sphinx
+  - pip
+
   - pandas
   - numpy=1.18
-  - pip
   - scipy
   - statsmodels
-  - ipykernel
-  - jupyterlab
   - seaborn
   - numba
-  - pdbpp
   - matplotlib-base
   - temfpy>=1.1
   - chaospy
+
+  - ipykernel
+  - jupyterlab
+
   - pre-commit
   - pytest=5.4.3
   - pytest-cov
@@ -28,21 +29,24 @@ dependencies:
   - pytest-black
   - pytest-flake8
   - black>=20.8b0
+  - pdbpp
   - hypothesis
+
+  - sphinx
+  - numpydoc
   - nbsphinx
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex
+
   - r-base
   - r-r.utils
   - r-condmvnorm
   - rpy2==2.9.4
 
   - pip:
-    - --ignore-installed
     - pytest-stress
     - pytest-randomly
     - black-nb
     - flake8-nb
-    - numpydoc
     - cairosvg
     - sphinxcontrib-svg2pdfconverter[CairoSVG]
