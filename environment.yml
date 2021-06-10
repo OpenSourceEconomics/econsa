@@ -1,4 +1,4 @@
-name: econsa_dev
+name: econsa
 
 channels:
   - defaults
