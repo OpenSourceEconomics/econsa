@@ -23,7 +23,7 @@ dependencies:
   - jupyterlab
 
   - pre-commit
-  - pytest=5.4.3
+  - pytest>=5.4.3
   - pytest-cov
   - pytest-sugar
   - pytest-black
