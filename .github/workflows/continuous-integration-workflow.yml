@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        python-version: ['3.7', '3.9']
+        python-version: ['3.7', '3.8', '3.9']
 
     steps:
     - uses: actions/checkout@v2
@@ -27,15 +27,15 @@ jobs:
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
 
-    # Dear future fellow dev:
+    # Dear fellow dev:
     # Please keep this step in the CI as long as we still use conda.
     # If you are not debugging, just comment them out.
-    - name: (Debug) Check system status.
-      run: |
-        conda info
-        conda config --show-sources
-        # conda list
-        # printenv | sort
+    # - name: (Debug) Check system status.
+    #   run: |
+    #     conda info
+    #     conda config --show-sources
+    #     # conda list
+    #     # printenv | sort
 
     - name: Run test suite.
       run: |
@@ -49,13 +49,7 @@ jobs:
         run-figures
 
     - name: Upload coverage to Codecov.
-      if: runner.os == 'Linux' && matrix.python-version == '3.7'
+      if: runner.os == 'Linux' && matrix.python-version == '3.9'
       uses: codecov/codecov-action@v1
       with:
         file: coverage.xml
-
-    - name: Run pre-commits.
-      if: runner.os == 'Linux'
-      run: |
-        pre-commit install
-        pre-commit run --all-files
