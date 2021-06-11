@@ -22,12 +22,12 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v2
       with:
           auto-update-conda: false
+          mamba-version: "*"
           activate-environment: econsa
-          channel-priority: flexible
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
 
-    - name: Test conda.
+    - name: Check conda status.
       run: |
         conda info
         conda config --show-sources

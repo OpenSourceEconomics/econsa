@@ -1,8 +1,8 @@
 name: econsa
 
 channels:
-  - defaults
   - conda-forge
+  - defaults
   - opensourceeconomics
 
 dependencies:
