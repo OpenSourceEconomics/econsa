@@ -10,7 +10,8 @@ dependencies:
   - pip
 
   - pandas
-  - numpy
+  - numpy=1.18
+  - numpoly=1.0.8
   - scipy
   - statsmodels
   - seaborn
