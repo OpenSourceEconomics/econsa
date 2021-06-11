@@ -34,7 +34,7 @@ dependencies:
   - nbsphinx
   - numpydoc
   - sphinx_rtd_theme
-  - sphinxcontrib-bibtex<2.0.0
+  - sphinxcontrib-bibtex>=2.0.0
 
   - pip:
     - pytest-stress
