@@ -45,6 +45,9 @@ dependencies:
   - rpy2
 
   - pip:
+    # Dear fellow dev:
+    # Please check twice before you add anything here
+    # that you absolutely cannot install it with conda itself.
     - pytest-stress
     - pytest-randomly
     - black-nb

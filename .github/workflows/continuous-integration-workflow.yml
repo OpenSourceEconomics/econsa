@@ -34,7 +34,6 @@ jobs:
     #   run: |
     #     conda info
     #     conda config --show-sources
-    #     # conda list
     #     # printenv | sort
 
     - name: Run test suite.
