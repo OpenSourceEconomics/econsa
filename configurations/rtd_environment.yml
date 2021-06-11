@@ -1,25 +1,27 @@
 name: econsa
 
 channels:
-  - defaults
   - conda-forge
+  - defaults
   - opensourceeconomics
 
 dependencies:
-  - python=3.7
-  - sphinx
-  - pandas
-  - numpy=1.18
+  - python
   - pip
+
+  - pandas
+  - numpy<1.20
+  - numpoly<1.2.0
   - scipy
   - statsmodels
-  - jupyter
-  - jupyterlab
+  - matplotlib-base
   - seaborn
   - numba
-  - pdbpp
   - temfpy>=1.1
   - chaospy
+
+  - ipykernel
+
   - pytest
   - pytest-black
   - pytest-flake8
@@ -27,11 +29,12 @@ dependencies:
   - pytest-sugar
   - black
   - hypothesis
+
+  - sphinx
   - nbsphinx
   - numpydoc
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex<2.0.0
-  - pre-commit
 
   - pip:
     - pytest-stress

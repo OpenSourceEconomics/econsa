@@ -14,9 +14,9 @@ dependencies:
   - numpoly<1.2.0
   - scipy
   - statsmodels
+  - matplotlib-base
   - seaborn
   - numba
-  - matplotlib-base
   - temfpy>=1.1
   - chaospy
 
@@ -35,9 +35,10 @@ dependencies:
 
   - sphinx
   - nbsphinx
+  - numpydoc
   - sphinx_rtd_theme
   - sphinxcontrib-bibtex>=2.0.0
-  - numpydoc
+
 
   - r-base
   - r-r.utils
