@@ -6,38 +6,32 @@ channels:
   - opensourceeconomics
 
 dependencies:
-  - python
-  - pip
-
+  - python=3.7
+  - sphinx
   - pandas
-  - numpy
+  - numpy=1.18
+  - pip
   - scipy
   - statsmodels
+  - ipykernel
+  - jupyterlab
   - seaborn
   - numba
+  - pdbpp
   - matplotlib-base
   - temfpy>=1.1
   - chaospy
-
-  - ipykernel
-  - jupyterlab
-
   - pre-commit
-  - pytest>=5.4.3
+  - pytest=5.4.3
   - pytest-cov
   - pytest-sugar
   - pytest-black
   - pytest-flake8
   - black>=20.8b0
-  - pdbpp
   - hypothesis
-
-  - sphinx
   - nbsphinx
   - sphinx_rtd_theme
-  - sphinxcontrib-bibtex<2.0.0
-  - numpydoc
-
+  - sphinxcontrib-bibtex
   - r-base
   - r-r.utils
   - r-condmvnorm
@@ -48,3 +42,6 @@ dependencies:
     - pytest-randomly
     - black-nb
     - flake8-nb
+    - numpydoc
+    - cairosvg
+    - sphinxcontrib-svg2pdfconverter[CairoSVG]
