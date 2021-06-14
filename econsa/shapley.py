@@ -5,16 +5,14 @@ dependent inputs.
 
 """
 import itertools
-from multiprocessing import Pool
 
 import chaospy as cp
 import numpy as np
 import pandas as pd
+from joblib import delayed
+from joblib import Parallel
 
 from econsa.sampling import cond_mvn
-
-# from joblib import delayed
-# from joblib import Parallel
 
 
 def get_shapley(
@@ -164,9 +162,9 @@ def get_shapley(
                 ]
 
     # calculate model output
-    # output = Parallel(n_jobs=n_jobs)(delayed(model)(inp) for inp in model_inputs)
-    p = Pool(processes=n_jobs)
-    output = p.map(model, model_inputs)
+    output = Parallel(n_jobs=n_jobs)(delayed(model)(inp) for inp in model_inputs)
+    # p = Pool(processes=n_jobs)
+    # output = p.map(model, model_inputs)
 
     # Initialize Shapley, main and total Sobol effects for all players
     shapley_effects = np.zeros(n_inputs)
