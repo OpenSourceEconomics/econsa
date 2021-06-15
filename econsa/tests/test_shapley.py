@@ -116,7 +116,7 @@ def test_get_permutations():
 def test_additive():
     # @jit(nopython=True)
     def additive_model(x):
-        return x[:, 0] + x[:, 1] * x[:, 2]
+        return x[0] + x[1] * x[2]
 
     def x_all(n):
         return cp.MvNormal(mean, cov).sample(n)
@@ -195,7 +195,7 @@ def test_additive():
 def test_ishigami():
     # @jit(nopython=True)
     def ishigami_function(x):
-        return np.sin(x[:, 0]) * (1 + 0.1 * (x[:, 2] ** 4)) + 7 * (np.sin(x[:, 1]) ** 2)
+        return np.sin(x[0]) * (1 + 0.1 * (x[2] ** 4)) + 7 * (np.sin(x[1]) ** 2)
 
     def x_all(n):
         distribution = cp.Iid(cp.Uniform(lower, upper), n_inputs)
