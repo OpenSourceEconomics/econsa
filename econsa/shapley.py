@@ -9,10 +9,11 @@ import itertools
 import chaospy as cp
 import numpy as np
 import pandas as pd
-from joblib import delayed
-from joblib import Parallel
 
 from econsa.sampling import cond_mvn
+
+# from joblib import delayed
+# from joblib import Parallel
 
 
 def get_shapley(
@@ -25,7 +26,7 @@ def get_shapley(
     n_output,
     n_outer,
     n_inner,
-    n_jobs=1,
+    # n_jobs=1,
     seed=123,
 ):
     """Shapley value function.
@@ -162,7 +163,8 @@ def get_shapley(
                 ]
 
     # calculate model output
-    output = Parallel(n_jobs=n_jobs)(delayed(model)(inp) for inp in model_inputs)
+    output = model(model_inputs)
+    # output = Parallel(n_jobs=n_jobs)(delayed(model)(inp) for inp in model_inputs)
     # p = Pool(processes=n_jobs)
     # output = p.map(model, model_inputs)
 

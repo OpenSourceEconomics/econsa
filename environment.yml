@@ -19,7 +19,6 @@ dependencies:
   - numba
   - temfpy>=1.1
   - chaospy
-  - joblib
 
   - ipykernel
   - jupyterlab

@@ -25,71 +25,71 @@ from econsa.shapley import get_shapley
 # from numba import jit
 
 
-def test_parallelism():
-    def linear_model(x):
-        beta = np.array([[beta_1], [beta_2]])
-        return x.dot(beta)
+# def test_parallelism():
+#     def linear_model(x):
+#         beta = np.array([[beta_1], [beta_2]])
+#         return x.dot(beta)
 
-    def x_all(n):
-        return cp.MvNormal(mean, cov).sample(n)
+#     def x_all(n):
+#         return cp.MvNormal(mean, cov).sample(n)
 
-    def x_cond(n, subset_j, subsetj_conditional, xjc):
-        if subsetj_conditional is None:
-            cov_int = np.array(cov).take(subset_j, axis=1)[subset_j]
-            distribution = cp.MvNormal(mean[subset_j], cov_int)
-            return distribution.sample(n)
-        else:
-            return _r_condmvn(
-                n,
-                mean=mean,
-                cov=cov,
-                dependent_ind=subset_j,
-                given_ind=subsetj_conditional,
-                x_given=xjc,
-            )
+#     def x_cond(n, subset_j, subsetj_conditional, xjc):
+#         if subsetj_conditional is None:
+#             cov_int = np.array(cov).take(subset_j, axis=1)[subset_j]
+#             distribution = cp.MvNormal(mean[subset_j], cov_int)
+#             return distribution.sample(n)
+#         else:
+#             return _r_condmvn(
+#                 n,
+#                 mean=mean,
+#                 cov=cov,
+#                 dependent_ind=subset_j,
+#                 given_ind=subsetj_conditional,
+#                 x_given=xjc,
+#             )
 
-    beta_1 = 1
-    beta_2 = 2
+#     beta_1 = 1
+#     beta_2 = 2
 
-    n_inputs = 2
-    mean = np.zeros(n_inputs)
-    cov = np.array([[2.0, 0.5], [0.5, 4.0]])
+#     n_inputs = 2
+#     mean = np.zeros(n_inputs)
+#     cov = np.array([[2.0, 0.5], [0.5, 4.0]])
 
-    method = "exact"
-    n_perms = None
-    n_output = 10 ** 4
-    n_outer = 10 ** 4
-    n_inner = 10
+#     method = "exact"
+#     n_perms = None
+#     n_output = 10 ** 4
+#     n_outer = 10 ** 4
+#     n_inner = 10
 
-    np.random.seed(1234)
-    no_parallelism = get_shapley(
-        method,
-        linear_model,
-        x_all,
-        x_cond,
-        n_perms,
-        n_inputs,
-        n_output,
-        n_outer,
-        n_inner,
-    )
+#     np.random.seed(1234)
+#     no_parallelism = get_shapley(
+#         method,
+#         linear_model,
+#         x_all,
+#         x_cond,
+#         n_perms,
+#         n_inputs,
+#         n_output,
+#         n_outer,
+#         n_inner,
+#     )
 
-    np.random.seed(1234)
-    n_cores = 2
-    with_parallelism = get_shapley(
-        method,
-        linear_model,
-        x_all,
-        x_cond,
-        n_perms,
-        n_inputs,
-        n_output,
-        n_outer,
-        n_inner,
-        n_cores,
-    )
+#     np.random.seed(1234)
+#     n_cores = 2
+#     with_parallelism = get_shapley(
+#         method,
+#         linear_model,
+#         x_all,
+#         x_cond,
+#         n_perms,
+#         n_inputs,
+#         n_output,
+#         n_outer,
+#         n_inner,
+#         n_cores,
+#     )
 
-    aaae(no_parallelism, with_parallelism, 5)
+#     aaae(no_parallelism, with_parallelism, 5)
 
 
 def test_get_permutations():
@@ -116,7 +116,7 @@ def test_get_permutations():
 def test_additive():
     # @jit(nopython=True)
     def additive_model(x):
-        return x[0] + x[1] * x[2]
+        return x[:, 0] + x[:, 1] * x[:, 2]
 
     def x_all(n):
         return cp.MvNormal(mean, cov).sample(n)
@@ -195,7 +195,7 @@ def test_additive():
 def test_ishigami():
     # @jit(nopython=True)
     def ishigami_function(x):
-        return np.sin(x[0]) * (1 + 0.1 * (x[2] ** 4)) + 7 * (np.sin(x[1]) ** 2)
+        return np.sin(x[:, 0]) * (1 + 0.1 * (x[:, 2] ** 4)) + 7 * (np.sin(x[:, 1]) ** 2)
 
     def x_all(n):
         distribution = cp.Iid(cp.Uniform(lower, upper), n_inputs)
@@ -412,6 +412,7 @@ def test_linear_two_inputs():
 
 def test_get_shapley_exact():
     def gaussian_model(x):
+        # return np.sum(x)
         return np.sum(x, 1)
 
     def x_all(n):
@@ -477,6 +478,7 @@ def test_get_shapley_exact():
 def test_get_shapley_random():
     def gaussian_model(x):
         return np.sum(x, 1)
+        # return np.sum(x)
 
     def x_all(n):
         distribution = cp.MvNormal(mean, cov)
