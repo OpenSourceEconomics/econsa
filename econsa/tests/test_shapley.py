@@ -174,7 +174,7 @@ def test_additive():
     method = "exact"
     n_perms = None
     n_output = 10 ** 4
-    n_outer = 2 * 10 ** 4
+    n_outer = 3 * 10 ** 4
     n_inner = 3
 
     calculated = get_shapley(
