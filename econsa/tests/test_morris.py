@@ -76,3 +76,119 @@ def test_ee():
     n_draws = 100
 
     elementary_effects(model_func, params, cov, n_draws)
+
+
+def simple_linear_model(x):
+    """For test case 1."""
+    return np.sum(x)
+
+
+def test_linear_function_a():
+    """Test case 1.a
+    This test case is taken from Ge, Q. & M. Menendez. 2017. Extending Morris
+    method for qualitative global sensitivity analysis of models with dependent
+    inputs. Reliability Engineering and System Safety 162 (2017) 28–39"""
+
+    n_inputs = 3
+    names = ["x1", "x2", "x3"]
+    params = pd.DataFrame(columns=["value"], data=np.zeros(n_inputs), index=names)
+    cov = pd.DataFrame(
+        data=[[1, 0.9, 0.4], [0.9, 1, 0.01], [0.4, 0.01, 1]],
+        columns=names,
+        index=names,
+    )
+    n_draws = 100
+
+    ee = elementary_effects(simple_linear_model, params, cov, n_draws)
+
+    # In paper only plots are given, no exact values. Therefore assert ranking only.
+    # Assert mu_ind
+    assert ee["mu_ind"].loc["x1"] < ee["mu_ind"].loc["x2"] < ee["mu_ind"].loc["x3"]
+
+    # Assert sigma_ind
+    assert ee["sigma_ind"].loc["x2"] < ee["sigma_ind"].loc["x3"]
+    assert ee["sigma_ind"].loc["x1"] < ee["sigma_ind"].loc["x3"]
+
+    # Assert mu_corr
+    assert ee["mu_corr"].loc["x3"] < ee["mu_corr"].loc["x2"] < ee["mu_corr"].loc["x1"]
+
+    # Assert sigma_corr
+    assert ee["sigma_corr"].loc["x3"] < ee["sigma_corr"].loc["x2"] < ee["sigma_corr"].loc["x1"]
+
+
+def test_different_seed_linear_function_a():
+    """Test case 1.a
+    This test case is taken from Ge, Q. & M. Menendez. 2017. Extending Morris
+    method for qualitative global sensitivity analysis of models with dependent
+    inputs. Reliability Engineering and System Safety 162 (2017) 28–39"""
+
+    n_inputs = 3
+    names = ["x1", "x2", "x3"]
+    params = pd.DataFrame(columns=["value"], data=np.zeros(n_inputs), index=names)
+    cov = pd.DataFrame(
+        data=[[1, 0.9, 0.4], [0.9, 1, 0.01], [0.4, 0.01, 1]],
+        columns=names,
+        index=names,
+    )
+    n_draws = 1000
+
+    sampling_scheme = "sobol"
+    n_cores = 1
+    seed = 67
+
+    ee = elementary_effects(
+        simple_linear_model,
+        params,
+        cov,
+        n_draws,
+        sampling_scheme,
+        seed,
+        n_cores,
+    )
+
+    # In paper only plots are given, no exact values. Therefore assert ranking only.
+    # Assert mu_ind
+    assert ee["mu_ind"].loc["x1"] < ee["mu_ind"].loc["x2"] < ee["mu_ind"].loc["x3"]
+
+    # Assert sigma_ind
+    assert ee["sigma_ind"].loc["x2"] < ee["sigma_ind"].loc["x3"]
+    assert ee["sigma_ind"].loc["x1"] < ee["sigma_ind"].loc["x3"]
+
+    # Assert mu_corr
+    assert ee["mu_corr"].loc["x3"] < ee["mu_corr"].loc["x2"] < ee["mu_corr"].loc["x1"]
+
+    # Assert sigma_corr
+    assert ee["sigma_corr"].loc["x3"] < ee["sigma_corr"].loc["x2"] < ee["sigma_corr"].loc["x1"]
+
+
+def test_linear_function_b():
+    """Test case 1.b
+    This test case is taken from Ge, Q. & M. Menendez. 2017. Extending Morris
+    method for qualitative global sensitivity analysis of models with dependent
+    inputs. Reliability Engineering and System Safety 162 (2017) 28–39"""
+
+    n_inputs = 3
+    names = ["x1", "x2", "x3"]
+    params = pd.DataFrame(columns=["value"], data=np.zeros(n_inputs), index=names)
+    cov = pd.DataFrame(
+        data=[[1, -0.9, -0.4], [-0.9, 1, 0.01], [-0.4, 0.01, 1]],
+        columns=names,
+        index=names,
+    )
+    n_draws = 100
+
+    ee = elementary_effects(simple_linear_model, params, cov, n_draws)
+
+    # In paper only plots are given, no exact values. Therefore assert ranking only.
+    # Assert mu_ind
+    assert ee["mu_ind"].loc["x1"] < ee["mu_ind"].loc["x2"] < ee["mu_ind"].loc["x3"]
+
+    # Assert sigma_ind (Values for x1 and x2 are very close in paper.)
+    assert ee["sigma_ind"].loc["x2"] < ee["sigma_ind"].loc["x3"]
+    assert ee["sigma_ind"].loc["x1"] < ee["sigma_ind"].loc["x3"]
+
+    # Assert mu_corr
+    assert ee["mu_corr"].loc["x2"] < ee["mu_corr"].loc["x1"] < ee["mu_corr"].loc["x3"]
+
+    # Assert sigma_corr
+    assert ee["sigma_corr"].loc["x2"] < ee["sigma_corr"].loc["x1"] < ee["sigma_corr"].loc["x3"]

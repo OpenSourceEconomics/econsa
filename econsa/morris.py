@@ -16,8 +16,20 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
+# from joblib import Parallel, delayed
 
-def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_cores=1):
+
+def elementary_effects(
+    func,
+    params,
+    cov,
+    n_draws,
+    sampling_scheme="sobol",
+    seed=1,
+    # parallel=False,
+    n_cores=1,
+    # parallel="joblib",
+):
     """Calculate Morris Indices of a model described by func.
 
     The distribution of the parameters is assumed to be multivariate normal, with
@@ -40,16 +52,40 @@ def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_co
         Number of draws
     sampling_scheme : str
         One of ["sobol", "random"]. Default: "sobol"
+    n_cores : int
+        Default: 1. Number of cpu cores one wants to use for parallelizing the model
+        evaluation step.
+    parallel : bool
+        Whether multiprocessing is used when computing the model output. Default: False
+    seed : int
+        Seed for quasi-random samples if ``sampling_scheme`` is "sobol".
 
     Returns
     -------
-    mu_ind : float
-        Absolute mean of independent part of elementary effects
-    sigma_ind : float
-        Standard deviation of independent part of elementary effects
+    Results : dict
+        "mu_ind": pd.Series
+            Absolute mean of independent part of elementary effects.
+        "mu_corr": pd.Series
+            Absolute mean of full part of elementary effects.
+        "sigma_ind": pd.Series
+            Standard deviation of independent part of elementary effects.
+        "sigma_corr": pd.Series
+            Standard deviation of full part of elementary effects.
+        "mu_ind_cum": pd.DataFrame
+            Cumulative absolute mean of elementary effect of each parameter.
+            There is one column per parameter.
+        "mu_corr_cum": pd.DataFrame
+            Cumulative absolute mean of elementary effect of each parameter.
+            There is one column per parameter.
+        "sigma_ind_cum": pd.DataFrame
+            Cumulative standard deviation of elementary effect of each parameter.
+            There is one column per parameter.
+        "sigma_corr_cum": pd.DataFrame
+            Cumulative standard deviation of elementary effect of each parameter.
+            There is one column per parameter.
 
     """
-    u_a, u_b = _get_uniform_base_draws(n_draws, len(params), sampling_scheme)
+    u_a, u_b = _get_uniform_base_draws(n_draws, len(params), sampling_scheme, seed)
     z_a = _uniform_to_standard_normal(u_a)
     z_b = _uniform_to_standard_normal(u_b)
     mean_np = params["value"].to_numpy()
@@ -115,7 +151,7 @@ def elementary_effects(func, params, cov, n_draws, sampling_scheme="sobol", n_co
     return res
 
 
-def _get_uniform_base_draws(n_draws, n_params, sampling_scheme):
+def _get_uniform_base_draws(n_draws, n_params, sampling_scheme, seed):
     """Get uniform random draws.
 
     Questions:
@@ -133,7 +169,11 @@ def _get_uniform_base_draws(n_draws, n_params, sampling_scheme):
 
     """
     if sampling_scheme == "sobol":
-        u = cp.generate_samples(order=n_draws, domain=2 * n_params, rule="S").reshape(
+        # u = cp.generate_samples(order=n_draws, domain=2 * n_params, rule="S").reshape(
+        #     n_draws,
+        #     -1,
+        # )
+        u = cp.create_sobol_samples(order=n_draws, dim=2 * n_params, seed=seed).reshape(
             n_draws,
             -1,
         )
@@ -315,10 +355,23 @@ def _evaluate_model(func, params, sample, n_cores):
             par["value"] = sample[d, p]
             inputs.append(par)
 
+    # if parallel == "multiprocessing":
+    #     p = Pool(processes=n_cores)
+    #     evals_flat = p.map(func, inputs)
+    # elif parallel == "joblib":
+    #     evals_flat = Parallel(n_jobs=n_cores)(delayed(func)(inp) for inp in inputs)
+    # else:
+    #     raise ValueError
+
+    # if parallel:
+    #     evals_flat = Parallel(n_jobs=n_cores)(delayed(func)(inp) for inp in inputs)
+    # elif not parallel:
+    #     evals_flat = func(inputs)
+    # else:
+    #     raise ValueError
+
     p = Pool(processes=n_cores)
     evals_flat = p.map(func, inputs)
-
-    # evals_flat = Parallel(n_jobs=n_cores)(delayed(func)(inp) for inp in inputs)
 
     evals = np.array(evals_flat).reshape(n_draws, n_params)
 
