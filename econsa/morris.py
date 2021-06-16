@@ -133,7 +133,7 @@ def _get_uniform_base_draws(n_draws, n_params, sampling_scheme):
 
     """
     if sampling_scheme == "sobol":
-        u = cp.generate_samples(order=n_draws * 2 * n_params, rule="S").reshape(
+        u = cp.generate_samples(order=n_draws, domain=2 * n_params, rule="S").reshape(
             n_draws,
             -1,
         )
