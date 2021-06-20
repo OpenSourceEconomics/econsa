@@ -6,6 +6,9 @@ jobs:
   run-tests:
     name: Run tests for ${{ matrix.os }} on ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash -l {0}
 
     strategy:
       fail-fast: false
@@ -19,32 +22,33 @@ jobs:
     - uses: conda-incubator/setup-miniconda@v2
       with:
           auto-update-conda: false
+          mamba-version: "*"
           activate-environment: econsa
           environment-file: environment.yml
           python-version: ${{ matrix.python-version }}
 
+    # Dear fellow dev:
+    # Please keep this step in the CI as long as we still use conda.
+    # If you are not debugging, just comment them out.
+    # - name: (Debug) Check system status.
+    #   run: |
+    #     conda info
+    #     conda config --show-sources
+    #     # printenv | sort
+
     - name: Run test suite.
-      shell: bash -l {0}
       run: |
         pytest --cov=econsa --cov-report=xml
 
     - name: Run figures.
       if: runner.os == 'Linux'
-      shell: bash -l {0}
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
         source .envrc
         run-figures
 
     - name: Upload coverage to Codecov.
-      if: runner.os == 'Linux' && matrix.python-version == '3.7'
+      if: runner.os == 'Linux' && matrix.python-version == '3.9'
       uses: codecov/codecov-action@v1
       with:
         file: coverage.xml
-
-    - name: Run pre-commits.
-      if: runner.os == 'Linux'
-      shell: bash -l {0}
-      run: |
-        pre-commit install
-        pre-commit run --all-files

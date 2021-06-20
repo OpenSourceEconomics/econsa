@@ -1,47 +1,54 @@
 name: econsa
 
 channels:
-  - defaults
   - conda-forge
+  - defaults
   - opensourceeconomics
 
 dependencies:
-  - python=3.7
-  - sphinx
-  - pandas
-  - numpy=1.18
+  - python
   - pip
+
+  - pandas
+  - numpy<1.20
+  - numpoly<1.2.0
   - scipy
   - statsmodels
-  - ipykernel
-  - jupyterlab
+  - matplotlib-base
   - seaborn
   - numba
-  - pdbpp
-  - matplotlib-base
   - temfpy>=1.1
   - chaospy
+
+  - ipykernel
+  - jupyterlab
+
   - pre-commit
-  - pytest=5.4.3
+  - pytest
   - pytest-cov
   - pytest-sugar
   - pytest-black
   - pytest-flake8
-  - black>=20.8b0
+  - black
+  - pdbpp
   - hypothesis
+
+  - sphinx
   - nbsphinx
+  - numpydoc
   - sphinx_rtd_theme
-  - sphinxcontrib-bibtex
+  - sphinxcontrib-bibtex>=2.0.0
+
   - r-base
   - r-r.utils
   - r-condmvnorm
-  - rpy2==2.9.4
+  - rpy2
 
   - pip:
+    # Dear fellow dev:
+    # Please check twice before you add anything here
+    # that you absolutely cannot find it with https://anaconda.org/search.
     - pytest-stress
     - pytest-randomly
     - black-nb
     - flake8-nb
-    - numpydoc
-    - cairosvg
-    - sphinxcontrib-svg2pdfconverter[CairoSVG]
