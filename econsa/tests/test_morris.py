@@ -93,7 +93,7 @@ def test_sampling_scheme():
         columns=names,
         index=names,
     )
-    n_draws = 1000
+    n_draws = 1500
 
     ee_sobol = elementary_effects(simple_linear_model, params, cov, n_draws, "sobol")
 
