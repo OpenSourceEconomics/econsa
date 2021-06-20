@@ -16,8 +16,6 @@ import numpy as np
 import pandas as pd
 from scipy.stats import norm
 
-# from joblib import Parallel, delayed
-
 
 def elementary_effects(
     func,
@@ -25,10 +23,8 @@ def elementary_effects(
     cov,
     n_draws,
     sampling_scheme="sobol",
-    seed=1,
-    # parallel=False,
     n_cores=1,
-    # parallel="joblib",
+    seed=1,
 ):
     """Calculate Morris Indices of a model described by func.
 
@@ -55,8 +51,6 @@ def elementary_effects(
     n_cores : int
         Default: 1. Number of cpu cores one wants to use for parallelizing the model
         evaluation step.
-    parallel : bool
-        Whether multiprocessing is used when computing the model output. Default: False
     seed : int
         Seed for quasi-random samples if ``sampling_scheme`` is "sobol".
 
