@@ -12,9 +12,6 @@ import pandas as pd
 
 from econsa.sampling import cond_mvn
 
-# from joblib import delayed
-# from joblib import Parallel
-
 
 def get_shapley(
     method,
@@ -34,13 +31,13 @@ def get_shapley(
     This function calculates Shapley effects and their standard errors for
     models with both dependent and independent inputs. We allow for two ways
     to calculate Shapley effects: by examining all permutations of the given
-    inputs or alternatively, by randomly sampling permutations of inputs.
+    inputs or, alternatively, by randomly sampling permutations of inputs.
 
-    This function is an implementation of algorithm 1 from Song, E., Nelson, B., &
+    This function implements algorithm 1 from Song, E., Nelson, B., &
     Staum, J. (2016). Shapley Effects for Global Sensitivity Analysis: Theory and
     Computation. SIAM/ASA J. Uncertain. Quantification, 4, 1060-1083.
 
-    The function is a translation of the exact (``shapleyPermEx_`` )and random
+    The function is a translation of the exact (``shapleyPermEx_`` ) and random
     permutation functions (``shapleyPermRand_``) found in R's ``sensitivity`` package,
     and takes the method (either ``exact`` or ``random``) as an argument and therefore
     estimates Shapley effects in both ways.
@@ -61,7 +58,7 @@ def get_shapley(
            ``random`` otherwise.
 
     model : string
-        The model/function you will calculate the shapley effects on.
+        The model/function to compute Shapley effects for.
 
     x_all : string (n)
         A function that takes `n` as an argument and generates an n-sample of
@@ -94,10 +91,6 @@ def get_shapley(
         The inner Monte Carlo sample size to estimate the cost function for
         `c(J) = Var[Y|X]`.
 
-    n_jobs : int
-        Default: 1. Number of cpu cores one wants to use for parallelizing the model
-        evaluation step using Joblib.
-
     seed : int
         Default: 123. Seed for randomly selecting permutations, if n_perms specified
         by an integer <= factorial of n_inputs.
@@ -105,8 +98,8 @@ def get_shapley(
     Returns
     -------
     effects : DataFrame
-            n dimensional DataFrame with the estimated shapley effects, the
-            standard errors and the confidence intervals for the input vectors.
+        n-dimensional DataFrame with the estimated shapley effects, the
+        standard errors and the confidence intervals for the input vectors.
 
     """
 
