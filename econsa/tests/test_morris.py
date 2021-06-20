@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from numpy.testing import assert_allclose
 from numpy.testing import assert_array_almost_equal as aaae
 
 from econsa.morris import _shift_cov
@@ -83,31 +84,6 @@ def simple_linear_model(x):
     return np.sum(x)
 
 
-def test_set_seed():
-
-    names = ["x1", "x2", "x3"]
-    params = pd.DataFrame(columns=["value"], data=[0, 0.0, 0], index=names)
-
-    cov = pd.DataFrame(
-        data=[[1, 0.9, 0.4], [0.9, 1, 0.01], [0.4, 0.01, 1]],
-        columns=names,
-        index=names,
-    )
-    n_draws = 100
-
-    elementary_effects(model_func, params, cov, n_draws, seed=124)
-
-    # ee = elementary_effects(model_func, params, cov, n_draws)
-
-    # ee_123 = elementary_effects(model_func, params, cov, n_draws, seed=124)
-
-    # aaae(ee["mu_ind"], ee_123["mu_ind"])
-    # aaae(ee["sigma_ind"], ee_123["sigma_ind"])
-
-    # aaae(ee["mu_corr"], ee_123["mu_corr"])
-    # aaae(ee["sigma_corr"], ee_123["sigma_corr"])
-
-
 def test_sampling_scheme():
     n_inputs = 3
     names = ["x1", "x2", "x3"]
@@ -117,19 +93,15 @@ def test_sampling_scheme():
         columns=names,
         index=names,
     )
-    n_draws = 100
+    n_draws = 1000
 
-    elementary_effects(simple_linear_model, params, cov, n_draws, "random")
+    ee_sobol = elementary_effects(simple_linear_model, params, cov, n_draws, "sobol")
 
-    # ee_sobol = elementary_effects(simple_linear_model, params, cov, n_draws, "sobol")
+    ee_random = elementary_effects(simple_linear_model, params, cov, n_draws, "random")
 
-    # ee_random = elementary_effects(simple_linear_model, params, cov, n_draws, "random")
+    assert_allclose(ee_sobol["mu_ind"], ee_random["mu_ind"], rtol=0.07)
 
-    # aaae(ee_sobol["mu_ind"], ee_random["mu_ind"])
-    # aaae(ee_sobol["sigma_ind"], ee_random["sigma_ind"])
-
-    # aaae(ee_sobol["mu_corr"], ee_random["mu_corr"])
-    # aaae(ee_sobol["sigma_corr"], ee_random["sigma_corr"])
+    assert_allclose(ee_sobol["mu_corr"], ee_random["mu_corr"], rtol=0.07)
 
 
 def test_linear_function_a():
@@ -191,8 +163,8 @@ def test_different_seed_linear_function_a():
         cov,
         n_draws,
         sampling_scheme,
-        seed,
         n_cores,
+        seed,
     )
 
     # In paper only plots are given, no exact values. Therefore assert ranking only.
