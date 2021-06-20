@@ -157,9 +157,6 @@ def get_shapley(
 
     # calculate model output
     output = model(model_inputs)
-    # output = Parallel(n_jobs=n_jobs)(delayed(model)(inp) for inp in model_inputs)
-    # p = Pool(processes=n_jobs)
-    # output = p.map(model, model_inputs)
 
     # Initialize Shapley, main and total Sobol effects for all players
     shapley_effects = np.zeros(n_inputs)
@@ -219,14 +216,11 @@ def get_shapley(
 
 def get_permutations(method, n_inputs, n_perms, seed):
     if method == "exact":
-        # permutations = list(itertools.permutations(range(n_inputs), n_inputs))
-        # permutations = [list(i) for i in permutations]
         permutations = np.asarray(list(itertools.permutations(range(n_inputs), n_inputs)))
         n_perms = len(permutations)
+
     elif method == "random":
         permutations = np.zeros((n_perms, n_inputs), dtype=np.int64)
-        # for i in range(n_perms):
-        #     permutations[i] = np.random.permutation(n_inputs)
         rng = np.random.default_rng(seed)
         permutations[0] = rng.permutation(n_inputs)
         count = 1
