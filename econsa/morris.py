@@ -172,7 +172,8 @@ def _get_uniform_base_draws(n_draws, n_params, sampling_scheme, seed):
             -1,
         )
     elif sampling_scheme == "random":
-        u = np.random.uniform(low=1e-5, high=1 - 1e-5, size=(n_draws, 2 * n_params))
+        rng = np.random.default_rng(seed)
+        u = rng.uniform(low=1e-5, high=1 - 1e-5, size=(n_draws, 2 * n_params))
     else:
         raise ValueError
     u_a = u[:, :n_params]
