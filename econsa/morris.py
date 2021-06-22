@@ -163,10 +163,6 @@ def _get_uniform_base_draws(n_draws, n_params, sampling_scheme, seed):
 
     """
     if sampling_scheme == "sobol":
-        # u = cp.generate_samples(order=n_draws, domain=2 * n_params, rule="S").reshape(
-        #     n_draws,
-        #     -1,
-        # )
         u = cp.create_sobol_samples(order=n_draws, dim=2 * n_params, seed=seed).reshape(
             n_draws,
             -1,
@@ -349,21 +345,6 @@ def _evaluate_model(func, params, sample, n_cores):
             par = params.copy()
             par["value"] = sample[d, p]
             inputs.append(par)
-
-    # if parallel == "multiprocessing":
-    #     p = Pool(processes=n_cores)
-    #     evals_flat = p.map(func, inputs)
-    # elif parallel == "joblib":
-    #     evals_flat = Parallel(n_jobs=n_cores)(delayed(func)(inp) for inp in inputs)
-    # else:
-    #     raise ValueError
-
-    # if parallel:
-    #     evals_flat = Parallel(n_jobs=n_cores)(delayed(func)(inp) for inp in inputs)
-    # elif not parallel:
-    #     evals_flat = func(inputs)
-    # else:
-    #     raise ValueError
 
     p = Pool(processes=n_cores)
     evals_flat = p.map(func, inputs)
