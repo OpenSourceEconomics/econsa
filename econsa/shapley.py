@@ -23,7 +23,6 @@ def get_shapley(
     n_output,
     n_outer,
     n_inner,
-    # n_jobs=1,
     seed=123,
 ):
     """Shapley value function.
