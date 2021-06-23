@@ -59,7 +59,6 @@ Supported by
    motivation/index
    methods/index
    tutorials/index
-   projects
    versions
    acknowledgment
    resources
