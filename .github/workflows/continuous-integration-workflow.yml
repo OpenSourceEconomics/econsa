@@ -39,14 +39,12 @@ jobs:
     - name: Run test suite.
       run: |
         pytest --cov=econsa --cov-report=xml
-
     - name: Run figures.
       if: runner.os == 'Linux'
       run: |
         export PATH="$PATH:/usr/share/miniconda/bin"
         source .envrc
         run-figures
-
     - name: Upload coverage to Codecov.
       if: runner.os == 'Linux' && matrix.python-version == '3.9'
       uses: codecov/codecov-action@v1
