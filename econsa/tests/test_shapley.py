@@ -43,9 +43,9 @@ def test_get_shapley_exact():
     cov = np.array([[1.0, 0, 0], [0, 1.0, 1.8], [0, 1.8, 4.0]])
     method = "exact"
     n_perms = None
-    n_output = 10 ** 4
-    n_outer = 10 ** 3
-    n_inner = 10 ** 2
+    n_output = 10**4
+    n_outer = 10**3
+    n_inner = 10**2
 
     col = ["X" + str(i) for i in np.arange(n_inputs) + 1]
     names = ["Shapley effects", "std. errors", "CI_min", "CI_max"]
@@ -107,7 +107,7 @@ def test_get_shapley_random():
     cov = np.array([[1.0, 0, 0], [0, 1.0, 1.8], [0, 1.8, 4.0]])
     method = "random"
     n_perms = 30000
-    n_output = 10 ** 4
+    n_output = 10**4
     n_outer = 1
     n_inner = 3
 
