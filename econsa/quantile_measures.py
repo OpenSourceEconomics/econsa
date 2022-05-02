@@ -250,16 +250,16 @@ def _dlr_conditional_samples(x):
     n_draws, n_params = x.shape
 
     # The dependence of m versus n_draws accroding to S. Kucherenko and S. Song(2017).
-    if n_draws == 2 ** 6:
-        m = 2 ** 3
-    elif n_draws in [2 ** 7, 2 ** 8, 2 ** 9]:
-        m = 2 ** 4
-    elif n_draws == 2 ** 10:
-        m = 2 ** 5
-    elif n_draws in [2 ** 11, 2 ** 12, 2 ** 13]:
-        m = 2 ** 6
-    elif n_draws in [2 ** 14, 2 ** 15]:
-        m = 2 ** 7
+    if n_draws == 2**6:
+        m = 2**3
+    elif n_draws in [2**7, 2**8, 2**9]:
+        m = 2**4
+    elif n_draws == 2**10:
+        m = 2**5
+    elif n_draws in [2**11, 2**12, 2**13]:
+        m = 2**6
+    elif n_draws in [2**14, 2**15]:
+        m = 2**7
     else:
         raise NotImplementedError
 

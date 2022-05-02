@@ -186,14 +186,14 @@ def get_shapley(
                 delta = estimated_cost - previous_cost
 
             shapley_effects[perms[j]] = shapley_effects[perms[j]] + delta
-            shapley_effects_squared[perms[j]] = shapley_effects_squared[perms[j]] + delta ** 2
+            shapley_effects_squared[perms[j]] = shapley_effects_squared[perms[j]] + delta**2
 
             previous_cost = estimated_cost
 
     shapley_effects = shapley_effects / n_perms / output_variance
-    shapley_effects_squared = shapley_effects_squared / n_perms / (output_variance ** 2)
+    shapley_effects_squared = shapley_effects_squared / n_perms / (output_variance**2)
     standard_errors = np.sqrt(
-        (shapley_effects_squared - shapley_effects ** 2) / n_perms,
+        (shapley_effects_squared - shapley_effects**2) / n_perms,
     )
 
     # confidence intervals

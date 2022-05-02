@@ -77,7 +77,7 @@ def test_1(test_1_fixture):
 
     for estimator, n_draws, decimal in zip(
         ["DLR", "DLR", "DLR", "DLR", "brute force"],
-        [2 ** 6, 2 ** 9, 2 ** 10, 2 ** 13, 3000],
+        [2**6, 2**9, 2**10, 2**13, 3000],
         [0, 1, 1, 2, 2],
     ):
         norm_q_2_solve = p_measures(
@@ -97,7 +97,7 @@ def test_wrong_value_criterion(test_1_fixture):
     # remove the last item in dictionary.
     test_1_fixture.popitem()
 
-    p_measures = partial(mc_quantile_measures, n_draws=2 ** 10, **test_1_fixture)
+    p_measures = partial(mc_quantile_measures, n_draws=2**10, **test_1_fixture)
 
     for estimator, scheme in zip(["double loop reordering", "DLR"], ["sobol", "halton"]):
         with pytest.raises(ValueError):
@@ -112,7 +112,7 @@ def test_not_implemented_criterion(test_1_fixture):
 
     p_measures = partial(mc_quantile_measures, estimator="DLR", **test_1_fixture)
 
-    for dist_type, n_draws in zip(["Gamma", "Normal"], [2 ** 10, 2 ** 5]):
+    for dist_type, n_draws in zip(["Gamma", "Normal"], [2**10, 2**5]):
         with pytest.raises(NotImplementedError):
             p_measures(dist_type=dist_type, n_draws=n_draws)
 
@@ -169,7 +169,7 @@ def test_2():
 
     for estimator, n_draws in zip(
         ["DLR", "brute force"],
-        [2 ** 14, 3000],
+        [2**14, 3000],
     ):
         norm_q_2_solve = mc_quantile_measures(
             estimator=estimator,
@@ -242,7 +242,7 @@ def test_3():
     # Here we test naive monte carlo estimates by specifying `sampling_scheme` to "random".
     for estimator, n_draws in zip(
         ["DLR", "brute force"],
-        [2 ** 14, 3000],
+        [2**14, 3000],
     ):
         norm_q_2_solve = mc_quantile_measures(
             estimator=estimator,
