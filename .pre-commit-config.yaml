@@ -1,7 +1,7 @@
 exclude: (bin/run-figures)
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.1.0
+    rev: v4.2.0
     hooks:
     -   id: check-added-large-files
         args: ['--maxkb=10000'] # 100 is too small for graphs
@@ -13,21 +13,21 @@ repos:
     -   id: mixed-line-ending
     -   id: trailing-whitespace
 -   repo: https://github.com/asottile/blacken-docs
-    rev: v1.7.0
+    rev: v1.12.1
     hooks:
     -   id: blacken-docs
         files: '(\.md|\.rst)$'
         additional_dependencies: [black]
 -   repo: https://github.com/psf/black
-    rev: 20.8b0
+    rev: 22.3.0
     hooks:
     -   id: black
         args: ['--line-length=100']
         files: '(\.pyi?|wscript|ipynb)$'
         language_version: python3
         additional_dependencies: [black-nb]
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.8.3
+-   repo: https://github.com/PyCQA/flake8
+    rev: 4.0.1
     hooks:
     -   id: flake8
         files: '(\.pyi?|wscript|ipynb)$'
@@ -41,13 +41,13 @@ repos:
         #     flake8-todo, flake8-unused-arguments, pep8-naming, pydocstyle, Pygments,
         # ]
 -   repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.3.0
+    rev: v3.1.0
     hooks:
     -   id: reorder-python-imports
         files: '(\.pyi?|wscript)$'
         exclude: '.*conf(ig)*\.py'
 -   repo: https://github.com/asottile/add-trailing-comma
-    rev: v2.0.1
+    rev: v2.2.3
     hooks:
     -   id: add-trailing-comma
         args: [--py36-plus]
