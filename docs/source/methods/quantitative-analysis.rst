@@ -10,6 +10,9 @@ We implement the methods outlined in :cite:`Kucherenko.2012`.
 
 **Constributor:** Tim Mensinger (`timmens <https://github.com/timmens>`_)
 
+.. automodule:: econsa.kucherenko
+    :members:
+
 Shapley values
 --------------
 

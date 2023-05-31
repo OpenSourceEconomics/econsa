@@ -1,3 +1,5 @@
+.idea/
+.vscode/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -133,3 +135,5 @@ dmypy.json
 *.sublime-workspace
 
 *data/
+
+!literature/SobolGSA_code.zip
